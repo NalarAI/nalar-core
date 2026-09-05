@@ -158,7 +158,9 @@ def selisih_tarif(model, kamus, arr, idx, episodes, tabel: TabelTarif, dev,
     model.eval()
     id_mask = kamus.id(MASK)
     penanda_trf = kamus.id("[BID:TRF]")
+    penanda_dxs = kamus.id("[BID:DXS]")
     f_trf = FIELD_ID["TRF"]
+    f_dxs = FIELD_ID["DXS"]
     tok_cbg = torch.from_numpy(tabel.tok_id).to(dev)
     tok_kls = torch.from_numpy(tabel.tok_kelas).to(dev)
 
@@ -189,6 +191,22 @@ def selisih_tarif(model, kamus, arr, idx, episodes, tabel: TabelTarif, dev,
             if p.size > 1:
                 pos_kls[b] = p[1]      # lalu kelas rawat
             tok[b, m] = id_mask
+
+            # Diagnosis sekunder ikut ditutup, dan ini yang menentukan.
+            #
+            # Versi pertama hanya menutup bidang tarif. Akibatnya fatal:
+            # upcoding bekerja dengan menambah diagnosis sekunder, dan
+            # diagnosis sekunder itu tetap terlihat model. Model membaca kode
+            # palsunya, menebak kelompok tarif tinggi dengan benar, dan
+            # selisihnya nol. Kepala ini jadi buta terhadap modus yang justru
+            # menjadi sasaran utamanya.
+            #
+            # Dengan diagnosis sekunder ikut ditutup, pertanyaannya berubah
+            # menjadi yang benar: tarif seperti apa yang didukung bukti klinis,
+            # tanpa memandang komorbiditas yang diakui pengaju klaim.
+            md = ((np.arange(T) < pjg[b]) & (fld[b] == f_dxs)
+                  & (tok[b] != penanda_dxs))
+            tok[b, md] = id_mask
 
         logit, _, _ = model(torch.from_numpy(tok).to(dev),
                             torch.from_numpy(fld).to(dev),
