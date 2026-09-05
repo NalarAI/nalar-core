@@ -179,10 +179,14 @@ def utama():
         "nalar_gabungan_lama": k1 * np.clip(k2_selisih, 0, None),
         "mesin_aturan": skor_aturan,
         "regresi_logistik": skor_reg,
+        "nilai_klaim": np.array(
+            [r["tarif"] + r.get("tagih_bhp", 0) for r in eps_te],
+            dtype=np.float64),
         "acak": rng.random(len(idx_te)),
     }
     hasil = metrik.kurva(penskor, sel_te, cur_te, daftar_k)
-    for nama in ("nalar", "nalar_k2_saja", "regresi_logistik"):
+    for nama in ("nalar", "nalar_k2_saja", "regresi_logistik",
+                 "nilai_klaim"):
         hasil[nama]["peningkatan_atas_aturan"] = metrik.peningkatan_atas(
             hasil, nama, "mesin_aturan", daftar_k)
     hasil["_total_selisih_tersedia"] = round(float(sel_te.sum()))
@@ -352,10 +356,16 @@ def utama():
     for nama in ("nalar_k3_saja", "nalar_k2_plus_k3"):
         hasil2[nama]["peningkatan_atas_aturan"] = metrik.peningkatan_atas(
             hasil2, nama, "mesin_aturan", daftar_k)
+        # Peningkatan atas garis dasar urutkan menurut nilai klaim. Inilah
+        # pembanding yang paling jujur untuk sistem yang keluarannya rupiah,
+        # karena mengurutkan klaim termahal lebih dulu itu gratis dan tidak
+        # butuh model sama sekali.
+        hasil2[nama]["peningkatan_atas_nilai_klaim"] = metrik.peningkatan_atas(
+            hasil2, nama, "nilai_klaim", daftar_k)
     catatan["metrik_dengan_k3"] = {
         k: v for k, v in hasil2.items()
         if k in ("nalar", "nalar_k3_saja", "nalar_k2_plus_k3",
-                 "mesin_aturan", "regresi_logistik")}
+                 "mesin_aturan", "regresi_logistik", "nilai_klaim")}
 
     catatan["waktu_total_detik"] = round(time.time() - t_mulai, 1)
     os.makedirs(os.path.dirname(a.keluaran), exist_ok=True)
@@ -375,9 +385,13 @@ def utama():
     h2 = catatan["metrik_dengan_k3"]
     print(f"  K3 saja rupiah@{k}: "
           f"Rp {h2['nalar_k3_saja']['rupiah_pada_k'][k]/1e6:.1f} juta")
+    print(f"  nilai klaim saja rupiah@{k}: "
+          f"Rp {hasil['nilai_klaim']['rupiah_pada_k'][k]/1e6:.1f} juta")
     print(f"  K2+K3   rupiah@{k}: "
           f"Rp {h2['nalar_k2_plus_k3']['rupiah_pada_k'][k]/1e6:.1f} juta   "
-          f"peningkatan {h2['nalar_k2_plus_k3']['peningkatan_atas_aturan']}")
+          f"peningkatan atas aturan {h2['nalar_k2_plus_k3']['peningkatan_atas_aturan']}")
+    print(f"  K2+K3 peningkatan atas nilai klaim: "
+          f"{h2['nalar_k2_plus_k3']['peningkatan_atas_nilai_klaim']}")
 
 
 if __name__ == "__main__":
