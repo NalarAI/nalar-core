@@ -562,3 +562,142 @@ untuk soal ini.
 Regresi logistik berlabel tetap unggul, Rp 1.207,7 juta. Jaraknya melebar dari
 seperlima menjadi sekitar sepertiga. Sistem berlabel makin bernilai, dan itu
 memperkuat rekomendasi P4.
+
+---
+
+## Percobaan 6 sampai 9, 6 September 2026
+
+Empat percobaan yang saling menjawab. Yang paling berharga di antaranya adalah
+yang menunjukkan model kami kalah dari sesuatu yang gratis.
+
+### Ablasi tabel tarif: dugaan soal keadilan terkonfirmasi
+
+`runs/p6_penuh.json` melawan `runs/p6_ablasi_tarif.json`. Data, model, benih,
+dan langkah pelatihan persis sama. Yang berbeda hanya tabel tarifnya.
+
+| | Tarif resmi | Tarif tebakan |
+|---|---:|---:|
+| Keadilan, rasio maks min | **1,737 lulus** | **3,539 gagal** |
+| rp@50 | 322,0 jt | 112,2 jt |
+| lift@50 atas aturan | 2,534 | 0,777 |
+| lift@1000 atas aturan | 1,162 | 0,770 |
+
+Dugaan pada percobaan 5 benar. **Tabel tarif yang menyebabkan uji keadilan
+berubah dari gagal menjadi lulus.** Dengan tarif tebakan yang hampir seragam,
+model bersandar pada ciri faskes untuk membedakan klaim, dan ciri faskes itulah
+yang menghasilkan ketimpangan antar kelas rumah sakit. Dengan tarif yang benar
+benar berbeda antar kelompok, sinyalnya pindah ke isi klinis.
+
+Ini temuan yang layak dibawa ke proposal. Masalah keadilan diselesaikan dengan
+memperbaiki data acuan, bukan dengan menyetel model.
+
+Angka lain di tabel itu juga menegaskan: tanpa tabel tarif resmi, seluruh
+keunggulan model hilang. Dari 2,534 kali menjadi 0,777 kali, artinya kalah dari
+mesin aturan di mana mana.
+
+### Garis dasar yang seharusnya sejak awal ada
+
+Ablasi pralatih memberi hasil yang mengganggu. Model dengan tiga puluh langkah
+menemukan Rp 862,3 juta, sedangkan model dengan tiga ribu langkah Rp 765,7 juta.
+Model yang nyaris tanpa latihan **lebih baik**.
+
+Sebabnya ketahuan begitu dipikirkan. Pada model tanpa latihan, sebaran atas
+kelompok tarif hampir seragam, sehingga skornya menyusut menjadi tarif dikurangi
+rata rata tarif. Itu sama saja dengan mengurutkan klaim menurut nilainya.
+
+Jadi kami menambahkan garis dasar yang seharusnya sejak awal ada:
+**urutkan menurut nilai klaim**. Gratis, tanpa model, tanpa data acuan apa pun.
+
+Hasilnya menampar. Sebelum K7 ditambahkan:
+
+| k | NALAR K2+K3 | Nilai klaim saja | Lift |
+|---|---:|---:|---:|
+| 50 | 322,0 jt | 298,6 jt | 1,078 |
+| 100 | 429,7 jt | 453,0 jt | 0,949 |
+| 500 | 685,6 jt | 810,1 jt | 0,846 |
+| 1000 | 750,5 jt | 978,8 jt | 0,767 |
+
+**Model kalah dari mengurutkan klaim mahal lebih dulu**, kecuali tipis di lima
+puluh teratas. Seluruh keunggulan 2,53 kali atas mesin aturan itu nyata, tapi
+mesin aturan ternyata tolok ukur yang salah. Yang benar tolok ukur gratis ini.
+
+### Membedah dari mana uangnya berasal
+
+Sebelum menebak lagi, kami hitung. Dari Rp 5,23 miliar selisih pada 7.356 klaim:
+
+| Modus | Porsi rupiah |
+|---|---:|
+| Barang habis pakai fiktif, M17 | sekitar 36 persen bersama kombinasinya |
+| Penagihan berulang, M11 | sekitar 24 persen |
+| Harga digelembungkan, M07 | sekitar 17 persen |
+| **Upcoding, M04** | **sekitar 12 persen** |
+| Klaim fiktif, M06 | sekitar 4 persen |
+
+**Upcoding, sasaran utama kepala K2, hanya dua belas persen uangnya.** Dua modus
+terbesar menyentuh tagihan barang, dan tidak satu pun kepala punya mekanisme
+melihatnya, karena semuanya menyasar kelompok tarif.
+
+Sebelum ini kami sempat menduga masalahnya pada penutupan bidang, dan menambah
+diagnosis sekunder ke daftar yang ditutup. Perbaikan itu benar secara prinsip,
+tapi hasilnya hampir tidak berubah, 764,8 juta melawan 750,5 juta. Menebak dua
+kali, meleset dua kali. Menghitung sekali, langsung ketemu.
+
+### Kepala K7 dan hasilnya
+
+Token bahan habis pakai diberi pita jumlah, lalu K7 menutup bidang itu dan
+membandingkan nilai yang ditagihkan dengan nilai yang wajar untuk tindakan dan
+lama rawat seperti ini.
+
+`runs/p9_k7.json`, konfigurasi sama persis dengan sebelumnya:
+
+| Penskor | rp@50 | rp@100 | rp@500 | rp@1000 | presisi@1000 |
+|---|---:|---:|---:|---:|---:|
+| **NALAR semua** | 298,6 jt | 453,0 jt | 922,9 jt | **1.152,4 jt** | **0,362** |
+| NALAR K7 saja | 95,1 jt | 217,4 jt | 643,6 jt | 737,3 jt | 0,477 |
+| NALAR K2+K3 | 298,6 jt | 429,7 jt | 711,4 jt | 754,2 jt | 0,162 |
+| Nilai klaim saja | 298,6 jt | 453,0 jt | 810,1 jt | 978,8 jt | 0,199 |
+| Mesin aturan | 127,1 jt | 247,2 jt | 573,6 jt | 658,9 jt | 0,312 |
+| Regresi logistik berlabel | 319,0 jt | 464,7 jt | 870,9 jt | 1.207,7 jt | 0,345 |
+
+Peningkatan atas mesin aturan: 2,35 kali pada lima puluh, 1,833 pada seratus,
+**1,749 pada seribu**, naik dari 1,161.
+
+Peningkatan atas nilai klaim: 1,056 pada dua ratus lima puluh, 1,139 pada lima
+ratus, **1,177 pada seribu**. Model akhirnya mengalahkan garis dasar gratis itu.
+
+Tiga hal yang berubah sekaligus:
+
+1. **Presisi melonjak dari 0,112 ke 0,362**, melewati mesin aturan yang 0,312.
+   Pembalikan presisi dan rupiah yang selama empat percobaan menjadi ciri khas
+   hasil kami sebagian besar hilang.
+2. **Jarak ke sistem berlabel nyaris tertutup.** Rp 1.152,4 juta melawan
+   Rp 1.207,7 juta, yaitu 95 persen, tanpa memakai satu pun label.
+3. **K7 punya presisi tertinggi di antara seluruh kepala, 0,477.**
+
+### Papan skor sekarang
+
+| Target | Hasil |
+|---|---|
+| T1 dua kali atas aturan pada seribu klaim | **belum**, 1,749. Tercapai pada lima puluh teratas, 2,35 |
+| T2 jaminan konformal | **tercapai**, tiga tingkat alpha |
+| T3 mengalahkan pohon berpenguat | belum diuji |
+| T4 pralatih memberi perbaikan | perlu diuji ulang setelah K7 |
+| T5 keadilan antar kelompok | **gagal tipis**, 2,017 dari batas 2,0. Sebelum K7 lulus di 1,737 |
+| T6 ketahanan pelaku | **tercapai**, 87,3 persen |
+| T7 faskes tak dikenal | tercapai, seluruh angka memakai pemisahan menurut faskes |
+
+T5 kembali gagal setelah K7 masuk, meski tipis. Perlu ditelusuri apakah kepala
+tagihan memperkenalkan ketimpangan baru, misalnya karena rumah sakit besar
+memakai lebih banyak bahan habis pakai.
+
+### Pelajaran metodologisnya
+
+Tiga kali berturut turut kami menebak penyebab dan meleset. Rumus penggabungan,
+penutupan bidang, lalu ukuran model. Yang akhirnya menyelesaikan bukan tebakan
+keempat, melainkan menghitung komposisi kebenaran dasar, sesuatu yang bisa
+dilakukan sejak hari pertama dan memakan waktu lima menit.
+
+Dan yang membuat seluruh rangkaian ini terjadi adalah satu garis dasar gratis
+yang sebelumnya tidak ada di daftar pembanding. Tanpa mengurutkan menurut nilai
+klaim, kami akan melaporkan 2,53 kali atas mesin aturan dan merasa berhasil,
+padahal saat itu model kalah dari menyortir spreadsheet.
