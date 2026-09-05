@@ -1,0 +1,112 @@
+"""Metrik operasional.
+
+Yang diukur bukan akurasi. Dengan prevalensi beberapa persen, menebak semuanya
+bersih sudah memberi akurasi di atas sembilan puluh persen. Yang diukur adalah
+berapa rupiah berlebih yang benar benar ditemukan pada anggaran audit tertentu,
+dan berapa lipat itu dibanding cara memilih audit yang dipakai sekarang.
+"""
+
+from __future__ import annotations
+
+import numpy as np
+
+
+def rupiah_pada_k(skor, selisih_benar, k):
+    """Jumlah selisih rupiah sebenarnya dari k klaim berperingkat teratas."""
+    skor = np.asarray(skor, dtype=np.float64)
+    sel = np.asarray(selisih_benar, dtype=np.float64)
+    k = min(int(k), len(skor))
+    if k <= 0:
+        return 0.0
+    urut = np.argsort(-skor)[:k]
+    return float(np.clip(sel[urut], 0, None).sum())
+
+
+def presisi_pada_k(skor, curang, k):
+    skor = np.asarray(skor, dtype=np.float64)
+    c = np.asarray(curang).astype(bool)
+    k = min(int(k), len(skor))
+    if k <= 0:
+        return 0.0
+    urut = np.argsort(-skor)[:k]
+    return float(c[urut].mean())
+
+
+def kurva(skor_dict, selisih, curang, daftar_k):
+    """Bandingkan beberapa penskor pada beberapa anggaran audit."""
+    hasil = {}
+    for nama, s in skor_dict.items():
+        hasil[nama] = {
+            "rupiah_pada_k": {int(k): round(rupiah_pada_k(s, selisih, k))
+                              for k in daftar_k},
+            "presisi_pada_k": {int(k): round(presisi_pada_k(s, curang, k), 4)
+                               for k in daftar_k},
+        }
+    return hasil
+
+
+def peningkatan_atas(hasil, nama_uji, nama_dasar, daftar_k):
+    """Berapa lipat model menemukan rupiah dibanding pembanding."""
+    out = {}
+    for k in daftar_k:
+        a = hasil[nama_uji]["rupiah_pada_k"][int(k)]
+        b = hasil[nama_dasar]["rupiah_pada_k"][int(k)]
+        out[int(k)] = round(a / b, 3) if b > 0 else None
+    return out
+
+
+def acak_dasar(selisih, k, n_ulang=200, seed=0):
+    """Rupiah yang ditemukan kalau audit dipilih acak. Batas bawah."""
+    rng = np.random.default_rng(seed)
+    sel = np.clip(np.asarray(selisih, dtype=np.float64), 0, None)
+    k = min(int(k), len(sel))
+    nilai = [sel[rng.choice(len(sel), size=k, replace=False)].sum()
+             for _ in range(n_ulang)]
+    return float(np.mean(nilai))
+
+
+def kalibrasi_selisih(perkiraan, benar, n_pita=8):
+    """Diagram keandalan untuk perkiraan selisih rupiah.
+
+    Ketika model memperkirakan selisih lima juta, apakah selisih sebenarnya
+    rata rata memang lima juta. Kalau tidak terkalibrasi, seluruh peringkat
+    audit salah, karena peringkatnya berdasarkan selisih.
+    """
+    p = np.asarray(perkiraan, dtype=np.float64)
+    b = np.asarray(benar, dtype=np.float64)
+    if len(p) < n_pita * 5:
+        return []
+    tepi = np.quantile(p, np.linspace(0, 1, n_pita + 1))
+    out = []
+    for i in range(n_pita):
+        m = (p >= tepi[i]) & (p <= tepi[i + 1] if i == n_pita - 1
+                              else p < tepi[i + 1])
+        if m.sum() < 5:
+            continue
+        out.append(dict(pita=i, n=int(m.sum()),
+                        perkiraan_rerata=round(float(p[m].mean())),
+                        benar_rerata=round(float(b[m].mean()))))
+    return out
+
+
+def keadilan_kelompok(tanda, kelompok, bersih):
+    """Laju penandaan per kelompok, dihitung hanya pada klaim yang bersih.
+
+    Sistem yang secara sistematis menuduh puskesmas di daerah akan dimatikan
+    dalam setahun, dan pantas dimatikan. Ini uji T5 pada rancangan.
+    """
+    tanda = np.asarray(tanda).astype(bool)
+    b = np.asarray(bersih).astype(bool)
+    kel = np.asarray(kelompok)
+    out = {}
+    for k in np.unique(kel):
+        m = (kel == k) & b
+        if m.sum() < 20:
+            continue
+        out[str(k)] = dict(n=int(m.sum()), laju=round(float(tanda[m].mean()), 5))
+    if len(out) >= 2:
+        laju = [v["laju"] for v in out.values()]
+        lo, hi = min(laju), max(laju)
+        out["_rasio_maks_min"] = round(hi / lo, 3) if lo > 0 else None
+        out["_lulus_batas_dua_kali"] = bool(lo > 0 and hi / lo <= 2.0)
+    return out
