@@ -28,6 +28,15 @@ Hasil percobaan ditulis ke `runs/percobaan.json`.
 
 Butuh Python 3.12, PyTorch, dan NumPy. Tidak butuh yang lain.
 
+Untuk GPU, pakai venv proyek:
+
+```
+./.venv/Scripts/python.exe scripts/percobaan.py --peserta 20000 --fkrtl 150     --fktp 900 --langkah 3000 --batch 128 --d 256 --lapis 8 --kepala 8 --dff 1024
+```
+
+Di RTX 5060 satu langkah memakan 0,104 detik untuk model tujuh juta parameter,
+sekitar lima puluh kali lebih cepat daripada CPU mesin ini.
+
 ## Isi
 
 | Berkas | Isi |
@@ -118,10 +127,11 @@ demi mengejar sasaran nasional. Daftar kondisi yang dilindungi ada di
 4. **Kepala K3, K4, dan K6 belum ditulis.** Yang jalan baru K1, K2, dan K5.
    Proses titik temporal, kelompok sebaya, dan titik perubahan masih rancangan.
 
-5. **Model belum dilatih pada perangkat keras yang memadai.** PyTorch di mesin
-   ini berjalan di CPU sekitar 10 GFLOPS. Konfigurasi penuh, 7 juta parameter,
-   memakan sekitar 5 detik per langkah. Percobaan yang sudah dijalankan memakai
-   konfigurasi kecil.
+5. **Memperbesar model tidak menambah rupiah yang ditemukan.** Model 7 juta
+   parameter dilatih 3.000 langkah menemukan Rp 1.430,3 juta. Model 0,97 juta
+   parameter dilatih 600 langkah menemukan Rp 1.439,7 juta. Rugi pralatih turun
+   jelas, jadi model besar memang menebak lebih baik, tapi kemampuan itu tidak
+   berubah menjadi uang. Penghambatnya cakupan kepala, bukan kapasitas model.
 
 6. **Semua data sintetis.** Tidak ada satu baris pun data peserta JKN yang
    nyata dipakai, sesuai butir 5.o dan bagian 12 panduan lomba.
@@ -139,13 +149,26 @@ Sudah dibuktikan:
   positif.
 - Pemisahan latih dan uji tidak bocor antar-faskes.
 
-Belum dibuktikan:
+- Kalibrasi konformal memenuhi jaminannya pada empat percobaan dan tiga
+  tingkat alpha, diuji dengan pemisahan menurut faskes.
+- Detektor membuat kecurangan tidak sepadan. Pelaku yang bisa melihat skor
+  detektor hanya sanggup mengambil dua sampai empat persen dari yang bisa
+  diambilnya tanpa pengawasan.
 
-- Apakah model mengalahkan mesin aturan. Ini target T1 pada rancangan, dan
-  angkanya ada di `runs/percobaan_cpu.json` setelah percobaan selesai.
-- Apakah model mengalahkan pohon berpenguat. Target T3.
-- Apakah pralatih memberi perbaikan nyata. Target T4.
-- Apakah kinerja bertahan pada faskes dan periode yang tidak pernah dilihat.
-  Target T7.
+Gagal, dan dilaporkan apa adanya:
+
+- Target T1, dua kali lipat rupiah atas mesin aturan. Yang didapat 1,20 sampai
+  1,44 kali.
+- Target T5, keadilan antar kelompok faskes. Rasio 2,46 sampai 5,09 kali,
+  batasnya dua kali. Model yang lebih baik justru lebih tidak adil.
+- Kepala K4 kelompok sebaya nyaris tidak lebih baik daripada menebak acak.
+
+Belum diuji:
+
+- Apakah model mengalahkan pohon berpenguat. Target T3. Pustakanya tidak
+  terpasang.
+- Apakah pralatih memberi perbaikan nyata. Target T4. Ablasi belum dijalankan.
 - Apakah data sintetis cukup realistis. Uji latih di sintetis uji di nyata
   belum dijalankan, karena butuh MIMIC atau DE-SynPUF.
+
+Rincian lengkap keempat percobaan ada di `TEMUAN.md`.

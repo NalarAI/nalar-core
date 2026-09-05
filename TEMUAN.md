@@ -219,3 +219,177 @@ menunjuk klaim yang bermasalah, meski nilainya kecil. Ini menguatkan
 pemakaiannya untuk penjelasan, bukan untuk peringkat.
 
 **K5 presisi sepuluh teratas 0,3**, lebih baik daripada K4 tapi masih lemah.
+
+---
+
+## Percobaan 3, 5 September 2026
+
+`runs/percobaan3.json`
+
+Pengaturan sama dengan percobaan 2. Yang berubah: klaim fiktif dibuat tampak
+lengkap, dan peringkat K4 memakai rata rata kelebihan rupiah per klaim.
+Uji pelaku dinaikkan menjadi empat ratus klaim rawat inap.
+
+### Hasil utama
+
+| Penskor | rp@100 | rp@500 | rp@1000 | presisi@1000 |
+|---|---:|---:|---:|---:|
+| NALAR | 454,1 jt | 1.258,8 jt | 1.439,7 jt | 0,160 |
+| NALAR rumus lama | 433,0 jt | 1.176,7 jt | 1.358,9 jt | 0,154 |
+| NALAR K1 saja | 62,5 jt | 291,6 jt | 535,5 jt | 0,762 |
+| Mesin aturan | 677,9 jt | 1.111,3 jt | 1.189,0 jt | 0,498 |
+| Regresi logistik | 684,4 jt | 1.324,1 jt | 1.639,1 jt | 0,260 |
+| Acak | 2,5 jt | 10,5 jt | 53,5 jt | 0,039 |
+
+Peningkatan atas mesin aturan naik dari 1,16 menjadi 1,21 kali setelah klaim
+fiktif dibuat realistis. Target T1, dua kali, tetap tidak tercapai.
+
+### Hasil terkuat proyek ini: uji pelaku yang beradaptasi
+
+Dua ratus sembilan puluh delapan klaim rawat inap bisa diserang.
+
+| Pelaku | Klaim diserang | Total diambil | Maksimum per klaim | Tertangkap |
+|---|---:|---:|---:|---:|
+| Serakah | 298 | Rp 3.241,3 jt | Rp 112,2 jt | 99,3% |
+| Hati hati, bisa melihat skor | 10 | Rp 11,8 jt | Rp 2,1 jt | 0% |
+| Menyebar | 298 | Rp 2.311,1 jt | Rp 59,9 jt | 96,6% |
+
+**Target T6 tercapai.** Penurunan keuntungan maksimum 98,1 persen, jauh di atas
+ambang setengah.
+
+Cara membacanya. Pelaku serakah mengambil Rp 3,24 miliar tapi hampir seluruhnya
+tertangkap. Pelaku yang punya orang dalam dan bisa melihat skor detektor lolos
+sepenuhnya, tapi ia hanya menemukan sepuluh klaim dari dua ratus sembilan puluh
+delapan yang bisa diserang tanpa memicu alarm, dan totalnya cuma Rp 11,8 juta.
+
+Ini ukuran yang benar untuk sistem pengawasan. Bukan berapa persen tertangkap,
+tapi apakah kecurangan masih sepadan dilakukan. Turun dari Rp 3,24 miliar
+menjadi Rp 11,8 juta berarti tidak sepadan lagi.
+
+Sepanjang penelusuran kami, evaluasi deteksi kecurangan kesehatan hampir selalu
+dilakukan pada data statis dengan pelaku yang dianggap tidak bergerak. Kami bisa
+mengujinya justru karena pembangkit datanya kami tulis sendiri.
+
+### Yang masih gagal
+
+**K4 tetap gagal.** Presisi sepuluh teratas tetap 0,2, sama dengan sebelum
+perubahan peringkat. Menebak acak memberi 0,16. Mengganti divergensi sebaran
+dengan rata rata kelebihan rupiah per klaim tidak menolong.
+
+Dugaan kami sekarang, masalahnya bukan pada statistiknya melainkan pada jumlah
+klaim per faskes di himpunan uji. Tiga puluh delapan faskes dinilai, banyak di
+antaranya di bawah dua ratus klaim. Pada jumlah sekecil itu, sinyal tingkat
+entitas tenggelam dalam derau. Perlu dijalankan ulang pada faskes dengan lebih
+banyak klaim sebelum menyimpulkan K4 tidak bekerja.
+
+**Uji keadilan T5 tetap gagal**, meski membaik dari 5,09 menjadi 2,46 kali.
+Batasnya dua kali. Rumah sakit tertentu masih ditandai lebih sering daripada
+FKTP pada klaim yang sama sama bersih.
+
+**K5 membaik** dari 0,3 ke 0,4.
+
+**Jaminan konformal tetap terpenuhi** pada tiga tingkat alpha.
+
+---
+
+## Percobaan 4, 5 September 2026, model ukuran penuh di GPU
+
+`runs/percobaan_gpu.json`
+
+Data sama persis dengan percobaan 3. Yang berubah hanya modelnya: 7,00 juta
+parameter melawan 0,97 juta, delapan lapis melawan empat, 3.000 langkah
+melawan 600. Dijalankan di RTX 5060 setelah PyTorch CUDA selesai terpasang.
+
+### Perbandingan langsung
+
+| | Kecil, 0,97 jt | Penuh, 7,00 jt |
+|---|---:|---:|
+| Langkah | 600 | 3.000 |
+| Rugi akhir | 2,848 | 2,110 |
+| Waktu total | 3.129 detik | 1.136 detik |
+| rp@1000 NALAR | 1.439,7 jt | 1.430,3 jt |
+| rp@1000 K1 saja | 535,5 jt | 725,9 jt |
+| presisi@1000 NALAR | 0,160 | 0,173 |
+| K4 presisi@10 | 0,2 | 0,3 |
+| K5 presisi@10 | 0,4 | 0,4 |
+| Keadilan, rasio maks min | 2,46 | 4,92 |
+| T6 penurunan keuntungan | 0,981 | 0,963 |
+
+### Temuan utama, dan ini temuan negatif
+
+**Model tujuh kali lebih besar, dilatih lima kali lebih lama, tidak menemukan
+rupiah lebih banyak.** Rp 1.430,3 juta melawan Rp 1.439,7 juta. Selisihnya
+kurang dari satu persen, dan arahnya justru sedikit turun.
+
+Rugi pralatih turun jelas, dari 2,848 ke 2,110, jadi model besar memang belajar
+menebak isi klaim lebih baik. Kemampuan menebak yang lebih baik itu tidak
+diterjemahkan menjadi uang yang ditemukan.
+
+Artinya penghambatnya bukan kapasitas model. Penghambatnya ada di kepala dan
+di cakupan. K1 dan K2 hanya menyentuh keluarga A, yaitu isi klaim yang tidak
+didukung bukti. Sebagian besar modus yang terinjeksi ada di keluarga B, yang
+soal waktu, dan keluarga C, yang soal pola entitas. Menambah parameter tidak
+membuat model melihat sesuatu yang tidak ada di pertanyaan yang diajukannya.
+
+Ini kesimpulan yang mahal untuk didapat dan murah untuk dipakai. Fase
+berikutnya harus dipakai menulis kepala K3, bukan memperbesar model.
+
+### Dua temuan tak terduga
+
+**1. Model yang lebih baik justru lebih mudah dihindari.**
+
+Pelaku hati hati yang bisa melihat skor detektor menemukan 38 klaim yang bisa
+diserang tanpa memicu alarm pada model besar, melawan 10 klaim pada model
+kecil. Yang bisa diambilnya naik dari Rp 11,8 juta menjadi Rp 81,3 juta, tujuh
+kali lipat.
+
+Dugaan kami, model yang lebih tajam memberi permukaan skor yang lebih halus,
+dan permukaan yang lebih halus lebih mudah ditelusuri pelaku yang mencari
+celah. Model yang kabur justru memaksa pelaku menebak.
+
+Kalau dugaan ini benar, ia menyentuh sesuatu yang jarang disebut: ketepatan dan
+ketahanan bisa saling bertentangan pada sistem yang lawannya manusia. Belum
+diuji cukup untuk disebut kesimpulan, tapi cukup untuk dijadikan pertanyaan
+penelitian.
+
+**2. Model yang lebih baik lebih tidak adil.**
+
+Rasio laju penandaan tertinggi terhadap terendah naik dari 2,46 menjadi 4,92
+kali. Keduanya di atas batas dua kali, jadi target T5 gagal pada keduanya, tapi
+arah perubahannya penting. Model yang lebih tajam memperbesar perbedaan antar
+kelompok faskes, bukan memperkecilnya.
+
+### Yang tetap bertahan
+
+Jaminan konformal terpenuhi pada tiga tingkat alpha, sekarang lebih rapat ke
+alpha yang diminta: 0,78 persen pada alpha satu persen, 1,80 persen pada dua
+persen, 4,76 persen pada lima persen. Model yang lebih terkalibrasi membuat
+jaminannya lebih efisien, bukan hanya aman.
+
+Target T6 tetap tercapai. Pelaku serakah mengambil Rp 3,24 miliar dan 93,6
+persen tertangkap. Pelaku hati hati turun ke Rp 81,3 juta, yaitu 2,5 persen
+dari yang bisa diambil tanpa pengawasan.
+
+---
+
+## Ringkasan seluruh percobaan
+
+| Target | Bunyi | Hasil |
+|---|---|---|
+| T1 | Dua kali lipat rupiah atas mesin aturan | **Gagal.** Terbaik 1,44 kali, terakhir 1,20 kali |
+| T2 | Jaminan konformal terpenuhi | **Tercapai** pada empat percobaan, tiga tingkat alpha |
+| T3 | Mengalahkan pohon berpenguat | **Belum diuji.** Pustakanya tidak terpasang |
+| T4 | Pralatih memberi perbaikan | **Belum diuji.** Ablasi belum dijalankan |
+| T5 | Laju penandaan antar kelompok tidak lebih dari dua kali | **Gagal.** 2,46 sampai 5,09 kali |
+| T6 | Keuntungan maksimum pelaku turun setengah | **Tercapai.** Turun 96 sampai 98 persen |
+| T7 | Bertahan pada faskes yang tidak pernah dilihat | **Tercapai sebagian.** Seluruh angka di atas sudah memakai pemisahan menurut faskes |
+
+Dua tercapai, dua gagal, dua belum diuji, satu tercapai sebagian.
+
+Yang paling perlu dikerjakan berikutnya, menurut urutan nilainya:
+
+1. Kepala K3 proses titik temporal. Percobaan 4 membuktikan memperbesar model
+   tidak menolong, dan sebagian besar modus ada di keluarga waktu dan entitas.
+2. Uji keadilan. Dua kali gagal, dan ini yang paling berbahaya bila diterapkan.
+3. Pohon berpenguat sebagai pembanding. Target T3 belum bisa dijawab.
+4. Menahan sebagian modus dari penulis mesin aturan, supaya pembandingnya adil.
