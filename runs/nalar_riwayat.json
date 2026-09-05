@@ -1,14 +1,14 @@
 [
  {
   "langkah": 1,
-  "rugi_latih": 7.375452518463135,
-  "rugi_valid": 6.606928904851277,
-  "detik": 3.3
+  "rugi_latih": 7.312226295471191,
+  "rugi_valid": 7.216725905736287,
+  "detik": 3.7
  },
  {
   "langkah": 25,
-  "rugi_latih": 4.62322473526001,
-  "rugi_valid": 4.5935196081797285,
-  "detik": 10.2
+  "rugi_latih": 6.229105472564697,
+  "rugi_valid": 6.159253756205241,
+  "detik": 10.1
  }
 ]

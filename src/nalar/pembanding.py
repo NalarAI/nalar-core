@@ -165,3 +165,98 @@ class RegresiLogistik:
     def skor(self, X):
         Z = (X - self.mu) / self.sd
         return 1.0 / (1.0 + np.exp(-(Z @ self.w + self.b)))
+
+
+# ---------------------------------------------------------------------------
+# Pohon berpenguat, dua bentuk
+# ---------------------------------------------------------------------------
+#
+# Rancangan menuliskan pohon berpenguat sebagai pembanding wajib, karena
+# literatur pemodelan tabular menunjukkan pohon sering mengalahkan model dalam
+# pada data seukuran ini. Target T3 menuntut model kami mengalahkannya.
+#
+# Dijalankan dalam dua bentuk, dan membedakannya penting.
+#
+#   terawasi   dilatih memakai label kecurangan yang sebenarnya. Ini batas
+#              atas dari dunia yang tidak kita punya, sekelas dengan regresi
+#              logistik berlabel. Berguna untuk mengukur jarak, bukan untuk
+#              menyatakan menang atau kalah.
+#
+#   normatif   dilatih tanpa satu pun label kecurangan. Ia menebak tarif dan
+#              nilai tagihan barang dari bukti, persis pekerjaan yang dilakukan
+#              tulang punggung kami, lalu selisihnya menjadi skor. Inilah
+#              pembanding yang benar benar sebanding, dan inilah uji T3 yang
+#              sesungguhnya.
+
+def fitur_bukti(episodes) -> np.ndarray:
+    """Fitur yang hanya memuat bukti, tanpa tarif dan tanpa diagnosis sekunder.
+
+    Diagnosis sekunder sengaja dibuang, dengan alasan yang sama seperti pada
+    kepala K2: upcoding bekerja dengan menambahnya, jadi memberikannya kepada
+    penebak berarti membocorkan jawabannya.
+    """
+    from .katalog import ICD_LIST, PEMERIKSAAN, pita_lab
+
+    peta_dxp = {c: i for i, c in enumerate(ICD_LIST)}
+    peta_lab = {c: i for i, c in enumerate(sorted(PEMERIKSAAN))}
+    n_lab = len(peta_lab)
+
+    baris = []
+    for r in episodes:
+        satu_dxp = np.zeros(len(peta_dxp) + 1)
+        satu_dxp[peta_dxp.get(r["dxp"], len(peta_dxp))] = 1.0
+        pita = np.zeros(n_lab)
+        for kode, nilai in r["lab"]:
+            j = peta_lab.get(kode)
+            if j is not None:
+                pita[j] = pita_lab(kode, nilai) + 1
+        dasar = [
+            r["umur"], r["sex"], r["segmen"], r["hak_kelas"], r["f_reg"],
+            r["f_jenis"], r["f_dtpk"], r["rawat_inap"], r["los"],
+            {"A": 0, "B": 1, "C": 2, "D": 3, "FKTP": 4}[r["f_kelas"]],
+            r["f_milik"], len(r["prc"]), len(r["obt"]), len(r["lab"]),
+            len(r["bhp"]), sum(n for _, n in r["bhp"]),
+            max(r["d_prev"], 0), r["rujuk"],
+        ]
+        baris.append(np.concatenate([dasar, satu_dxp, pita]))
+    return np.asarray(baris, dtype=np.float64)
+
+
+def pohon_terawasi(X_tr, y_tr, X_te, nilai_te, seed=0):
+    """Pohon berpenguat yang dilatih memakai label kecurangan."""
+    from sklearn.ensemble import HistGradientBoostingClassifier
+
+    m = HistGradientBoostingClassifier(
+        max_iter=300, learning_rate=0.08, max_leaf_nodes=63,
+        l2_regularization=1.0, random_state=seed, class_weight="balanced")
+    m.fit(X_tr, y_tr)
+    p = m.predict_proba(X_te)[:, 1]
+    # diperingkat menurut ekspektasi rupiah, bukan menurut peluang saja
+    return p * np.asarray(nilai_te, dtype=np.float64)
+
+
+def pohon_normatif(X_tr, tarif_tr, bhp_tr, X_te, tarif_te, bhp_te, seed=0):
+    """Pohon berpenguat tanpa label kecurangan.
+
+    Menebak tarif dan nilai tagihan barang dari bukti, lalu selisih terhadap
+    yang benar benar ditagihkan menjadi skornya. Ini pekerjaan yang sama
+    dengan tulang punggung kami, dikerjakan pohon.
+
+    Dilatih pada seluruh klaim, bukan hanya yang jujur, karena di dunia nyata
+    kita memang tidak tahu mana yang jujur. Sebagian besar klaim jujur, jadi
+    pohon mempelajari pemetaan yang wajar dan klaim curang menjadi pencilan.
+    """
+    from sklearn.ensemble import HistGradientBoostingRegressor
+
+    def buat():
+        return HistGradientBoostingRegressor(
+            max_iter=300, learning_rate=0.08, max_leaf_nodes=63,
+            l2_regularization=1.0, random_state=seed)
+
+    m_tarif = buat().fit(X_tr, np.log1p(tarif_tr))
+    m_bhp = buat().fit(X_tr, np.log1p(bhp_tr))
+    harap_tarif = np.expm1(m_tarif.predict(X_te))
+    harap_bhp = np.expm1(m_bhp.predict(X_te))
+    selisih = ((np.asarray(tarif_te, dtype=np.float64) - harap_tarif)
+               + (np.asarray(bhp_te, dtype=np.float64) - harap_bhp))
+    return np.clip(selisih, 0, None), harap_tarif, harap_bhp

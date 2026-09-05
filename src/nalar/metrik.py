@@ -32,15 +32,39 @@ def presisi_pada_k(skor, curang, k):
     return float(c[urut].mean())
 
 
+def batas_atas(selisih, k):
+    """Rupiah yang ditemukan kalau kita tahu jawabannya.
+
+    Ini penskor sempurna: urutkan menurut selisih sebenarnya. Dipakai sebagai
+    pembagi, sehingga hasil tiap penskor bisa dinyatakan sebagai porsi dari
+    yang mungkin, bukan sebagai kelipatan atas pembanding yang dipilih
+    sembarang.
+
+    Metrik kelipatan atas mesin aturan punya cacat yang baru terlihat setelah
+    beberapa percobaan: pada anggaran besar, semua penskor mendekati batas
+    atas, jadi kelipatannya menyusut walau kinerjanya membaik. Porsi terhadap
+    batas atas tidak punya cacat itu.
+    """
+    sel = np.clip(np.asarray(selisih, dtype=np.float64), 0, None)
+    k = min(int(k), len(sel))
+    if k <= 0:
+        return 0.0
+    return float(np.sort(sel)[::-1][:k].sum())
+
+
 def kurva(skor_dict, selisih, curang, daftar_k):
     """Bandingkan beberapa penskor pada beberapa anggaran audit."""
-    hasil = {}
+    atas = {int(k): batas_atas(selisih, k) for k in daftar_k}
+    hasil = {"_batas_atas": {k: round(v) for k, v in atas.items()}}
     for nama, s in skor_dict.items():
+        rp = {int(k): rupiah_pada_k(s, selisih, k) for k in daftar_k}
         hasil[nama] = {
-            "rupiah_pada_k": {int(k): round(rupiah_pada_k(s, selisih, k))
-                              for k in daftar_k},
+            "rupiah_pada_k": {k: round(v) for k, v in rp.items()},
             "presisi_pada_k": {int(k): round(presisi_pada_k(s, curang, k), 4)
                                for k in daftar_k},
+            # porsi dari yang mungkin ditemukan pada anggaran itu
+            "porsi_batas_atas": {k: round(rp[k] / atas[k], 4) if atas[k] > 0
+                                 else None for k in rp},
         }
     return hasil
 

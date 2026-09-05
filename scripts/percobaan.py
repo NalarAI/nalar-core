@@ -31,8 +31,9 @@ from nalar.heads import (TabelBarang, TabelTarif,  # noqa: E402
                          selisih_tagihan, selisih_tarif, skor_kejutan,
                          wakil_faskes)
 from nalar.konformal import Kalibrator, periksa_jaminan  # noqa: E402
-from nalar.pembanding import (RegresiLogistik, fitur_tangan,  # noqa: E402
-                              mesin_aturan)
+from nalar.pembanding import (RegresiLogistik, fitur_bukti,  # noqa: E402
+                              fitur_tangan, mesin_aturan, pohon_normatif,
+                              pohon_terawasi)
 from nalar.tokenizer import Penoken  # noqa: E402
 from nalar.train import perangkat, pralatih  # noqa: E402
 from nalar.vocab import Kamus  # noqa: E402
@@ -176,6 +177,29 @@ def utama():
     skor_reg = reg.skor(X_te) * np.maximum(
         [r["tarif"] + r.get("tagih_bhp", 0) for r in eps_te], 1)
 
+    # Pohon berpenguat, target T3. Dua bentuk. Yang normatif tidak memakai
+    # satu pun label kecurangan, jadi itulah pembanding yang sebanding.
+    eps_latih = [eps[i] for i in idx_latih]
+    nilai_te = np.array([r["tarif"] + r.get("tagih_bhp", 0) for r in eps_te],
+                        dtype=np.float64)
+    skor_pohon_awas = skor_pohon_norm = None
+    try:
+        Xb_tr, Xb_te = fitur_bukti(eps_latih), fitur_bukti(eps_te)
+        skor_pohon_awas = pohon_terawasi(X_tr, y_tr, X_te, nilai_te, a.seed)
+        skor_pohon_norm, _, _ = pohon_normatif(
+            Xb_tr,
+            np.array([r["tarif"] for r in eps_latih], dtype=np.float64),
+            np.array([r.get("tagih_bhp", 0) for r in eps_latih],
+                     dtype=np.float64),
+            Xb_te,
+            np.array([r["tarif"] for r in eps_te], dtype=np.float64),
+            np.array([r.get("tagih_bhp", 0) for r in eps_te],
+                     dtype=np.float64),
+            a.seed)
+        print("    pohon berpenguat selesai", flush=True)
+    except Exception as e:
+        print(f"    pohon berpenguat dilewat: {e}", flush=True)
+
     # --- 7. metrik --------------------------------------------------------
     sel_te = selisih[idx_te]
     cur_te = curang[idx_te]
@@ -195,6 +219,10 @@ def utama():
             dtype=np.float64),
         "acak": rng.random(len(idx_te)),
     }
+    if skor_pohon_awas is not None:
+        penskor["pohon_terawasi"] = skor_pohon_awas
+    if skor_pohon_norm is not None:
+        penskor["pohon_normatif"] = skor_pohon_norm
     hasil = metrik.kurva(penskor, sel_te, cur_te, daftar_k)
     for nama in ("nalar", "nalar_k2_saja", "regresi_logistik",
                  "nilai_klaim"):
@@ -379,7 +407,8 @@ def utama():
         k: v for k, v in hasil2.items()
         if k in ("nalar", "nalar_k3_saja", "nalar_k2_plus_k3", "nalar_semua",
                  "nalar_k7_saja", "mesin_aturan", "regresi_logistik",
-                 "nilai_klaim")}
+                 "nilai_klaim", "pohon_terawasi", "pohon_normatif",
+                 "_batas_atas")}
 
     # --- 13. keadilan per kepala, dan pada skor yang sebenarnya dipakai ---
     # Pengukuran keadilan sebelumnya hanya memakai skor K2, bukan skor
@@ -431,6 +460,13 @@ def utama():
           f"{h2['nalar_semua']['peningkatan_atas_aturan']}")
     print(f"  SEMUA lift atas nilai klaim: "
           f"{h2['nalar_semua']['peningkatan_atas_nilai_klaim']}")
+    print(f"  SEMUA porsi batas atas     : "
+          f"{h2['nalar_semua']['porsi_batas_atas']}")
+    for nm in ("pohon_normatif", "pohon_terawasi"):
+        if nm in hasil:
+            print(f"  {nm:16s} rp@{k}: "
+                  f"Rp {hasil[nm]['rupiah_pada_k'][k]/1e6:8.1f} juta   "
+                  f"porsi batas atas {hasil[nm]['porsi_batas_atas'][k]}")
 
 
 if __name__ == "__main__":
