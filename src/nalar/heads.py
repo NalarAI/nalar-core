@@ -482,9 +482,11 @@ def divergensi_sebaya(episodes, idx, tabel, harapan, faskes_list, kelompok,
             return float((p[m_] * np.log(p[m_] / np.maximum(q[m_], 1e-12))).sum())
         js = 0.5 * kl(teramati, m) + 0.5 * kl(diharap, m)
 
-        # kelebihan rupiah yang diperkirakan dari pergeseran sebaran
-        nilai = np.where(tabel.inap, tabel.dasar_ri, tabel.dasar_rj) * \
-            np.where(tabel.inap, tabel.mult_kep, 1.0)
+        # Kelebihan rupiah yang diperkirakan dari pergeseran sebaran. Nilai
+        # per kelompok diambil dari tabel resmi pada satu konteks acuan, yaitu
+        # rumah sakit kelas C regional 1 kelas rawat 3, karena yang
+        # dibandingkan di sini pergeseran sebarannya, bukan tarif absolutnya.
+        nilai = tabel.matriks(None, [], "C", 0)[:, 2]
         lebih = float((teramati - diharap) @ nilai) * len(pos)
         # Kelebihan rupiah rata rata per klaim. Percobaan kedua menunjukkan
         # divergensi sebaran terlalu berisik pada faskes dengan sedikit klaim,

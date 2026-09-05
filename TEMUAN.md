@@ -393,3 +393,78 @@ Yang paling perlu dikerjakan berikutnya, menurut urutan nilainya:
 2. Uji keadilan. Dua kali gagal, dan ini yang paling berbahaya bila diterapkan.
 3. Pohon berpenguat sebagai pembanding. Target T3 belum bisa dijawab.
 4. Menahan sebagian modus dari penulis mesin aturan, supaya pembandingnya adil.
+
+---
+
+## Perubahan besar, 6 September 2026
+
+### Tabel tarif resmi menggantikan tabel tebakan
+
+Lampiran Permenkes 3/2023 berhasil diunduh dan diekstraksi: 76.970 baris,
+885 kode INA-CBG, lima regional, empat kelas rumah sakit, pemerintah dan
+swasta. Ini menutup risiko R3, risiko berdampak tertinggi pada rancangan.
+
+Dua pemeriksaan kewajaran lulus tanpa satu pun pengecualian. Tarif kelas 1
+tidak pernah lebih murah dari kelas 3 pada seluruh 76.970 baris, dan seluruh
+10.066 pasangan keparahan I ke III naik.
+
+Selisih keparahan I ke III pada rumah sakit kelas C regional 1 kelas rawat 3
+rata rata **Rp 5.032.284**. Angka Rp 4,9 juta yang selama ini dikutip dari
+pustaka terkonfirmasi dari sumber primernya.
+
+### Seberapa salah tabel tebakan kami
+
+Lebih salah daripada dugaan. Dari 594 kode yang kami karang, hanya **10 persen**
+benar benar ada di peraturan. Huruf CMG-nya pun banyak meleset: stroke ternyata
+masuk G bukan A, pneumonia masuk J bukan D.
+
+Dua hal yang sama sekali tidak ada di model tebakan kami dan ternyata penting:
+
+- **Kepemilikan rumah sakit memengaruhi tarif.** Pemerintah dan swasta punya
+  angka berbeda untuk kode yang sama.
+- **Rawat inap dan rawat jalan adalah keluarga kelompok yang terpisah**, bukan
+  tarif yang sama dengan pengali. Tidak satu pun dari 885 kode punya versi
+  rawat inap dan rawat jalan sekaligus.
+
+Enam puluh enam kondisi katalog dipetakan ulang ke kelompok asli: 32 tepat,
+31 dekat, 3 payung. Cakupan tarif 95 persen. Kamus token menyusut dari 2.121
+ke 1.418 karena kode kelompoknya sekarang 226 yang asli, bukan 594 karangan.
+
+Yang belum tercakup hampir seluruhnya kelompok rawat jalan bukan prosedur.
+Ekstraksi menangkap 885 dari sekitar 1.077 kelompok, dan yang hilang ada di
+halaman yang belum terbaca benar.
+
+### MIMIC-IV dilepas
+
+Kredensial PhysioNet tidak bisa diurus, jadi MIMIC-IV keluar dari rencana.
+Rancangan sudah menyiapkan jalur ini sebagai risiko R2 dengan mitigasi yang
+sudah tertulis: pakai DE-SynPUF untuk struktur klaim.
+
+Yang sudah ada di tangan sekarang: CMS DE-SynPUF bagian penerima manfaat,
+rawat inap, dan rawat jalan, ditambah daftar pengecualian LEIE. Semuanya
+domain publik tanpa perjanjian.
+
+Akibat yang harus ditulis: sebaran bersyarat antara diagnosis, nilai
+laboratorium, dan obat di dalam pembangkit tetap berasal dari katalog yang
+kami susun sendiri, bukan dari data klinis nyata. Realisme lapisan itu lebih
+rendah daripada yang dirancang, dan uji latih di sintetis uji di nyata jadi
+hanya bisa dijalankan terhadap DE-SynPUF, bukan terhadap rekam klinis.
+
+### Kepala K3 ditulis
+
+Proses titik temporal bertanda. Jarak antar-episode dimodelkan sebagai campuran
+log-normal bersyarat representasi episode, ditambah sebaran tanda apakah episode
+berikutnya melanjutkan diagnosis yang sama, berpindah, atau tidak ada lagi.
+
+Campuran log-normal dipilih daripada intensitas kontinu, karena rapatnya
+ternormalkan sendiri sehingga integral kompensatornya tidak perlu dihitung
+numerik. Untuk pertanyaan yang diajukan, yaitu seberapa mengejutkan jarak
+sampai kejadian berikutnya, rapat jarak antar-kejadian sudah memuat jawabannya.
+
+Keluarannya berdenominasi rupiah, sama seperti K2: peluang pasangan ini
+sebenarnya satu episode, dikali rupiah yang didapat dari memecahnya. Dengan
+begitu K2 dan K3 bisa diperingkat bersama, bukan digabung lewat bobot manual.
+
+Pada uji kecil, rugi turun dari 5,79 ke 5,28. Jarak antar-episode nyata pada
+data sintetis: median 19 hari, persentil 10 sebesar 2 hari, persentil 90
+sebesar 90 hari.
