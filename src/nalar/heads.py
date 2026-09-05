@@ -114,6 +114,10 @@ class TabelTarif:
                 self.kode.append(tok[3:])
                 tok_id.append(i)
         self.tok_id = np.array(tok_id, dtype=np.int64)
+        # token kelas rawat, supaya kepala K2 bisa menaksir kelas juga
+        self.tok_kelas = np.array(
+            [kamus.id(f"KLSRAWAT:{i}") for i in range(3)], dtype=np.int64)
+        self.peta_kode = {k: i for i, k in enumerate(self.kode)}
 
         peta_balik = {}
         for dxp, (cmg, nomor, _, _) in PETA_KONDISI.items():
@@ -157,6 +161,29 @@ class TabelTarif:
         v = v * self._m_kelas_rs[kelas_rs] * self._m_regional[regional]
         return np.round(v / 1000.0) * 1000.0
 
+    def matriks(self, dxp, prc, kelas_rs, regional):
+        """Tarif untuk setiap pasangan kelompok dan kelas rawat.
+
+        Versi sebelumnya menahan kelas rawat pada nilai yang ditagihkan, jadi
+        manipulasi kelas perawatan tidak terlihat sama sekali oleh kepala ini.
+        Dengan menaksir kelas rawat juga, selisihnya menangkap dua hal
+        sekaligus: kelompok tarif yang dinaikkan, dan kelas yang dinaikkan.
+
+        Bentuk keluarannya (jumlah kelompok, tiga kelas rawat).
+        """
+        pengali_prc = 1.0
+        for p in prc:
+            if p in self._prc_besar:
+                pengali_prc = max(pengali_prc, self._prc_besar[p])
+        dasar = np.where(self.inap, self.dasar_ri, self.dasar_rj) * pengali_prc
+        keluar = np.zeros((len(self.kode), 3), dtype=np.float64)
+        for j, kr in enumerate((1, 2, 3)):
+            v = np.where(self.inap,
+                         dasar * self.mult_kep * self._m_kelas_rawat[kr],
+                         dasar)
+            keluar[:, j] = v * self._m_kelas_rs[kelas_rs] *                 self._m_regional[regional]
+        return np.round(keluar / 1000.0) * 1000.0
+
 
 @torch.no_grad()
 def selisih_tarif(model, kamus, arr, idx, episodes, tabel: TabelTarif, dev,
@@ -174,10 +201,15 @@ def selisih_tarif(model, kamus, arr, idx, episodes, tabel: TabelTarif, dev,
     penanda_trf = kamus.id("[BID:TRF]")
     f_trf = FIELD_ID["TRF"]
     tok_cbg = torch.from_numpy(tabel.tok_id).to(dev)
+    tok_kls = torch.from_numpy(tabel.tok_kelas).to(dev)
 
     hasil = np.zeros(len(idx), dtype=np.float64)
     yakin = np.zeros(len(idx), dtype=np.float64)
     harapan = np.zeros(len(idx), dtype=np.float64)
+    # peluang bahwa kelompok yang ditagihkan bukan kelompok yang benar,
+    # dan besar selisihnya bila memang bukan
+    p_salah = np.zeros(len(idx), dtype=np.float64)
+    selisih_bila_salah = np.zeros(len(idx), dtype=np.float64)
 
     for s in range(0, len(idx), batch):
         sel = idx[s:s + batch]
@@ -188,12 +220,15 @@ def selisih_tarif(model, kamus, arr, idx, episodes, tabel: TabelTarif, dev,
 
         T = tok.shape[1]
         pos_cbg = np.full(len(sel), -1, dtype=np.int64)
+        pos_kls = np.full(len(sel), -1, dtype=np.int64)
         for b in range(len(sel)):
             m = ((np.arange(T) < pjg[b]) & (fld[b] == f_trf)
                  & (tok[b] != penanda_trf))
             p = np.flatnonzero(m)
             if p.size:
                 pos_cbg[b] = p[0]      # token kelompok tarif ada di awal TRF
+            if p.size > 1:
+                pos_kls[b] = p[1]      # lalu kelas rawat
             tok[b, m] = id_mask
 
         logit, _, _ = model(torch.from_numpy(tok).to(dev),
@@ -203,16 +238,48 @@ def selisih_tarif(model, kamus, arr, idx, episodes, tabel: TabelTarif, dev,
         for b in range(len(sel)):
             if pos_cbg[b] < 0:
                 continue
-            l = logit[b, pos_cbg[b]].float()
-            p = torch.softmax(l[tok_cbg], dim=-1).cpu().numpy()
             r = episodes[sel[b]]
-            v = tabel.nilai(r["dxp"], r["prc"], r["kelas_rawat"],
-                            r["f_kelas"], r["f_reg"])
-            e = float((p * v).sum())
+            p = torch.softmax(
+                logit[b, pos_cbg[b]].float()[tok_cbg], dim=-1).cpu().numpy()
+            if pos_kls[b] >= 0:
+                q = torch.softmax(
+                    logit[b, pos_kls[b]].float()[tok_kls], dim=-1
+                ).cpu().numpy()
+            else:
+                q = np.zeros(3)
+                q[r["kelas_rawat"] - 1] = 1.0
+            M = tabel.matriks(r["dxp"], r["prc"], r["f_kelas"], r["f_reg"])
+            # kelompok tarif dan kelas rawat dianggap saling bebas bila
+            # buktinya sudah diketahui. Itu penyederhanaan, dan tanpa
+            # penyederhanaan itu kita harus menaksir sebaran gabungan atas
+            # seribu lima ratus lebih pasangan dari satu klaim.
+            e = float(p @ M @ q)
             harapan[s + b] = e
             hasil[s + b] = float(r["tarif"]) - e
-            yakin[s + b] = float(p.max())
-    return hasil, harapan, yakin
+            yakin[s + b] = float(p.max() * q.max())
+
+            # Percobaan pertama memakai gabungan berupa perkalian antara
+            # persentil kejutan dan selisih rupiah. Hasilnya lebih buruk
+            # daripada memakai selisih rupiah saja, karena peluangnya sudah
+            # terkandung di dalam nilai harapan dan perkalian menghitungnya
+            # dua kali. Yang di bawah adalah bentuk yang benar, yaitu peluang
+            # kelompok yang ditagihkan salah, dikali selisih bila memang salah.
+            j = tabel.peta_kode.get(r["cbg"], -1)
+            jk = r["kelas_rawat"] - 1
+            if j >= 0:
+                pk = float(p[j] * q[jk])
+                p_salah[s + b] = 1.0 - pk
+                if pk < 1.0 - 1e-9:
+                    pq = np.outer(p, q).copy()
+                    pq[j, jk] = 0.0
+                    tot = pq.sum()
+                    if tot > 1e-12:
+                        e_salah = float((pq * M).sum() / tot)
+                        selisih_bila_salah[s + b] = float(r["tarif"]) - e_salah
+            else:
+                p_salah[s + b] = 1.0
+                selisih_bila_salah[s + b] = hasil[s + b]
+    return hasil, harapan, yakin, p_salah, selisih_bila_salah
 
 
 # ---------------------------------------------------------------------------

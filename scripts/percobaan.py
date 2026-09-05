@@ -132,12 +132,15 @@ def utama():
     k1 = normalkan_terhadap_sejenis(k1_mentah, kunci_sejenis)
 
     tabel = TabelTarif(V, eps)
-    k2_selisih, k2_harapan, k2_yakin = selisih_tarif(
+    k2_selisih, k2_harapan, k2_yakin, p_salah, sel_salah = selisih_tarif(
         model, V, arr, idx_te, eps, tabel, dev)
     print(f"    selesai dalam {time.time() - t:.0f}s", flush=True)
 
-    # skor gabungan: peluang ada ketidaksesuaian dikali besar selisihnya
-    skor_nalar = k1 * np.clip(k2_selisih, 0, None)
+    # Skor gabungan: peluang kelompok yang ditagihkan salah, dikali selisih
+    # rupiah bila memang salah. Percobaan pertama memakai perkalian persentil
+    # kejutan dengan selisih, dan itu lebih buruk daripada selisih saja karena
+    # peluangnya sudah terkandung di dalam nilai harapan.
+    skor_nalar = p_salah * np.clip(sel_salah, 0, None)
 
     # --- 6. pembanding ----------------------------------------------------
     print("[5] menjalankan pembanding", flush=True)
@@ -161,6 +164,7 @@ def utama():
         "nalar": skor_nalar,
         "nalar_k1_saja": k1,
         "nalar_k2_saja": np.clip(k2_selisih, 0, None),
+        "nalar_gabungan_lama": k1 * np.clip(k2_selisih, 0, None),
         "mesin_aturan": skor_aturan,
         "regresi_logistik": skor_reg,
         "acak": rng.random(len(idx_te)),
@@ -179,8 +183,9 @@ def utama():
     kunci_kal = np.array([f"{eps[i]['dxp']}|{eps[i]['rawat_inap']}"
                           for i in idx_kal])
     k1_kal = normalkan_terhadap_sejenis(k1_kal_mentah, kunci_kal)
-    k2_kal, _, _ = selisih_tarif(model, V, arr, idx_kal, eps, tabel, dev)
-    skor_kal = k1_kal * np.clip(k2_kal, 0, None)
+    _, _, _, ps_kal, ss_kal = selisih_tarif(model, V, arr, idx_kal, eps,
+                                            tabel, dev)
+    skor_kal = ps_kal * np.clip(ss_kal, 0, None)
 
     kel_kal = np.array([eps[i]["f_kelas"] for i in idx_kal])
     kel_te = np.array([r["f_kelas"] for r in eps_te])
@@ -265,8 +270,9 @@ def utama():
         k1x = skor_kejutan(model, V, a, ix, ["TRF"], dev)
         kun = np.array([f"{r['dxp']}|{r['rawat_inap']}" for r in daftar])
         k1n = normalkan_terhadap_sejenis(k1x, kun)
-        k2x, _, _ = selisih_tarif(model, V, a, ix, daftar, tabel_lokal, dev)
-        return k1n * np.clip(k2x, 0, None)
+        _, _, _, psx, ssx = selisih_tarif(model, V, a, ix, daftar,
+                                          tabel_lokal, dev)
+        return psx * np.clip(ssx, 0, None)
 
     kal2 = Kalibrator(alpha=0.02).pasang(skor_kal, kel_kal)
     catatan["adversarial"] = bandingkan_pelaku(
