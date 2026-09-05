@@ -701,3 +701,106 @@ Dan yang membuat seluruh rangkaian ini terjadi adalah satu garis dasar gratis
 yang sebelumnya tidak ada di daftar pembanding. Tanpa mengurutkan menurut nilai
 klaim, kami akan melaporkan 2,53 kali atas mesin aturan dan merasa berhasil,
 padahal saat itu model kalah dari menyortir spreadsheet.
+
+---
+
+## Percobaan 10, 6 September 2026: T4 terjawab, dan salah paham soal keadilan diluruskan
+
+`runs/p10_penuh.json` dan `runs/p10_tanpa_pralatih.json`. Konfigurasi sama,
+yang berbeda hanya jumlah langkah pralatih.
+
+### T4 tercapai, dan temuan negatif sebelumnya batal
+
+| | 3.000 langkah | 30 langkah |
+|---|---:|---:|
+| Rugi pralatih akhir | 2,131 | 4,594 |
+| rp@1000 semua | **1.106,1 jt** | 861,6 jt |
+| Lift atas mesin aturan | 1,679 | 1,308 |
+| Lift atas nilai klaim | **1,130** | **0,880** |
+| Presisi@1000 | 0,354 | 0,212 |
+
+**Pralatih memberi perbaikan nyata. T4 tercapai.**
+
+Ini membatalkan temuan negatif percobaan 4 dan ablasi sebelumnya, yang
+menyimpulkan memperbesar model dan melatih lebih lama tidak menambah rupiah.
+Kesimpulan itu benar untuk susunan kepala saat itu, dan salah sebagai
+pernyataan tentang arsitekturnya. Penghambatnya memang cakupan kepala, dan
+begitu K7 masuk, kapasitas model mulai terpakai.
+
+Perhatikan baris terakhir. Tanpa pralatih, model kalah dari mengurutkan menurut
+nilai klaim, 0,880. Dengan pralatih, menang, 1,130. Jadi seluruh keunggulan
+atas garis dasar gratis itu memang berasal dari yang dipelajari model.
+
+### Keadilan: dua dugaan saya keliru, dan yang benar lebih menarik
+
+Pada percobaan 9 saya menduga K7 memperkenalkan ketimpangan. Pada uji kecil
+penguraian menunjuk K3. Keduanya salah.
+
+Laju penandaan per kelas faskes pada anggaran dua persen, dihitung hanya pada
+klaim yang bersih:
+
+| Penskor | B | C | D | FKTP |
+|---|---:|---:|---:|---:|
+| K2 | 7,7% | 4,2% | 5,4% | 0,25% |
+| K3 | 5,6% | 2,6% | 2,4% | 1,00% |
+| K7 | 4,3% | 2,7% | 3,3% | 0,09% |
+| Semua | 6,4% | 3,1% | 3,8% | 0,06% |
+| **Nilai klaim saja** | **8,1%** | **4,9%** | **4,5%** | **0,00%** |
+| Mesin aturan | 3,3% | 1,3% | 1,0% | 1,32% |
+
+Baris yang menjelaskan segalanya adalah nilai klaim saja. Garis dasar gratis
+yang tidak memakai model sama sekali justru **paling timpang**, dan tidak
+menandai satu pun klaim FKTP.
+
+Sebabnya sederhana. Klaim FKTP bernilai ratusan ribu, klaim rumah sakit
+bernilai jutaan. Antrean yang diurutkan menurut rupiah pasti menaruh rumah
+sakit di atas. Itu bukan ketimpangan model, itu tujuan sistemnya. Uangnya
+memang ada di sana.
+
+Jadi tidak ada kepala yang bersalah. Yang ada, seluruh skor berdenominasi
+rupiah memusat ke faskes mahal, termasuk yang gratis.
+
+### Yang benar benar menyelesaikannya
+
+| | Rasio maks min | Lulus |
+|---|---:|---|
+| Ambang tunggal, anggaran tetap | 105,2 | tidak |
+| Ambang konformal per kelas faskes | **1,774** | **ya** |
+
+Kalibrasi konformal per kelompok bukan hiasan. Ia satu satunya yang membuat
+laju gangguan terhadap faskes jujur sebanding antar kelas. Tanpa itu, FKTP
+tidak pernah diperiksa dan rumah sakit kelas B diperiksa seratus kali lebih
+sering, pada klaim yang sama sama bersih.
+
+Angka 105 banding 1,774 itu argumen terkuat untuk bagian kalibrasi pada
+rancangan, dan sebelumnya kami hanya bisa menyatakannya sebagai prinsip.
+
+Catatan koreksi: pada percobaan 9 saya melaporkan T5 gagal di 2,017. Pada
+percobaan 10 dengan konfigurasi yang sama angkanya 1,774 dan lulus. Selisih
+antar-jalannya cukup besar untuk menyimpulkan T5 berada tepat di batas, bukan
+lulus dengan aman.
+
+### Papan skor
+
+| Target | Hasil |
+|---|---|
+| T1 dua kali atas aturan pada seribu klaim | belum, 1,679 sampai 1,749. Tercapai pada lima puluh teratas |
+| T2 jaminan konformal | **tercapai** |
+| T3 mengalahkan pohon berpenguat | belum diuji, pustakanya tidak terpasang |
+| T4 pralatih memberi perbaikan | **tercapai**, 1,130 melawan 0,880 |
+| T5 keadilan antar kelompok | **tercapai tipis**, 1,774 dan 2,017 pada dua jalan |
+| T6 ketahanan pelaku | **tercapai** |
+| T7 faskes tak dikenal | tercapai |
+
+Empat tercapai, satu belum, satu belum diuji, satu tercapai sebagian.
+
+### Catatan tentang cara kerja
+
+Empat kali berturut turut saya menebak penyebab dan meleset: rumus
+penggabungan, penutupan bidang, ukuran model, lalu kepala mana yang membuat
+timpang. Yang menyelesaikan selalu pengukuran, bukan tebakan berikutnya.
+
+Pola yang berulang: begitu satu garis dasar atau satu penguraian ditambahkan,
+kesimpulan sebelumnya berubah. Garis dasar nilai klaim membatalkan klaim
+keunggulan 2,53 kali. Kepala K7 membatalkan temuan bahwa model besar tidak
+berguna. Penguraian per kepala membatalkan dua dugaan soal keadilan sekaligus.
