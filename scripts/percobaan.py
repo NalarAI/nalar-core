@@ -52,9 +52,21 @@ def utama():
     ap.add_argument("--utas", type=int, default=8)
     ap.add_argument("--seed", type=int, default=7)
     ap.add_argument("--keluaran", default="runs/percobaan.json")
+    ap.add_argument("--tarif-cadangan", action="store_true",
+                    help="pakai tarif tebakan, bukan tabel resmi. Untuk ablasi.")
     a = ap.parse_args()
 
     torch.set_num_threads(a.utas)
+    if getattr(a, "tarif_cadangan", False):
+        # Ablasi: matikan tabel resmi dengan mengarahkan berkasnya ke jalur
+        # yang tidak ada, sehingga seluruh alur jatuh ke tarif tebakan.
+        from nalar import tarif_resmi as _tr
+        _tr.CSV_TARIF = os.path.join(AKAR_PALSU := "", "tidak_ada.csv")
+        _tr._muat.cache_clear()
+        _tr._cadangan_per_kode.cache_clear()
+        _tr.kode_tersedia.cache_clear()
+        print("[ablasi] tabel tarif resmi dimatikan, memakai tarif tebakan",
+              flush=True)
     t_mulai = time.time()
     catatan: dict = {"pengaturan": vars(a)}
 
@@ -295,7 +307,7 @@ def utama():
         b_ = berikut.get(int(i))
         if b_ is None:
             continue
-        rp = tpp.selisih_pemecahan(eps, int(i), b_)
+        rp = tpp.rupiah_dipertaruhkan(eps, int(i), b_)
         if rp <= 0:
             continue
         peluang = float(p_lama[j]) * float(p_tanda[j][tpp.TANDA_LANJUT])

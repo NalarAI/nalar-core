@@ -200,22 +200,51 @@ def latih(kepala, H, dhari, tanda, ada, dev, langkah=400, batch=512, lr=2e-3,
     return riwayat
 
 
-def selisih_pemecahan(episodes, a: int, b: int) -> int:
-    """Berapa rupiah yang didapat dari memecah satu episode menjadi dua.
+def rupiah_dipertaruhkan(episodes, a: int, b: int) -> int:
+    """Berapa rupiah yang dipertaruhkan kalau dua episode ini sebenarnya satu.
 
-    Dihitung sebagai jumlah dua tarif terpisah dikurangi tarif episode yang
-    digabung. Ini yang membuat keluaran K3 punya satuan yang sama dengan K2,
-    sehingga keduanya bisa diperingkat bersama.
+    Bentuknya berbeda menurut tempat layanan, dan itu bukan kerumitan yang
+    dibuat buat. Modusnya memang berbeda.
+
+      Rawat inap dan rawat inap
+          Pemecahan episode. Yang dipertaruhkan selisih antara jumlah dua
+          tarif terpisah dan satu tarif gabungan.
+
+      Rawat jalan berulang, diagnosis sama
+          Kunjungan yang tidak perlu. Yang dipertaruhkan tarif kunjungan
+          kedua itu sendiri, karena kalau ia memang tidak perlu, seluruh
+          nilainya yang salah, bukan selisihnya.
+
+    Versi pertama hanya menangani pasangan rawat inap, dan akibatnya cuma 93
+    klaim dari 42.624 yang mendapat skor. Rawat inap hanya dua persen klaim,
+    sedangkan kondisi kronis berulang seperti hemodialisis dan kemoterapi
+    justru ada di rawat jalan dan berfrekuensi tinggi.
+
+    Yang menyaring kunjungan sah dari yang tidak perlu bukan fungsi ini,
+    melainkan peluang dari kepala waktu. Dialisis dua kali seminggu akan
+    dipelajari sebagai wajar, jadi peluangnya rendah dan hasil kalinya kecil.
     """
     from .tarif import kelompokkan, tarif
 
     ra, rb = episodes[a], episodes[b]
-    if not (ra["rawat_inap"] and rb["rawat_inap"]):
+    if ra["dxp"] != rb["dxp"]:
         return 0
-    dxs = list(dict.fromkeys(list(ra["dxs"]) + list(rb["dxs"])))[:9]
-    prc = list(dict.fromkeys(list(ra["prc"]) + list(rb["prc"])))[:6]
-    los = int(ra["los"]) + int(rb["los"])
-    kel = kelompokkan(ra["dxp"], dxs, prc, los, True)
-    gabung = tarif(kel, ra["dxp"], prc, ra["kelas_rawat"], ra["f_kelas"],
-                   ra["f_reg"])
-    return int(ra["tarif"] + rb["tarif"] - gabung)
+
+    if ra["rawat_inap"] and rb["rawat_inap"]:
+        dxs = list(dict.fromkeys(list(ra["dxs"]) + list(rb["dxs"])))[:9]
+        prc = list(dict.fromkeys(list(ra["prc"]) + list(rb["prc"])))[:6]
+        los = int(ra["los"]) + int(rb["los"])
+        kel = kelompokkan(ra["dxp"], dxs, prc, los, True)
+        gabung = tarif(kel, ra["dxp"], prc, ra["kelas_rawat"], ra["f_kelas"],
+                       ra["f_reg"])
+        return max(int(ra["tarif"] + rb["tarif"] - gabung), 0)
+
+    if not ra["rawat_inap"] and not rb["rawat_inap"]:
+        return int(rb["tarif"]) + int(rb.get("tagih_bhp", 0))
+
+    return 0
+
+
+# nama lama dipertahankan supaya pemanggil yang sudah ada tidak putus
+def selisih_pemecahan(episodes, a: int, b: int) -> int:
+    return rupiah_dipertaruhkan(episodes, a, b)
