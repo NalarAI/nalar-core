@@ -1,0 +1,52 @@
+{
+ "sumber": "Lampiran Permenkes Nomor 3 Tahun 2023",
+ "n_baris": 76970,
+ "n_kode_unik": 885,
+ "cmg": [
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+  "G",
+  "H",
+  "I",
+  "J",
+  "K",
+  "L",
+  "M",
+  "N",
+  "O",
+  "P",
+  "S",
+  "T",
+  "U",
+  "V",
+  "W",
+  "Z"
+ ],
+ "regional": [
+  1,
+  2,
+  3,
+  4,
+  5
+ ],
+ "kelas_rs": [
+  "A",
+  "B",
+  "C",
+  "D"
+ ],
+ "kepemilikan": [
+  "PEMERINTAH",
+  "SWASTA"
+ ],
+ "rawat": [
+  "INAP",
+  "JALAN"
+ ],
+ "tarif_terendah": 222500,
+ "tarif_tertinggi": 458181300
+}
