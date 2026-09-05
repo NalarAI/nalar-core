@@ -84,6 +84,23 @@ class Penoken:
         return 9
 
     @staticmethod
+    def pita_jumlah(n: int) -> int:
+        """Pita jumlah barang habis pakai.
+
+        Ditambahkan setelah pembedahan menunjukkan barang fiktif dan harga
+        digelembungkan menyumbang lebih dari separuh selisih rupiah, sementara
+        tidak satu pun kepala punya mekanisme melihatnya. Tanpa jumlah di
+        dalam token, model hanya bisa menebak barang apa yang wajar, bukan
+        berapa banyak, padahal modusnya persis menambah jumlah.
+        """
+        if n <= 0:
+            return 0
+        for i, batas in enumerate([1, 2, 4, 8, 16]):
+            if n <= batas:
+                return i + 1
+        return 6
+
+    @staticmethod
     def pita_tt(tt: int) -> int:
         if tt <= 0:
             return 0
@@ -180,8 +197,8 @@ class Penoken:
         # BHP
         tambah(bid("BHP"), "BHP")
         if r["bhp"]:
-            for kode, _ in r["bhp"][: BATAS["BHP"]]:
-                tambah(f"BH:{kode}", "BHP")
+            for kode, jml in r["bhp"][: BATAS["BHP"]]:
+                tambah(f"BH:{kode}:{self.pita_jumlah(jml)}", "BHP")
         else:
             tambah(MISS, "BHP")
 

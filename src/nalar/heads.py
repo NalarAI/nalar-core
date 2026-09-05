@@ -535,3 +535,96 @@ def divergensi_sebaya(episodes, idx, tabel, harapan, faskes_list, kelompok,
             for f in anggota:
                 hasil[f][nama] = round((hasil[f][kunci] - med) / mad, 3)
     return hasil
+
+
+# ---------------------------------------------------------------------------
+# K7 konsistensi tagihan bahan habis pakai
+# ---------------------------------------------------------------------------
+#
+# Ditambahkan setelah pembedahan kebenaran dasar menunjukkan sesuatu yang
+# seharusnya diperiksa jauh lebih awal. Upcoding, yang menjadi sasaran utama
+# kepala K2, ternyata hanya menyumbang sekitar dua belas persen selisih rupiah.
+# Yang besar justru barang habis pakai fiktif dan harga yang digelembungkan,
+# bersama sekitar lima puluh tiga persen, dan tidak satu pun kepala punya
+# mekanisme melihatnya.
+#
+# Kepala ini menutup bidang bahan habis pakai, lalu menanyakan berapa nilai
+# barang yang wajar untuk tindakan dan lama rawat seperti ini. Selisihnya
+# terhadap yang ditagihkan menangkap dua modus sekaligus: jumlah yang
+# ditambahkan, dan harga yang dinaikkan di atas acuan.
+
+# titik tengah tiap pita jumlah, dipakai menghitung nilai harapan
+TENGAH_PITA_JUMLAH = np.array([0.0, 1.0, 2.0, 3.0, 6.0, 12.0, 24.0])
+
+
+class TabelBarang:
+    """Peta token bahan habis pakai ke nilai rupiah harapannya."""
+
+    def __init__(self, kamus):
+        from .vocab import HARGA_ACUAN
+
+        self.tok_id, self.nilai = [], []
+        for tok, i in kamus.stoi.items():
+            if not tok.startswith("BH:"):
+                continue
+            bagian = tok.split(":")
+            if len(bagian) != 3:
+                continue
+            kode, pita = bagian[1], int(bagian[2])
+            self.tok_id.append(i)
+            self.nilai.append(HARGA_ACUAN.get(kode, 0) *
+                              TENGAH_PITA_JUMLAH[min(pita, 6)])
+        self.tok_id = np.array(self.tok_id, dtype=np.int64)
+        self.nilai = np.array(self.nilai, dtype=np.float64)
+
+
+@torch.no_grad()
+def selisih_tagihan(model, kamus, arr, idx, episodes, barang: TabelBarang,
+                    dev, batch=128):
+    """Selisih antara tagihan barang dan nilai barang yang didukung bukti.
+
+    Mengembalikan selisih rupiah dan nilai harapannya. Selisih positif berarti
+    yang ditagihkan lebih besar daripada yang wajar untuk tindakan seperti ini.
+    """
+    model.eval()
+    id_mask = kamus.id(MASK)
+    penanda_bhp = kamus.id("[BID:BHP]")
+    f_bhp = FIELD_ID["BHP"]
+    tok_bh = torch.from_numpy(barang.tok_id).to(dev)
+    nilai_bh = torch.from_numpy(barang.nilai).to(dev)
+
+    selisih = np.zeros(len(idx), dtype=np.float64)
+    harapan = np.zeros(len(idx), dtype=np.float64)
+
+    for s in range(0, len(idx), batch):
+        sel = idx[s:s + batch]
+        tok = arr["tok"][sel].astype(np.int64).copy()
+        fld = arr["fld"][sel].astype(np.int64)
+        pjg = arr["pjg"][sel]
+        dh = arr["dhari"][sel].astype(np.int64)
+
+        T = tok.shape[1]
+        posisi = []
+        for b in range(len(sel)):
+            m = ((np.arange(T) < pjg[b]) & (fld[b] == f_bhp)
+                 & (tok[b] != penanda_bhp))
+            posisi.append(np.flatnonzero(m))
+            tok[b, m] = id_mask
+
+        logit, _, _ = model(torch.from_numpy(tok).to(dev),
+                            torch.from_numpy(fld).to(dev),
+                            torch.from_numpy(dh).to(dev))
+
+        for b in range(len(sel)):
+            r = episodes[sel[b]]
+            ditagih = float(r.get("tagih_bhp", 0))
+            if posisi[b].size == 0:
+                selisih[s + b] = ditagih
+                continue
+            nilai_diharap = 0.0
+            for p in posisi[b]:
+                pr = torch.softmax(logit[b, p].float()[tok_bh], dim=-1)
+                nilai_diharap += float((pr * nilai_bh).sum())
+            harapan[s + b] = nilai_diharap
+            selisih[s + b] = ditagih - nilai_diharap
+    return selisih, harapan

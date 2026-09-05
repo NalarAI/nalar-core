@@ -220,7 +220,8 @@ class Kamus:
 
         # bahan habis pakai, dibangkitkan dari katalog barang sederhana
         for kode in BARANG:
-            self._tambah(f"BH:{kode}")
+            for pita in range(7):
+                self._tambah(f"BH:{kode}:{pita}")
 
         # token kategorial dan pita numerik
         for nama, n in KATEGORIAL.items():

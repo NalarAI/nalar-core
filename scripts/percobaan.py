@@ -25,10 +25,11 @@ from nalar import kalibrasi, metrik  # noqa: E402
 from nalar.dataset import (bangun_array, bangun_meta,  # noqa: E402
                            pisah_menurut_entitas)
 from nalar.generator import Pembangkit  # noqa: E402
-from nalar.heads import (TabelTarif, divergensi_sebaya,  # noqa: E402
-                         kemiripan_berlebih, kmeans,
+from nalar.heads import (TabelBarang, TabelTarif,  # noqa: E402
+                         divergensi_sebaya, kemiripan_berlebih, kmeans,
                          normalkan_terhadap_sejenis, sebaran_harapan,
-                         selisih_tarif, skor_kejutan, wakil_faskes)
+                         selisih_tagihan, selisih_tarif, skor_kejutan,
+                         wakil_faskes)
 from nalar.konformal import Kalibrator, periksa_jaminan  # noqa: E402
 from nalar.pembanding import (RegresiLogistik, fitur_tangan,  # noqa: E402
                               mesin_aturan)
@@ -148,6 +149,15 @@ def utama():
         model, V, arr, idx_te, eps, tabel, dev)
     print(f"    selesai dalam {time.time() - t:.0f}s", flush=True)
 
+    # K7 konsistensi tagihan bahan habis pakai. Ditambahkan setelah pembedahan
+    # kebenaran dasar menunjukkan upcoding hanya dua belas persen selisih
+    # rupiah, sedangkan barang fiktif dan harga digelembungkan bersama lima
+    # puluh tiga persen dan tidak terlihat kepala mana pun.
+    print("[4b] kepala K7 konsistensi tagihan", flush=True)
+    barang = TabelBarang(V)
+    k7_selisih, k7_harapan = selisih_tagihan(model, V, arr, idx_te, eps,
+                                             barang, dev)
+
     # Skor gabungan: peluang kelompok yang ditagihkan salah, dikali selisih
     # rupiah bila memang salah. Percobaan pertama memakai perkalian persentil
     # kejutan dengan selisih, dan itu lebih buruk daripada selisih saja karena
@@ -179,6 +189,7 @@ def utama():
         "nalar_gabungan_lama": k1 * np.clip(k2_selisih, 0, None),
         "mesin_aturan": skor_aturan,
         "regresi_logistik": skor_reg,
+        "nalar_k7_saja": np.clip(k7_selisih, 0, None),
         "nilai_klaim": np.array(
             [r["tarif"] + r.get("tagih_bhp", 0) for r in eps_te],
             dtype=np.float64),
@@ -352,8 +363,10 @@ def utama():
     penskor2 = dict(penskor)
     penskor2["nalar_k3_saja"] = skor_k3
     penskor2["nalar_k2_plus_k3"] = skor_nalar + skor_k3
+    penskor2["nalar_semua"] = (skor_nalar + skor_k3
+                               + np.clip(k7_selisih, 0, None))
     hasil2 = metrik.kurva(penskor2, sel_te, cur_te, daftar_k)
-    for nama in ("nalar_k3_saja", "nalar_k2_plus_k3"):
+    for nama in ("nalar_k3_saja", "nalar_k2_plus_k3", "nalar_semua"):
         hasil2[nama]["peningkatan_atas_aturan"] = metrik.peningkatan_atas(
             hasil2, nama, "mesin_aturan", daftar_k)
         # Peningkatan atas garis dasar urutkan menurut nilai klaim. Inilah
@@ -364,8 +377,9 @@ def utama():
             hasil2, nama, "nilai_klaim", daftar_k)
     catatan["metrik_dengan_k3"] = {
         k: v for k, v in hasil2.items()
-        if k in ("nalar", "nalar_k3_saja", "nalar_k2_plus_k3",
-                 "mesin_aturan", "regresi_logistik", "nilai_klaim")}
+        if k in ("nalar", "nalar_k3_saja", "nalar_k2_plus_k3", "nalar_semua",
+                 "nalar_k7_saja", "mesin_aturan", "regresi_logistik",
+                 "nilai_klaim")}
 
     catatan["waktu_total_detik"] = round(time.time() - t_mulai, 1)
     os.makedirs(os.path.dirname(a.keluaran), exist_ok=True)
@@ -390,8 +404,14 @@ def utama():
     print(f"  K2+K3   rupiah@{k}: "
           f"Rp {h2['nalar_k2_plus_k3']['rupiah_pada_k'][k]/1e6:.1f} juta   "
           f"peningkatan atas aturan {h2['nalar_k2_plus_k3']['peningkatan_atas_aturan']}")
-    print(f"  K2+K3 peningkatan atas nilai klaim: "
-          f"{h2['nalar_k2_plus_k3']['peningkatan_atas_nilai_klaim']}")
+    print(f"  K7 saja rupiah@{k}: "
+          f"Rp {hasil['nalar_k7_saja']['rupiah_pada_k'][k]/1e6:.1f} juta")
+    print(f"  SEMUA   rupiah@{k}: "
+          f"Rp {h2['nalar_semua']['rupiah_pada_k'][k]/1e6:.1f} juta")
+    print(f"  SEMUA lift atas aturan     : "
+          f"{h2['nalar_semua']['peningkatan_atas_aturan']}")
+    print(f"  SEMUA lift atas nilai klaim: "
+          f"{h2['nalar_semua']['peningkatan_atas_nilai_klaim']}")
 
 
 if __name__ == "__main__":
