@@ -18,7 +18,7 @@ import numpy as np
 import torch
 
 from .schema import FIELD_ID, MASK
-from .tarif import PETA_KONDISI, Kelompok, tarif
+from .tarif import Kelompok, tarif
 
 
 # ---------------------------------------------------------------------------
@@ -100,89 +100,48 @@ def normalkan_terhadap_sejenis(skor, kunci, minimal=25):
 class TabelTarif:
     """Peta dari token kelompok tarif ke nilai rupiah, per konteks klaim.
 
-    Tabel tarif dipisahkan sebagai acuan, bukan ditanam di bobot model. Kalau
-    tarif berubah, yang diganti berkas acuan, bukan modelnya.
+    Sejak tabel resmi masuk, kelas ini hanya membungkus tarif_resmi. Tabel
+    tarif tetap dipisahkan sebagai berkas acuan, bukan ditanam di bobot model.
+    Kalau tarif berubah, yang diganti berkasnya, bukan modelnya.
     """
 
     def __init__(self, kamus, episodes=None):
-        from .tarif import (PENGALI_KELAS_RAWAT, PENGALI_KELAS_RS,
-                            PENGALI_KEPARAHAN, PENGALI_REGIONAL,
-                            PROSEDUR_BESAR)
+        from .tarif_resmi import matriks_tarif, vektor_tarif
+        self._matriks_resmi = matriks_tarif
+        self._vektor_resmi = vektor_tarif
+
         self.kode, tok_id = [], []
         for tok, i in kamus.stoi.items():
             if tok.startswith("CB:"):
                 self.kode.append(tok[3:])
                 tok_id.append(i)
         self.tok_id = np.array(tok_id, dtype=np.int64)
-        # token kelas rawat, supaya kepala K2 bisa menaksir kelas juga
+        self.peta_kode = {k: i for i, k in enumerate(self.kode)}
+        # token kelas rawat, supaya kepala K2 menaksir kelas juga
         self.tok_kelas = np.array(
             [kamus.id(f"KLSRAWAT:{i}") for i in range(3)], dtype=np.int64)
-        self.peta_kode = {k: i for i, k in enumerate(self.kode)}
+        self.inap = np.array(
+            [k.rsplit("-", 1)[1] in ("I", "II", "III") for k in self.kode])
+        self._singgahan: dict[tuple, np.ndarray] = {}
 
-        peta_balik = {}
-        for dxp, (cmg, nomor, _, _) in PETA_KONDISI.items():
-            peta_balik.setdefault((cmg, nomor), dxp)
+    def nilai(self, dxp, prc, kelas_rawat, kelas_rs, regional,
+              kepemilikan="PEMERINTAH"):
+        """Vektor tarif untuk seluruh kelompok, pada konteks klaim ini."""
+        return self._vektor_resmi(self.kode, kelas_rawat, kelas_rs,
+                                  int(regional) + 1, kepemilikan)
 
-        n = len(self.kode)
-        self.dasar_ri = np.zeros(n)
-        self.dasar_rj = np.zeros(n)
-        self.inap = np.zeros(n, dtype=bool)
-        self.mult_kep = np.ones(n)
-        for i, k in enumerate(self.kode):
-            cmg, tipe, nomor, rom = k.split("-")
-            dxp = peta_balik.get((cmg, int(nomor)))
-            _, _, dri, drj = PETA_KONDISI.get(
-                dxp, ("Z", 99, 2_000_000, 160_000))
-            self.dasar_ri[i], self.dasar_rj[i] = dri, drj
-            kep = {"0": 0, "I": 1, "II": 2, "III": 3}[rom]
-            self.inap[i] = kep > 0
-            self.mult_kep[i] = PENGALI_KEPARAHAN.get(kep, 1.0)
-
-        self._prc_besar = PROSEDUR_BESAR
-        self._m_kelas_rawat = PENGALI_KELAS_RAWAT
-        self._m_kelas_rs = PENGALI_KELAS_RS
-        self._m_regional = PENGALI_REGIONAL
-
-    def nilai(self, dxp, prc, kelas_rawat, kelas_rs, regional):
-        """Vektor tarif untuk seluruh kelompok, pada konteks klaim ini.
-
-        Ditulis vektor karena versi awal memanggil fungsi tarif sekali per
-        kelompok, lima ratus dua puluh dua kali per klaim, dan itu memakan
-        hampir seluruh waktu penskoran.
-        """
-        pengali_prc = 1.0
-        for p in prc:
-            if p in self._prc_besar:
-                pengali_prc = max(pengali_prc, self._prc_besar[p])
-        v = np.where(self.inap, self.dasar_ri, self.dasar_rj) * pengali_prc
-        v = np.where(self.inap,
-                     v * self.mult_kep * self._m_kelas_rawat[kelas_rawat],
-                     v)
-        v = v * self._m_kelas_rs[kelas_rs] * self._m_regional[regional]
-        return np.round(v / 1000.0) * 1000.0
-
-    def matriks(self, dxp, prc, kelas_rs, regional):
+    def matriks(self, dxp, prc, kelas_rs, regional,
+                kepemilikan="PEMERINTAH"):
         """Tarif untuk setiap pasangan kelompok dan kelas rawat.
 
-        Versi sebelumnya menahan kelas rawat pada nilai yang ditagihkan, jadi
-        manipulasi kelas perawatan tidak terlihat sama sekali oleh kepala ini.
-        Dengan menaksir kelas rawat juga, selisihnya menangkap dua hal
-        sekaligus: kelompok tarif yang dinaikkan, dan kelas yang dinaikkan.
-
-        Bentuk keluarannya (jumlah kelompok, tiga kelas rawat).
+        Hasilnya disinggahkan per konteks, karena konteks yang berbeda cuma
+        ada delapan puluh kombinasi sedangkan klaimnya ratusan ribu.
         """
-        pengali_prc = 1.0
-        for p in prc:
-            if p in self._prc_besar:
-                pengali_prc = max(pengali_prc, self._prc_besar[p])
-        dasar = np.where(self.inap, self.dasar_ri, self.dasar_rj) * pengali_prc
-        keluar = np.zeros((len(self.kode), 3), dtype=np.float64)
-        for j, kr in enumerate((1, 2, 3)):
-            v = np.where(self.inap,
-                         dasar * self.mult_kep * self._m_kelas_rawat[kr],
-                         dasar)
-            keluar[:, j] = v * self._m_kelas_rs[kelas_rs] *                 self._m_regional[regional]
-        return np.round(keluar / 1000.0) * 1000.0
+        kunci = (kelas_rs, int(regional), kepemilikan)
+        if kunci not in self._singgahan:
+            self._singgahan[kunci] = self._matriks_resmi(
+                self.kode, kelas_rs, int(regional) + 1, kepemilikan)
+        return self._singgahan[kunci]
 
 
 @torch.no_grad()

@@ -259,6 +259,58 @@ def utama():
             "status": "dilewat, faskes pada himpunan uji terlalu sedikit",
             "n_faskes": len(faskes_list)}
 
+    # --- 11b. kepala K3 integritas episode -------------------------------
+    print("[8b] kepala K3 integritas episode", flush=True)
+    from nalar import tpp
+
+    a_tr, d_tr, m_tr, ada_tr = tpp.susun_pasangan(eps, idx_latih)
+    H_tr = tpp.representasi(model, arr, a_tr, dev)
+    kepala_waktu = tpp.KepalaWaktu(H_tr.shape[1]).to(dev)
+    riwayat_k3 = tpp.latih(kepala_waktu, H_tr, d_tr, m_tr, ada_tr, dev,
+                           langkah=500, seed=a.seed)
+
+    a_te, d_te, m_te, ada_te = tpp.susun_pasangan(eps, idx_te)
+    H_te = tpp.representasi(model, arr, a_te, dev)
+    p_lama = kepala_waktu.peluang_lebih_lama(
+        H_te.to(dev), torch.from_numpy(d_te).to(dev))
+    p_tanda = kepala_waktu.peluang_tanda(H_te.to(dev))
+
+    # Skor K3 dalam rupiah, satuan yang sama dengan K2 supaya bisa
+    # diperingkat bersama. Peluang pasangan ini sebenarnya satu episode,
+    # dikali rupiah yang didapat dari memecahnya.
+    posisi_te = {int(i): j for j, i in enumerate(idx_te)}
+    skor_k3 = np.zeros(len(idx_te), dtype=np.float64)
+    urut_pasien: dict[int, list[int]] = {}
+    for i in idx_te:
+        urut_pasien.setdefault(int(eps[i]["peserta_id"]), []).append(int(i))
+    for daftar in urut_pasien.values():
+        daftar.sort(key=lambda i: eps[i]["hari"])
+    berikut = {}
+    for daftar in urut_pasien.values():
+        for x, y in zip(daftar, daftar[1:]):
+            berikut[x] = y
+    for j, i in enumerate(a_te):
+        if ada_te[j] != 1:
+            continue
+        b_ = berikut.get(int(i))
+        if b_ is None:
+            continue
+        rp = tpp.selisih_pemecahan(eps, int(i), b_)
+        if rp <= 0:
+            continue
+        peluang = float(p_lama[j]) * float(p_tanda[j][tpp.TANDA_LANJUT])
+        k = posisi_te.get(int(i))
+        if k is not None:
+            skor_k3[k] = peluang * rp
+
+    catatan["k3_waktu"] = {
+        "riwayat_rugi": riwayat_k3,
+        "n_pasangan_latih": int(len(a_tr)),
+        "n_pasangan_uji": int(len(a_te)),
+        "n_klaim_berskor": int((skor_k3 > 0).sum()),
+        "rupiah_tertimbang_total": round(float(skor_k3.sum())),
+    }
+
     # --- 12. pelaku yang beradaptasi -------------------------------------
     print("[9] pelaku yang beradaptasi", flush=True)
     from nalar.adversarial import bandingkan as bandingkan_pelaku
@@ -280,6 +332,19 @@ def utama():
     catatan["adversarial"] = bandingkan_pelaku(
         eps, idx_te, penskor_klaim, kal2.ambang_global, seed=a.seed)
 
+    # metrik ulang dengan K3 ikut serta
+    penskor2 = dict(penskor)
+    penskor2["nalar_k3_saja"] = skor_k3
+    penskor2["nalar_k2_plus_k3"] = skor_nalar + skor_k3
+    hasil2 = metrik.kurva(penskor2, sel_te, cur_te, daftar_k)
+    for nama in ("nalar_k3_saja", "nalar_k2_plus_k3"):
+        hasil2[nama]["peningkatan_atas_aturan"] = metrik.peningkatan_atas(
+            hasil2, nama, "mesin_aturan", daftar_k)
+    catatan["metrik_dengan_k3"] = {
+        k: v for k, v in hasil2.items()
+        if k in ("nalar", "nalar_k3_saja", "nalar_k2_plus_k3",
+                 "mesin_aturan", "regresi_logistik")}
+
     catatan["waktu_total_detik"] = round(time.time() - t_mulai, 1)
     os.makedirs(os.path.dirname(a.keluaran), exist_ok=True)
     with open(a.keluaran, "w", encoding="utf-8") as f:
@@ -295,6 +360,12 @@ def utama():
               f"presisi {hasil[nama]['presisi_pada_k'][k]:.3f}")
     print(f"  peningkatan nalar atas aturan: "
           f"{hasil['nalar']['peningkatan_atas_aturan']}")
+    h2 = catatan["metrik_dengan_k3"]
+    print(f"  K3 saja rupiah@{k}: "
+          f"Rp {h2['nalar_k3_saja']['rupiah_pada_k'][k]/1e6:.1f} juta")
+    print(f"  K2+K3   rupiah@{k}: "
+          f"Rp {h2['nalar_k2_plus_k3']['rupiah_pada_k'][k]/1e6:.1f} juta   "
+          f"peningkatan {h2['nalar_k2_plus_k3']['peningkatan_atas_aturan']}")
 
 
 if __name__ == "__main__":
