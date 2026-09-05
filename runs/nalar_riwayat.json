@@ -1,14 +1,56 @@
 [
  {
   "langkah": 1,
-  "rugi_latih": 7.312226295471191,
-  "rugi_valid": 7.216725905736287,
-  "detik": 3.7
+  "rugi_latih": 7.387031078338623,
+  "rugi_valid": 7.379667282104492,
+  "detik": 2.6
  },
  {
-  "langkah": 25,
-  "rugi_latih": 6.229105472564697,
-  "rugi_valid": 6.159253756205241,
-  "detik": 10.1
+  "langkah": 375,
+  "rugi_latih": 2.620776891708374,
+  "rugi_valid": 2.712441166241964,
+  "detik": 64.1
+ },
+ {
+  "langkah": 750,
+  "rugi_latih": 2.4781646728515625,
+  "rugi_valid": 2.519685427347819,
+  "detik": 124.0
+ },
+ {
+  "langkah": 1125,
+  "rugi_latih": 2.168154716491699,
+  "rugi_valid": 2.5006319681803384,
+  "detik": 183.2
+ },
+ {
+  "langkah": 1500,
+  "rugi_latih": 2.2928264141082764,
+  "rugi_valid": 2.3298137187957764,
+  "detik": 248.8
+ },
+ {
+  "langkah": 1875,
+  "rugi_latih": 2.196685552597046,
+  "rugi_valid": 2.179179867108663,
+  "detik": 308.9
+ },
+ {
+  "langkah": 2250,
+  "rugi_latih": 2.149294137954712,
+  "rugi_valid": 2.1237263679504395,
+  "detik": 368.2
+ },
+ {
+  "langkah": 2625,
+  "rugi_latih": 2.0745491981506348,
+  "rugi_valid": 2.103832562764486,
+  "detik": 428.5
+ },
+ {
+  "langkah": 3000,
+  "rugi_latih": 2.195455551147461,
+  "rugi_valid": 2.1393309434254966,
+  "detik": 487.8
  }
 ]

@@ -804,3 +804,103 @@ Pola yang berulang: begitu satu garis dasar atau satu penguraian ditambahkan,
 kesimpulan sebelumnya berubah. Garis dasar nilai klaim membatalkan klaim
 keunggulan 2,53 kali. Kepala K7 membatalkan temuan bahwa model besar tidak
 berguna. Penguraian per kepala membatalkan dua dugaan soal keadilan sekaligus.
+
+---
+
+## Percobaan 11 dan 12, 6 September 2026: T3 terjawab, dan kami kalah
+
+`runs/p11_pohon.json` dan `runs/p12_gabung.json`
+
+scikit-learn akhirnya terpasang, jadi target T3 bisa dijawab. Pohon berpenguat
+dijalankan dua bentuk, dan membedakannya menentukan seluruh penafsiran.
+
+**Terawasi** dilatih memakai label kecurangan. Itu batas atas dari dunia yang
+tidak kita punya, sekelas regresi logistik berlabel.
+
+**Normatif** tidak memakai satu pun label. Ia menebak tarif dan nilai tagihan
+barang dari bukti, lalu selisihnya menjadi skor. Itu pekerjaan yang persis sama
+dengan tulang punggung kami, dikerjakan pohon. Inilah uji T3 yang sesungguhnya.
+
+### Hasil
+
+Batas atas pada seribu klaim, kalau kita tahu jawabannya: Rp 1.753,6 juta.
+
+| Penskor | rp@50 | rp@500 | rp@1000 | Porsi batas atas |
+|---|---:|---:|---:|---:|
+| Pohon terawasi, berlabel | 354,6 jt | 1.078,7 jt | 1.417,8 jt | 0,808 |
+| Pohon + K3 + K7 | 233,8 jt | 1.141,3 jt | 1.272,3 jt | 0,726 |
+| **Pohon normatif, tanpa label** | 216,0 jt | 1.009,6 jt | **1.264,3 jt** | **0,721** |
+| Pohon + K3 | 262,2 jt | 1.097,1 jt | 1.246,4 jt | 0,711 |
+| **NALAR semua** | 322,0 jt | 900,5 jt | **1.138,8 jt** | **0,649** |
+| Nilai klaim saja | 298,6 jt | 810,1 jt | 978,8 jt | 0,558 |
+| Mesin aturan | 127,1 jt | 573,6 jt | 658,9 jt | 0,376 |
+
+### T3 gagal, dan lebih telak daripada yang diantisipasi
+
+Pohon normatif menemukan Rp 1.264,3 juta, NALAR Rp 1.138,8 juta. **Pohon
+mengalahkan kami sebelas persen, tanpa memakai satu pun label, pada pekerjaan
+yang persis sama.**
+
+Rancangan sudah menyiapkan jawaban bila ini terjadi: pertahankan model dalam
+untuk keluarga B dan C, yang tidak bisa dikerjakan pohon karena pohon bekerja
+satu baris satu baris. Kami menguji jalan keluar itu, dan **jalan keluar itu
+juga tidak berlaku**.
+
+Menambahkan kepala K3 di atas pohon justru **menurunkan** hasilnya, dari
+1.264,3 menjadi 1.246,4. Menambahkan K3 dan K7 sekaligus menaikkannya
+**0,6 persen**, dari 1.264,3 menjadi 1.272,3. Itu di dalam derau.
+
+Jadi tidak ada bagian dari arsitektur kami yang terbukti menyumbang di atas
+pohon berpenguat sederhana.
+
+### Yang tetap berdiri
+
+Kesimpulan di atas menjatuhkan pilihan modelnya, bukan pendekatannya. Yang
+terbukti dan tidak bergantung pada model mana yang dipakai:
+
+1. **Pemodelan kewajaran tanpa label bekerja.** Pohon normatif, yang tidak
+   pernah melihat satu pun label kecurangan, menemukan Rp 1.264,3 juta melawan
+   Rp 658,9 juta milik mesin aturan. Hampir dua kali lipat. Itu tesis pokok
+   rancangan, dan tesis itu bertahan.
+
+2. **Jarak ke sistem berlabel tinggal sebelas persen.** 0,721 melawan 0,808
+   porsi batas atas. Kecil, dan itu memperkuat rekomendasi P4 sekaligus
+   menunjukkan sistem tanpa label sudah mendekati langit langitnya.
+
+3. **Kalibrasi konformal per kelompok** yang mengubah rasio ketimpangan dari
+   105 menjadi 1,77 sama sekali tidak bergantung pada model. Ia berlaku untuk
+   pohon juga.
+
+4. **Uji pelaku yang beradaptasi, tabel tarif resmi, metrik porsi batas atas,
+   dan pembangkit datanya** semuanya model-agnostik.
+
+### Rekomendasi yang berubah
+
+Yang jujur sekarang: **pakai pohon berpenguat sebagai penebak normatifnya, dan
+pertahankan seluruh sisanya.**
+
+Keuntungannya bukan cuma angka. Pohon dilatih dalam hitungan detik, sedangkan
+transformer memakan sekitar seribu detik di kartu grafis. Untuk BPJS artinya
+sistem bisa dilatih ulang tiap hari di perangkat biasa, tanpa kartu grafis,
+tanpa bergantung pada penyedia awan.
+
+Proposal yang keluar dari sini lebih sederhana, lebih murah, dan lebih mudah
+dipertanggungjawabkan daripada yang kami rancang di awal. Itu hasil yang baik,
+meski bukan hasil yang menyenangkan.
+
+Transformer tetap disimpan di repositori, karena ia yang menghasilkan seluruh
+pembedahan yang membawa kami ke sini, dan karena ablasi lanjutan mungkin
+menemukan konfigurasi yang berbeda. Tapi ia tidak lagi menjadi usulan utama
+sampai ada bukti yang mendukungnya.
+
+### Papan skor akhir
+
+| Target | Hasil |
+|---|---|
+| T1 dua kali atas aturan pada seribu klaim | belum, 1,73. Tercapai pada lima puluh teratas, 2,53 |
+| T2 jaminan konformal | **tercapai** |
+| T3 mengalahkan pohon berpenguat | **gagal**, 0,649 melawan 0,721 porsi batas atas |
+| T4 pralatih memberi perbaikan | tercapai, tapi menjadi tidak relevan bila tulang punggungnya diganti pohon |
+| T5 keadilan antar kelompok | tercapai tipis, 1,77 dan 2,02 pada dua jalan |
+| T6 ketahanan pelaku | **tercapai** |
+| T7 faskes tak dikenal | tercapai |

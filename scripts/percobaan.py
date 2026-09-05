@@ -393,8 +393,19 @@ def utama():
     penskor2["nalar_k2_plus_k3"] = skor_nalar + skor_k3
     penskor2["nalar_semua"] = (skor_nalar + skor_k3
                                + np.clip(k7_selisih, 0, None))
+    # Uji positioning. Pohon normatif mengalahkan kami pada pekerjaan per
+    # klaim, yaitu keluarga A. Tapi pohon bekerja satu baris satu baris, jadi
+    # ia tidak bisa mengerjakan keluarga B yang soal barisan waktu. Gabungan
+    # di bawah menguji apakah sumbangan kami memang ada di kepala yang tidak
+    # bisa dikerjakan pohon, bukan di tulang punggungnya.
+    if skor_pohon_norm is not None:
+        penskor2["pohon_plus_k3"] = skor_pohon_norm + skor_k3
+        penskor2["pohon_plus_k3_k7"] = (skor_pohon_norm + skor_k3
+                                        + np.clip(k7_selisih, 0, None))
     hasil2 = metrik.kurva(penskor2, sel_te, cur_te, daftar_k)
-    for nama in ("nalar_k3_saja", "nalar_k2_plus_k3", "nalar_semua"):
+    for nama in [n for n in ("nalar_k3_saja", "nalar_k2_plus_k3",
+                             "nalar_semua", "pohon_plus_k3",
+                             "pohon_plus_k3_k7") if n in hasil2]:
         hasil2[nama]["peningkatan_atas_aturan"] = metrik.peningkatan_atas(
             hasil2, nama, "mesin_aturan", daftar_k)
         # Peningkatan atas garis dasar urutkan menurut nilai klaim. Inilah
@@ -408,7 +419,7 @@ def utama():
         if k in ("nalar", "nalar_k3_saja", "nalar_k2_plus_k3", "nalar_semua",
                  "nalar_k7_saja", "mesin_aturan", "regresi_logistik",
                  "nilai_klaim", "pohon_terawasi", "pohon_normatif",
-                 "_batas_atas")}
+                 "pohon_plus_k3", "pohon_plus_k3_k7", "_batas_atas")}
 
     # --- 13. keadilan per kepala, dan pada skor yang sebenarnya dipakai ---
     # Pengukuran keadilan sebelumnya hanya memakai skor K2, bukan skor
@@ -462,6 +473,11 @@ def utama():
           f"{h2['nalar_semua']['peningkatan_atas_nilai_klaim']}")
     print(f"  SEMUA porsi batas atas     : "
           f"{h2['nalar_semua']['porsi_batas_atas']}")
+    for nm in ("pohon_plus_k3", "pohon_plus_k3_k7"):
+        if nm in h2:
+            print(f"  {nm:18s} rp@{k}: "
+                  f"Rp {h2[nm]['rupiah_pada_k'][k]/1e6:8.1f} juta   "
+                  f"porsi batas atas {h2[nm]['porsi_batas_atas'][k]}")
     for nm in ("pohon_normatif", "pohon_terawasi"):
         if nm in hasil:
             print(f"  {nm:16s} rp@{k}: "
