@@ -233,15 +233,17 @@ def utama():
         label, _ = kmeans(Xf, k, seed=a.seed)
         harapan = sebaran_harapan(model, V, arr, idx_te, tabel, dev)
         div = divergensi_sebaya(eps, idx_te, tabel, harapan, faskes_list,
-                                label)
-        urut4 = sorted(div.items(), key=lambda kv: -kv[1]["js_relatif"])[:10]
+                                label, selisih_klaim=np.clip(k2_selisih, 0, None))
+        urut4 = sorted(div.items(), key=lambda kv: -kv[1]["skor_relatif"])[:10]
         keb_rs = {int(f): int(g.kebijakan.rs[f]) for f in div}
         catatan["k4_sebaya"] = {
             "n_faskes_dinilai": len(div),
             "n_kelompok_sebaya": int(k),
             "sepuluh_teratas": [
-                dict(faskes=int(f), js_relatif=v["js_relatif"],
-                     n_klaim=v["n"], kelompok=v["kelompok"],
+                dict(faskes=int(f), skor_relatif=v["skor_relatif"],
+                     js_relatif=v["js_relatif"], n_klaim=v["n"],
+                     kelebihan_per_klaim_rp=v["kelebihan_per_klaim_rp"],
+                     kelompok=v["kelompok"],
                      perkiraan_kelebihan_rp=v["perkiraan_kelebihan_rp"],
                      kebijakan_sebenarnya=keb_rs.get(int(f)))
                 for f, v in urut4],
@@ -276,7 +278,7 @@ def utama():
 
     kal2 = Kalibrator(alpha=0.02).pasang(skor_kal, kel_kal)
     catatan["adversarial"] = bandingkan_pelaku(
-        eps, idx_te[:600], penskor_klaim, kal2.ambang_global, seed=a.seed)
+        eps, idx_te, penskor_klaim, kal2.ambang_global, seed=a.seed)
 
     catatan["waktu_total_detik"] = round(time.time() - t_mulai, 1)
     os.makedirs(os.path.dirname(a.keluaran), exist_ok=True)

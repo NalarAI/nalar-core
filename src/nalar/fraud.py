@@ -364,10 +364,22 @@ def pasca(episodes: list[dict], keb: Kebijakan, jaringan,
             d["eps_id"] = next_id
             next_id += 1
             d["hari"] = int(rng.integers(0, max(asal["hari"] + 1, 2)))
-            d["obt"] = []
-            d["lab"] = []
-            d["bhp"] = []
-            d["tagih_bhp"] = 0
+            # Versi pertama mengosongkan obat dan pemeriksaan, dan itu keliru.
+            # Klaim fiktif yang dibuat orang justru dilengkapi supaya lolos
+            # verifikasi berkas. Yang kosong akan tertangkap aturan paling
+            # sederhana, dan memakainya membuat mesin aturan pembanding
+            # terlihat jauh lebih kuat daripada seharusnya.
+            #
+            # Yang benar, isinya disalin dari klaim lain yang wajar di faskes
+            # yang sama. Jejak yang hilang bukan di dalam berkas, melainkan di
+            # luar berkas: pasiennya tidak pernah datang. Karena itu satu
+            # satunya yang bisa melihatnya adalah pola pada tingkat entitas,
+            # yaitu kepala K4 dan K5, bukan pemeriksaan per klaim.
+            donor = episodes[int(rng.choice(idxs))]
+            d["obt"] = list(donor["obt"])
+            d["lab"] = list(donor["lab"])
+            d["bhp"] = list(donor["bhp"])
+            d["tagih_bhp"] = int(donor.get("tagih_bhp", 0))
             d["modus"] = ["M06"]
             d["selisih_rp"] = int(d["tarif"])
             d["fiktif"] = True

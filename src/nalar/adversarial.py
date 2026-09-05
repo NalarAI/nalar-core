@@ -60,7 +60,7 @@ def kandidat_gerakan(r: dict, maks: int = 6) -> list[list[str]]:
 
 
 def jalankan(episodes, idx, penskor, ambang, rng, jenis: str = "hati_hati",
-             maks_klaim: int = 1500):
+             maks_klaim: int = 400):
     """Jalankan satu jenis pelaku dan ukur berapa yang bisa ia ambil.
 
     penskor  fungsi yang menerima daftar klaim dan mengembalikan skornya

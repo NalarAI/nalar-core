@@ -487,7 +487,7 @@ def wakil_faskes(model, kamus, arr, idx, episodes, dev, batch=256):
 
 
 def divergensi_sebaya(episodes, idx, tabel, harapan, faskes_list, kelompok,
-                      minimal=40):
+                      minimal=40, selisih_klaim=None):
     """Seberapa jauh sebaran tarif faskes menyimpang dari yang diharapkan.
 
     Pembandingnya bukan sebaran rata rata kelompok, tapi sebaran yang
@@ -527,8 +527,17 @@ def divergensi_sebaya(episodes, idx, tabel, harapan, faskes_list, kelompok,
         nilai = np.where(tabel.inap, tabel.dasar_ri, tabel.dasar_rj) * \
             np.where(tabel.inap, tabel.mult_kep, 1.0)
         lebih = float((teramati - diharap) @ nilai) * len(pos)
+        # Kelebihan rupiah rata rata per klaim. Percobaan kedua menunjukkan
+        # divergensi sebaran terlalu berisik pada faskes dengan sedikit klaim,
+        # dan peringkatnya nyaris tidak lebih baik daripada acak. Rata rata
+        # selisih per klaim jauh lebih stabil, dan satuannya langsung rupiah.
+        if selisih_klaim is not None:
+            per_klaim = float(np.mean(np.clip(selisih_klaim[pos], 0, None)))
+        else:
+            per_klaim = lebih / max(len(pos), 1)
         hasil[f] = dict(js=round(js, 5), n=len(pos),
                         kelompok=kel_of.get(f, -1),
+                        kelebihan_per_klaim_rp=round(per_klaim),
                         perkiraan_kelebihan_rp=round(lebih))
 
     # bandingkan hanya di dalam kelompok sebaya
@@ -537,10 +546,13 @@ def divergensi_sebaya(episodes, idx, tabel, harapan, faskes_list, kelompok,
         if len(anggota) < 3:
             for f in anggota:
                 hasil[f]["js_relatif"] = 0.0
+                hasil[f]["skor_relatif"] = 0.0
             continue
-        nilai = np.array([hasil[f]["js"] for f in anggota])
-        med = float(np.median(nilai))
-        mad = float(np.median(np.abs(nilai - med))) or 1e-9
-        for f in anggota:
-            hasil[f]["js_relatif"] = round((hasil[f]["js"] - med) / mad, 3)
+        for kunci, nama in (("js", "js_relatif"),
+                            ("kelebihan_per_klaim_rp", "skor_relatif")):
+            nilai = np.array([hasil[f][kunci] for f in anggota], dtype=float)
+            med = float(np.median(nilai))
+            mad = float(np.median(np.abs(nilai - med))) or 1e-9
+            for f in anggota:
+                hasil[f][nama] = round((hasil[f][kunci] - med) / mad, 3)
     return hasil
