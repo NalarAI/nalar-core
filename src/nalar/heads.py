@@ -319,3 +319,161 @@ def kemiripan_berlebih(episodes, idx, n_pasang_maks=400_000, seed=0):
     for f, v in skor_faskes.items():
         v["kelebihan"] = v["porsi_sangat_mirip"] - dasar
     return skor_faskes, dasar
+
+
+# ---------------------------------------------------------------------------
+# K4 kelompok sebaya
+# ---------------------------------------------------------------------------
+
+def kmeans(X, k, iterasi=40, seed=0):
+    """K-means sederhana, ditulis sendiri.
+
+    Dipakai membentuk kelompok sebaya faskes. Ditulis sendiri karena
+    scikit-learn tidak terpasang, dan karena algoritmanya cukup pendek
+    sehingga menambah ketergantungan tidak sepadan.
+    """
+    rng = np.random.default_rng(seed)
+    n = len(X)
+    k = min(k, n)
+    pusat = X[rng.choice(n, size=k, replace=False)].copy()
+    label = np.zeros(n, dtype=np.int64)
+    for _ in range(iterasi):
+        jarak = ((X[:, None, :] - pusat[None, :, :]) ** 2).sum(-1)
+        baru = jarak.argmin(1)
+        if (baru == label).all():
+            break
+        label = baru
+        for j in range(k):
+            m = label == j
+            if m.any():
+                pusat[j] = X[m].mean(0)
+    return label, pusat
+
+
+@torch.no_grad()
+def sebaran_harapan(model, kamus, arr, idx, tabel, dev, batch=128):
+    """Sebaran peluang kelompok tarif yang diharapkan, per klaim.
+
+    Bidang tarif ditutup, lalu model menebaknya dari bukti. Yang dikembalikan
+    adalah sebaran penuh, bukan tebakan tunggal, karena yang dibandingkan pada
+    tingkat faskes adalah sebaran melawan sebaran.
+    """
+    model.eval()
+    id_mask = kamus.id(MASK)
+    penanda_trf = kamus.id("[BID:TRF]")
+    f_trf = FIELD_ID["TRF"]
+    tok_cbg = torch.from_numpy(tabel.tok_id).to(dev)
+    out = np.zeros((len(idx), len(tabel.kode)), dtype=np.float32)
+
+    for s in range(0, len(idx), batch):
+        sel = idx[s:s + batch]
+        tok = arr["tok"][sel].astype(np.int64).copy()
+        fld = arr["fld"][sel].astype(np.int64)
+        pjg = arr["pjg"][sel]
+        dh = arr["dhari"][sel].astype(np.int64)
+        T = tok.shape[1]
+        pos = np.full(len(sel), -1, dtype=np.int64)
+        for b in range(len(sel)):
+            m = ((np.arange(T) < pjg[b]) & (fld[b] == f_trf)
+                 & (tok[b] != penanda_trf))
+            p = np.flatnonzero(m)
+            if p.size:
+                pos[b] = p[0]
+            tok[b, m] = id_mask
+        logit, h, _ = model(torch.from_numpy(tok).to(dev),
+                            torch.from_numpy(fld).to(dev),
+                            torch.from_numpy(dh).to(dev))
+        for b in range(len(sel)):
+            if pos[b] < 0:
+                continue
+            out[s + b] = torch.softmax(
+                logit[b, pos[b]].float()[tok_cbg], dim=-1).cpu().numpy()
+    return out
+
+
+@torch.no_grad()
+def wakil_faskes(model, kamus, arr, idx, episodes, dev, batch=256):
+    """Vektor wakil tiap faskes, dari rata rata representasi episodenya."""
+    model.eval()
+    d = model.d
+    jumlah: dict[int, np.ndarray] = {}
+    hitung: dict[int, int] = {}
+    for s in range(0, len(idx), batch):
+        sel = idx[s:s + batch]
+        tok = torch.from_numpy(arr["tok"][sel].astype(np.int64)).to(dev)
+        fld = torch.from_numpy(arr["fld"][sel].astype(np.int64)).to(dev)
+        dh = torch.from_numpy(arr["dhari"][sel].astype(np.int64)).to(dev)
+        h, pad = model.encode(tok, fld, dh)
+        v = (h * pad.unsqueeze(-1)).sum(1) / pad.sum(1, keepdim=True).clamp(min=1)
+        v = v.cpu().numpy()
+        for b, i in enumerate(sel):
+            r = episodes[i]
+            if not r["f_jenis"]:
+                continue
+            f = int(r["faskes"])
+            jumlah[f] = jumlah.get(f, np.zeros(d, dtype=np.float64)) + v[b]
+            hitung[f] = hitung.get(f, 0) + 1
+    faskes = sorted(jumlah)
+    X = np.stack([jumlah[f] / hitung[f] for f in faskes]) if faskes else \
+        np.zeros((0, d))
+    return faskes, X, np.array([hitung[f] for f in faskes])
+
+
+def divergensi_sebaya(episodes, idx, tabel, harapan, faskes_list, kelompok,
+                      minimal=40):
+    """Seberapa jauh sebaran tarif faskes menyimpang dari yang diharapkan.
+
+    Pembandingnya bukan sebaran rata rata kelompok, tapi sebaran yang
+    diperkirakan model untuk pasien pasien yang benar benar datang ke faskes
+    ini. Ini yang menjawab bantahan paling umum dari rumah sakit, bahwa pasien
+    mereka memang lebih berat.
+    """
+    peta_kode = {k: i for i, k in enumerate(tabel.kode)}
+    per_faskes: dict[int, list[int]] = {}
+    for j, i in enumerate(idx):
+        r = episodes[i]
+        if r["f_jenis"]:
+            per_faskes.setdefault(int(r["faskes"]), []).append(j)
+
+    kel_of = {f: int(k) for f, k in zip(faskes_list, kelompok)}
+    hasil = {}
+    for f, pos in per_faskes.items():
+        if len(pos) < minimal:
+            continue
+        teramati = np.zeros(len(tabel.kode), dtype=np.float64)
+        for j in pos:
+            c = episodes[idx[j]]["cbg"]
+            if c in peta_kode:
+                teramati[peta_kode[c]] += 1.0
+        teramati /= max(teramati.sum(), 1.0)
+        diharap = harapan[pos].mean(0).astype(np.float64)
+        diharap /= max(diharap.sum(), 1e-12)
+
+        # divergensi Jensen Shannon, simetris dan berbatas
+        m = 0.5 * (teramati + diharap)
+        def kl(p, q):
+            m_ = p > 0
+            return float((p[m_] * np.log(p[m_] / np.maximum(q[m_], 1e-12))).sum())
+        js = 0.5 * kl(teramati, m) + 0.5 * kl(diharap, m)
+
+        # kelebihan rupiah yang diperkirakan dari pergeseran sebaran
+        nilai = np.where(tabel.inap, tabel.dasar_ri, tabel.dasar_rj) * \
+            np.where(tabel.inap, tabel.mult_kep, 1.0)
+        lebih = float((teramati - diharap) @ nilai) * len(pos)
+        hasil[f] = dict(js=round(js, 5), n=len(pos),
+                        kelompok=kel_of.get(f, -1),
+                        perkiraan_kelebihan_rp=round(lebih))
+
+    # bandingkan hanya di dalam kelompok sebaya
+    for kel in {v["kelompok"] for v in hasil.values()}:
+        anggota = [f for f, v in hasil.items() if v["kelompok"] == kel]
+        if len(anggota) < 3:
+            for f in anggota:
+                hasil[f]["js_relatif"] = 0.0
+            continue
+        nilai = np.array([hasil[f]["js"] for f in anggota])
+        med = float(np.median(nilai))
+        mad = float(np.median(np.abs(nilai - med))) or 1e-9
+        for f in anggota:
+            hasil[f]["js_relatif"] = round((hasil[f]["js"] - med) / mad, 3)
+    return hasil

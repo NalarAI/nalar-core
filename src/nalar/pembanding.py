@@ -8,6 +8,24 @@ alasan untuk ada, dan itu harus dilaporkan apa adanya.
 Aturan di bawah disusun dari pemeriksaan yang wajar dilakukan verifikator:
 duplikasi, keparahan tanpa bukti, kelas melampaui hak, harga di atas acuan,
 lama rawat tanpa tindakan, dan pasangan prosedur yang saling meniadakan.
+
+CATATAN YANG HARUS DIBACA SEBELUM MENAFSIRKAN HASILNYA.
+
+Aturan ini ditulis oleh orang yang sama yang menulis injeksi modus di
+fraud.py. Artinya mesin aturan ini tahu persis bentuk kecurangan yang ada di
+data, sesuatu yang tidak pernah dimiliki mesin aturan di dunia nyata. Di
+lapangan, aturan selalu tertinggal di belakang modus yang berkembang.
+
+Akibatnya dua arah, dan keduanya harus disebut:
+
+  Kalau model mengalahkan aturan ini, itu hasil yang kuat, karena
+  pembandingnya diuntungkan.
+
+  Kalau model kalah, penafsirannya tidak langsung, karena sebagian kekalahan
+  berasal dari keuntungan yang tidak dimiliki aturan sungguhan.
+
+Uji yang lebih adil adalah menahan sebagian modus dari penulis aturan, dan itu
+belum dikerjakan.
 """
 
 from __future__ import annotations

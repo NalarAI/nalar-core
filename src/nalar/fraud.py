@@ -63,13 +63,34 @@ class Kebijakan:
 
 
 def tetapkan_kebijakan(jaringan, rng: np.random.Generator,
-                       prevalensi: float = 0.22) -> Kebijakan:
+                       prevalensi: float = 0.22,
+                       minimal_per_jenis: int = 3) -> Kebijakan:
+    """Tetapkan kebijakan per faskes, berstrata.
+
+    Undian bebas menghasilkan masalah pada jaringan kecil. Dengan dua puluh
+    rumah sakit dan porsi ekstrem dua persen, jumlah yang diharapkan kurang
+    dari satu, jadi sering tidak ada satu pun faskes ekstrem dan kepala K4
+    serta K5 tidak punya apa apa untuk ditemukan. Evaluasinya lalu terlihat
+    seolah kepala itu gagal, padahal soalnya memang kosong.
+
+    Penetapan berstrata menjamin tiap jenis kebijakan punya wakil minimal.
+    Porsi keseluruhan tetap dijaga sedekat mungkin dengan yang diminta, dan
+    penyimpangannya dicatat supaya bisa diperiksa.
+    """
     keb = Kebijakan(jaringan.n_fkrtl, jaringan.n_fktp)
     for arr, n in ((keb.rs, jaringan.n_fkrtl), (keb.fktp, jaringan.n_fktp)):
-        nakal = rng.random(n) < prevalensi
-        jenis = rng.choice([OPORTUNIS, SISTEMATIS, EKSTREM],
-                           size=int(nakal.sum()), p=PORSI_NAKAL)
-        arr[nakal] = jenis
+        target = np.maximum(
+            np.round(n * prevalensi * PORSI_NAKAL).astype(int),
+            min(minimal_per_jenis, max(n // 8, 1)))
+        total = int(target.sum())
+        if total > n:
+            target = np.floor(target * n / total).astype(int)
+            total = int(target.sum())
+        pilih = rng.permutation(n)[:total]
+        ofs = 0
+        for jenis, jml in zip((OPORTUNIS, SISTEMATIS, EKSTREM), target):
+            arr[pilih[ofs:ofs + jml]] = jenis
+            ofs += jml
     # sebagian FKTP nakal punya rumah sakit favorit
     for i in np.flatnonzero(keb.fktp > 0):
         if rng.random() < 0.55:

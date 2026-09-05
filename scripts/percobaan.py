@@ -25,9 +25,10 @@ from nalar import kalibrasi, metrik  # noqa: E402
 from nalar.dataset import (bangun_array, bangun_meta,  # noqa: E402
                            pisah_menurut_entitas)
 from nalar.generator import Pembangkit  # noqa: E402
-from nalar.heads import (TabelTarif, kemiripan_berlebih,  # noqa: E402
-                         normalkan_terhadap_sejenis, selisih_tarif,
-                         skor_kejutan)
+from nalar.heads import (TabelTarif, divergensi_sebaya,  # noqa: E402
+                         kemiripan_berlebih, kmeans,
+                         normalkan_terhadap_sejenis, sebaran_harapan,
+                         selisih_tarif, skor_kejutan, wakil_faskes)
 from nalar.konformal import Kalibrator, periksa_jaminan  # noqa: E402
 from nalar.pembanding import (RegresiLogistik, fitur_tangan,  # noqa: E402
                               mesin_aturan)
@@ -218,6 +219,58 @@ def utama():
     nakal = [1 if keb.get(int(f), 0) > 0 else 0 for f, _ in urut]
     catatan["k5_kemiripan"]["presisi_sepuluh_teratas"] = (
         round(float(np.mean(nakal)), 3) if nakal else None)
+
+    # --- 11. kepala K4 kelompok sebaya -----------------------------------
+    print("[8] kepala K4 kelompok sebaya", flush=True)
+    faskes_list, Xf, n_klaim = wakil_faskes(model, V, arr, idx_te, eps, dev)
+    if len(faskes_list) >= 6:
+        k = max(2, min(5, len(faskes_list) // 4))
+        label, _ = kmeans(Xf, k, seed=a.seed)
+        harapan = sebaran_harapan(model, V, arr, idx_te, tabel, dev)
+        div = divergensi_sebaya(eps, idx_te, tabel, harapan, faskes_list,
+                                label)
+        urut4 = sorted(div.items(), key=lambda kv: -kv[1]["js_relatif"])[:10]
+        keb_rs = {int(f): int(g.kebijakan.rs[f]) for f in div}
+        catatan["k4_sebaya"] = {
+            "n_faskes_dinilai": len(div),
+            "n_kelompok_sebaya": int(k),
+            "sepuluh_teratas": [
+                dict(faskes=int(f), js_relatif=v["js_relatif"],
+                     n_klaim=v["n"], kelompok=v["kelompok"],
+                     perkiraan_kelebihan_rp=v["perkiraan_kelebihan_rp"],
+                     kebijakan_sebenarnya=keb_rs.get(int(f)))
+                for f, v in urut4],
+        }
+        nakal4 = [1 if keb_rs.get(int(f), 0) > 0 else 0 for f, _ in urut4]
+        catatan["k4_sebaya"]["presisi_sepuluh_teratas"] = (
+            round(float(np.mean(nakal4)), 3) if nakal4 else None)
+        # berapa porsi faskes nakal yang ada di daftar peringkat teratas
+        semua_nakal = sum(1 for f in div if keb_rs.get(int(f), 0) > 0)
+        catatan["k4_sebaya"]["n_faskes_nakal_sebenarnya"] = semua_nakal
+    else:
+        catatan["k4_sebaya"] = {
+            "status": "dilewat, faskes pada himpunan uji terlalu sedikit",
+            "n_faskes": len(faskes_list)}
+
+    # --- 12. pelaku yang beradaptasi -------------------------------------
+    print("[9] pelaku yang beradaptasi", flush=True)
+    from nalar.adversarial import bandingkan as bandingkan_pelaku
+
+    tabel_lokal = tabel
+
+    def penskor_klaim(daftar):
+        """Skor NALAR untuk sekumpulan klaim yang belum ada di array."""
+        a = bangun_array(daftar, pen)
+        ix = np.arange(len(daftar))
+        k1x = skor_kejutan(model, V, a, ix, ["TRF"], dev)
+        kun = np.array([f"{r['dxp']}|{r['rawat_inap']}" for r in daftar])
+        k1n = normalkan_terhadap_sejenis(k1x, kun)
+        k2x, _, _ = selisih_tarif(model, V, a, ix, daftar, tabel_lokal, dev)
+        return k1n * np.clip(k2x, 0, None)
+
+    kal2 = Kalibrator(alpha=0.02).pasang(skor_kal, kel_kal)
+    catatan["adversarial"] = bandingkan_pelaku(
+        eps, idx_te[:600], penskor_klaim, kal2.ambang_global, seed=a.seed)
 
     catatan["waktu_total_detik"] = round(time.time() - t_mulai, 1)
     os.makedirs(os.path.dirname(a.keluaran), exist_ok=True)
