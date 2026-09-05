@@ -468,3 +468,97 @@ begitu K2 dan K3 bisa diperingkat bersama, bukan digabung lewat bobot manual.
 Pada uji kecil, rugi turun dari 5,79 ke 5,28. Jarak antar-episode nyata pada
 data sintetis: median 19 hari, persentil 10 sebesar 2 hari, persentil 90
 sebesar 90 hari.
+
+---
+
+## Percobaan 5, 6 September 2026, tarif resmi dan kepala K3
+
+`runs/percobaan5.json`
+
+Data dan model sama persis dengan percobaan 4: 20.000 peserta, 164.301 episode,
+model 7 juta parameter, 3.000 langkah, GPU, 884 detik. Yang berubah dua:
+tarif resmi menggantikan tarif tebakan, dan kepala K3 ikut serta.
+
+Himpunan uji 42.624 klaim, selisih tersedia Rp 1,82 miliar.
+Rugi pralatih 7,335 turun ke 2,142.
+
+### Hasil
+
+| Penskor | rp@50 | rp@100 | rp@500 | rp@1000 | presisi@1000 |
+|---|---:|---:|---:|---:|---:|
+| NALAR K2 | 322,0 jt | 429,7 jt | 633,3 jt | 682,6 jt | 0,121 |
+| NALAR K2+K3 | 322,0 jt | 429,7 jt | 680,3 jt | 727,2 jt | 0,131 |
+| NALAR K3 saja | 285,9 jt | 349,8 jt | 353,9 jt | 373,4 jt | 0,071 |
+| NALAR K1 saja | 99,7 jt | 125,6 jt | 318,1 jt | 560,9 jt | 0,720 |
+| Mesin aturan | 127,1 jt | 247,2 jt | 573,6 jt | 658,9 jt | 0,312 |
+| Regresi logistik | 319,0 jt | 464,7 jt | 870,9 jt | 1.207,7 jt | 0,345 |
+| Acak | 2,3 jt | 3,0 jt | 12,2 jt | 80,4 jt | 0,039 |
+
+Peningkatan K2+K3 atas mesin aturan: **2,534 kali pada lima puluh teratas**,
+1,738 pada seratus, 1,355 pada dua ratus lima puluh, 1,186 pada lima ratus,
+1,104 pada seribu.
+
+### Papan skor berubah
+
+Empat dari tujuh target tercapai, naik dari dua.
+
+| Target | Sebelum | Sekarang |
+|---|---|---|
+| T1 dua kali atas aturan | gagal, 1,16 sampai 1,44 | **tercapai di lima puluh teratas, 2,53 kali.** Pada seribu masih 1,10 |
+| T2 jaminan konformal | tercapai | tercapai, dan lebih rapat |
+| T5 keadilan antar kelompok | gagal, 2,46 sampai 5,09 | **tercapai, 1,72 kali** |
+| T6 ketahanan pelaku | tercapai, 96 sampai 98 persen | tercapai, 87,3 persen |
+
+**Soal T1, harus dibaca hati hati.** Targetnya ditulis untuk anggaran audit
+seribu klaim, dan pada angka itu yang didapat 1,10 kali, jadi **sebagaimana
+ditulis, T1 masih gagal**. Yang tercapai adalah pada lima puluh dan seratus
+klaim teratas. Kami tidak mengubah bunyi targetnya untuk mengaku menang.
+
+Tapi perubahan bentuknya sendiri yang menarik. Sebelum tarif resmi masuk, model
+justru kalah di puncak peringkat, 0,57 sampai 0,75 kali, dan hanya unggul tipis
+di ekor. Sekarang terbalik: unggul telak di puncak, menyempit di ekor. Puncak
+peringkat adalah tempat anggaran audit sebenarnya bekerja.
+
+Sebabnya bisa diterka. Tarif resmi punya rentang Rp 222.500 sampai
+Rp 458.181.300, jauh lebih lebar daripada tarif tebakan yang hampir seragam.
+Sinyal selisih rupiah jadi jauh lebih tajam di kelompok bernilai besar.
+
+### Kepala K3 memberi hasil, tapi cakupannya sempit
+
+K3 sendirian menemukan Rp 373,4 juta, dan itu **dari 93 klaim saja** di antara
+42.624. Pemusatan yang luar biasa, rata rata sekitar Rp 4 juta per klaim yang
+diskornya bukan nol.
+
+Digabung, K2+K3 menaikkan hasil pada dua ratus lima puluh teratas dari 1,288
+menjadi 1,355 kali, dan pada seribu dari 1,036 menjadi 1,104.
+
+Cakupan 93 klaim itu terlalu sempit dan harus diperbaiki. Sebabnya, skor hanya
+diberikan pada pasangan episode yang keduanya rawat inap dan selisih
+pemecahannya positif. Rawat inap cuma dua persen klaim, jadi calonnya memang
+sedikit. Perluasan ke rawat jalan berulang, misalnya hemodialisis dan
+kemoterapi, belum dikerjakan.
+
+### Uji keadilan akhirnya lulus
+
+Rasio laju penandaan antar kelas faskes 1,72 kali, di bawah batas dua kali.
+Sebelumnya 4,92 pada model yang sama dengan tarif tebakan.
+
+Yang berubah cuma tabel tarifnya. Dugaan kami, tarif tebakan yang hampir
+seragam membuat model bersandar pada ciri faskes untuk membedakan klaim, dan
+ciri faskes itulah yang menghasilkan ketimpangan. Dengan tarif yang benar
+benar berbeda antar kelompok, sinyalnya pindah ke isi klinis. Ini dugaan,
+belum diuji dengan ablasi.
+
+### Yang memburuk
+
+Pelaku serakah sekarang hanya tertangkap 49 persen, turun dari 94 persen. Tapi
+pelaku hati hati tetap terkekang: keuntungan maksimum per klaim Rp 4,6 juta
+melawan Rp 36,2 juta tanpa pengawasan, turun 87,3 persen.
+
+Presisi NALAR 0,121 melawan mesin aturan 0,312. Pembalikan presisi dan rupiah
+tetap ada, dan tetap menjadi bukti terkuat bahwa presisi metrik yang salah
+untuk soal ini.
+
+Regresi logistik berlabel tetap unggul, Rp 1.207,7 juta. Jaraknya melebar dari
+seperlima menjadi sekitar sepertiga. Sistem berlabel makin bernilai, dan itu
+memperkuat rekomendasi P4.
