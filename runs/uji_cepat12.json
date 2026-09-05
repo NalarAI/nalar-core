@@ -1,0 +1,722 @@
+{
+ "pengaturan": {
+  "peserta": 1500,
+  "tahun": 2,
+  "fktp": 90,
+  "fkrtl": 22,
+  "langkah": 30,
+  "batch": 64,
+  "d": 128,
+  "lapis": 4,
+  "kepala": 4,
+  "dff": 384,
+  "utas": 8,
+  "seed": 7,
+  "keluaran": "runs/uji_cepat12.json",
+  "tarif_cadangan": false
+ },
+ "data": {
+  "n_episode": 6840,
+  "n_peserta": 1500,
+  "n_fktp": 90,
+  "n_fkrtl": 22,
+  "faktor_kompresi_peserta_per_faskes": 1298.1,
+  "uji_kecocokan_agregat": {
+   "kunjungan_per_orang_tahun": {
+    "terukur": 2.28,
+    "sasaran": 2.57,
+    "selisih_relatif": 0.113
+   },
+   "porsi_FKTP": {
+    "terukur": 0.7189,
+    "sasaran": 0.75,
+    "selisih_relatif": 0.042
+   },
+   "porsi_RJTL": {
+    "terukur": 0.2544,
+    "sasaran": 0.23,
+    "selisih_relatif": 0.106
+   },
+   "porsi_RITL": {
+    "terukur": 0.0268,
+    "sasaran": 0.02,
+    "selisih_relatif": 0.338
+   },
+   "lulus": false
+  },
+  "porsi_klaim_terpengaruh": 0.0548,
+  "porsi_nilai_terpengaruh": 0.0962
+ },
+ "kamus": {
+  "ukuran": 1508,
+  "panjang_rerata": 43.31461988304093,
+  "panjang_maks": 58
+ },
+ "pemisahan": {
+  "cara": "menurut faskes, bukan acak per klaim",
+  "n_latih": 4211,
+  "n_kalibrasi": 1052,
+  "n_uji": 1577
+ },
+ "pralatih": {
+  "perangkat": "cpu",
+  "parameter_juta": 0.892,
+  "riwayat": [
+   {
+    "langkah": 1,
+    "rugi_latih": 7.388747215270996,
+    "rugi_valid": 7.241296927134196,
+    "detik": 4.7
+   },
+   {
+    "langkah": 25,
+    "rugi_latih": 6.279554843902588,
+    "rugi_valid": 6.175849596659343,
+    "detik": 47.1
+   }
+  ],
+  "rugi_awal": 7.241296927134196,
+  "rugi_akhir": 6.175849596659343
+ },
+ "metrik": {
+  "nalar": {
+   "rupiah_pada_k": {
+    "50": 290548309,
+    "100": 291024309,
+    "250": 297227369,
+    "500": 320703867,
+    "1000": 339544936
+   },
+   "presisi_pada_k": {
+    "50": 0.4,
+    "100": 0.22,
+    "250": 0.136,
+    "500": 0.124,
+    "1000": 0.101
+   },
+   "peningkatan_atas_aturan": {
+    "50": 1.541,
+    "100": 1.446,
+    "250": 0.884,
+    "500": 0.922,
+    "1000": 0.927
+   }
+  },
+  "nalar_k1_saja": {
+   "rupiah_pada_k": {
+    "50": 208662484,
+    "100": 306193289,
+    "250": 350013523,
+    "500": 357772695,
+    "1000": 363340401
+   },
+   "presisi_pada_k": {
+    "50": 0.78,
+    "100": 0.7,
+    "250": 0.428,
+    "500": 0.242,
+    "1000": 0.133
+   }
+  },
+  "nalar_k2_saja": {
+   "rupiah_pada_k": {
+    "50": 290548309,
+    "100": 291024309,
+    "250": 297227369,
+    "500": 320703867,
+    "1000": 339544936
+   },
+   "presisi_pada_k": {
+    "50": 0.4,
+    "100": 0.22,
+    "250": 0.136,
+    "500": 0.124,
+    "1000": 0.101
+   },
+   "peningkatan_atas_aturan": {
+    "50": 1.541,
+    "100": 1.446,
+    "250": 0.884,
+    "500": 0.922,
+    "1000": 0.927
+   }
+  },
+  "nalar_gabungan_lama": {
+   "rupiah_pada_k": {
+    "50": 290548309,
+    "100": 291024309,
+    "250": 297227369,
+    "500": 320703867,
+    "1000": 339544936
+   },
+   "presisi_pada_k": {
+    "50": 0.4,
+    "100": 0.22,
+    "250": 0.136,
+    "500": 0.124,
+    "1000": 0.101
+   }
+  },
+  "mesin_aturan": {
+   "rupiah_pada_k": {
+    "50": 188535264,
+    "100": 201218015,
+    "250": 336219237,
+    "500": 347673837,
+    "1000": 366413737
+   },
+   "presisi_pada_k": {
+    "50": 0.56,
+    "100": 0.45,
+    "250": 0.34,
+    "500": 0.198,
+    "1000": 0.128
+   }
+  },
+  "regresi_logistik": {
+   "rupiah_pada_k": {
+    "50": 334547769,
+    "100": 343663854,
+    "250": 357320583,
+    "500": 359766675,
+    "1000": 368238691
+   },
+   "presisi_pada_k": {
+    "50": 0.88,
+    "100": 0.63,
+    "250": 0.524,
+    "500": 0.27,
+    "1000": 0.146
+   },
+   "peningkatan_atas_aturan": {
+    "50": 1.774,
+    "100": 1.708,
+    "250": 1.063,
+    "500": 1.035,
+    "1000": 1.005
+   }
+  },
+  "nalar_k7_saja": {
+   "rupiah_pada_k": {
+    "50": 3897167,
+    "100": 4373167,
+    "250": 22023039,
+    "500": 67495737,
+    "1000": 110908206
+   },
+   "presisi_pada_k": {
+    "50": 0.12,
+    "100": 0.08,
+    "250": 0.092,
+    "500": 0.106,
+    "1000": 0.095
+   }
+  },
+  "nilai_klaim": {
+   "rupiah_pada_k": {
+    "50": 328906796,
+    "100": 338154933,
+    "250": 354505626,
+    "500": 359656102,
+    "1000": 369377884
+   },
+   "presisi_pada_k": {
+    "50": 0.78,
+    "100": 0.5,
+    "250": 0.352,
+    "500": 0.214,
+    "1000": 0.143
+   },
+   "peningkatan_atas_aturan": {
+    "50": 1.745,
+    "100": 1.681,
+    "250": 1.054,
+    "500": 1.034,
+    "1000": 1.008
+   }
+  },
+  "acak": {
+   "rupiah_pada_k": {
+    "50": 732820,
+    "100": 2013410,
+    "250": 11836478,
+    "500": 31364703,
+    "1000": 239779522
+   },
+   "presisi_pada_k": {
+    "50": 0.02,
+    "100": 0.04,
+    "250": 0.06,
+    "500": 0.07,
+    "1000": 0.083
+   }
+  },
+  "_total_selisih_tersedia": 371769845,
+  "_n_uji": 1577
+ },
+ "konformal": {
+  "0.01": {
+   "alpha": 0.01,
+   "laju_penandaan_klaim_bersih": 0.0,
+   "batas_lulus": 0.015,
+   "lulus": true,
+   "n_bersih": 1426,
+   "n_ditandai": 7
+  },
+  "0.02": {
+   "alpha": 0.02,
+   "laju_penandaan_klaim_bersih": 0.0014,
+   "batas_lulus": 0.03,
+   "lulus": true,
+   "n_bersih": 1426,
+   "n_ditandai": 16
+  },
+  "0.05": {
+   "alpha": 0.05,
+   "laju_penandaan_klaim_bersih": 0.0014,
+   "batas_lulus": 0.075,
+   "lulus": true,
+   "n_bersih": 1426,
+   "n_ditandai": 16
+  }
+ },
+ "keadilan": {
+  "menurut_kelas_faskes": {
+   "C": {
+    "n": 322,
+    "laju": 0.00621
+   },
+   "FKTP": {
+    "n": 1104,
+    "laju": 0.0
+   },
+   "_rasio_maks_min": null,
+   "_lulus_batas_dua_kali": false
+  },
+  "menurut_daerah_tertinggal": {
+   "0": {
+    "n": 1426,
+    "laju": 0.0014
+   }
+  }
+ },
+ "kalibrasi_selisih_k2": [
+  {
+   "pita": 0,
+   "n": 197,
+   "perkiraan_rerata": -5002413,
+   "benar_rerata": 100391
+  },
+  {
+   "pita": 1,
+   "n": 197,
+   "perkiraan_rerata": -4643607,
+   "benar_rerata": 102038
+  },
+  {
+   "pita": 2,
+   "n": 197,
+   "perkiraan_rerata": -4188883,
+   "benar_rerata": 2416
+  },
+  {
+   "pita": 3,
+   "n": 197,
+   "perkiraan_rerata": -4146855,
+   "benar_rerata": 27494
+  },
+  {
+   "pita": 4,
+   "n": 197,
+   "perkiraan_rerata": -4110406,
+   "benar_rerata": 6125
+  },
+  {
+   "pita": 5,
+   "n": 197,
+   "perkiraan_rerata": -3997203,
+   "benar_rerata": 3684
+  },
+  {
+   "pita": 6,
+   "n": 197,
+   "perkiraan_rerata": -3851394,
+   "benar_rerata": 54462
+  },
+  {
+   "pita": 7,
+   "n": 198,
+   "perkiraan_rerata": -1089422,
+   "benar_rerata": 1582514
+  }
+ ],
+ "k5_kemiripan": {
+  "dasar_median": 0.0005,
+  "sepuluh_teratas": [
+   {
+    "faskes": 0,
+    "kelebihan": 0.0039,
+    "n_klaim": 151,
+    "kebijakan_sebenarnya": 3
+   },
+   {
+    "faskes": 11,
+    "kelebihan": 0.0005,
+    "n_klaim": 154,
+    "kebijakan_sebenarnya": 1
+   },
+   {
+    "faskes": 9,
+    "kelebihan": -0.0005,
+    "n_klaim": 71,
+    "kebijakan_sebenarnya": 0
+   },
+   {
+    "faskes": 17,
+    "kelebihan": -0.0005,
+    "n_klaim": 52,
+    "kebijakan_sebenarnya": 0
+   }
+  ],
+  "presisi_sepuluh_teratas": 0.5
+ },
+ "k4_sebaya": {
+  "status": "dilewat, faskes pada himpunan uji terlalu sedikit",
+  "n_faskes": 4
+ },
+ "k3_waktu": {
+  "riwayat_rugi": [
+   {
+    "langkah": 1,
+    "rugi": 6.0888
+   },
+   {
+    "langkah": 100,
+    "rugi": 5.5323
+   },
+   {
+    "langkah": 200,
+    "rugi": 5.5435
+   },
+   {
+    "langkah": 300,
+    "rugi": 5.5833
+   },
+   {
+    "langkah": 400,
+    "rugi": 5.471
+   },
+   {
+    "langkah": 500,
+    "rugi": 5.4536
+   }
+  ],
+  "n_pasangan_latih": 4211,
+  "n_pasangan_uji": 1577,
+  "n_klaim_berskor": 919,
+  "rupiah_tertimbang_total": 230765531
+ },
+ "adversarial": {
+  "serakah": {
+   "jenis_pelaku": "serakah",
+   "klaim_yang_bisa_diserang": 19,
+   "klaim_yang_diserang": 19,
+   "total_diambil_rp": 49106400,
+   "rerata_per_klaim_rp": 2584547,
+   "maks_per_klaim_rp": 6230300,
+   "porsi_tertangkap": 0.9474,
+   "diambil_tanpa_tertangkap_rp": 2584547
+  },
+  "hati_hati": {
+   "jenis_pelaku": "hati_hati",
+   "klaim_yang_bisa_diserang": 19,
+   "klaim_yang_diserang": 5,
+   "total_diambil_rp": 3292900,
+   "rerata_per_klaim_rp": 658580,
+   "maks_per_klaim_rp": 1891800,
+   "porsi_tertangkap": 0.0,
+   "diambil_tanpa_tertangkap_rp": 3292900
+  },
+  "menyebar": {
+   "jenis_pelaku": "menyebar",
+   "klaim_yang_bisa_diserang": 19,
+   "klaim_yang_diserang": 19,
+   "total_diambil_rp": 37959700,
+   "rerata_per_klaim_rp": 1997879,
+   "maks_per_klaim_rp": 5703200,
+   "porsi_tertangkap": 0.7368,
+   "diambil_tanpa_tertangkap_rp": 9989395
+  },
+  "_penurunan_keuntungan_maksimum": 0.696,
+  "_target_T6_turun_setengah": true
+ },
+ "metrik_dengan_k3": {
+  "nalar": {
+   "rupiah_pada_k": {
+    "50": 290548309,
+    "100": 291024309,
+    "250": 297227369,
+    "500": 320703867,
+    "1000": 339544936
+   },
+   "presisi_pada_k": {
+    "50": 0.4,
+    "100": 0.22,
+    "250": 0.136,
+    "500": 0.124,
+    "1000": 0.101
+   }
+  },
+  "mesin_aturan": {
+   "rupiah_pada_k": {
+    "50": 188535264,
+    "100": 201218015,
+    "250": 336219237,
+    "500": 347673837,
+    "1000": 366413737
+   },
+   "presisi_pada_k": {
+    "50": 0.56,
+    "100": 0.45,
+    "250": 0.34,
+    "500": 0.198,
+    "1000": 0.128
+   }
+  },
+  "regresi_logistik": {
+   "rupiah_pada_k": {
+    "50": 334547769,
+    "100": 343663854,
+    "250": 357320583,
+    "500": 359766675,
+    "1000": 368238691
+   },
+   "presisi_pada_k": {
+    "50": 0.88,
+    "100": 0.63,
+    "250": 0.524,
+    "500": 0.27,
+    "1000": 0.146
+   }
+  },
+  "nalar_k7_saja": {
+   "rupiah_pada_k": {
+    "50": 3897167,
+    "100": 4373167,
+    "250": 22023039,
+    "500": 67495737,
+    "1000": 110908206
+   },
+   "presisi_pada_k": {
+    "50": 0.12,
+    "100": 0.08,
+    "250": 0.092,
+    "500": 0.106,
+    "1000": 0.095
+   }
+  },
+  "nilai_klaim": {
+   "rupiah_pada_k": {
+    "50": 328906796,
+    "100": 338154933,
+    "250": 354505626,
+    "500": 359656102,
+    "1000": 369377884
+   },
+   "presisi_pada_k": {
+    "50": 0.78,
+    "100": 0.5,
+    "250": 0.352,
+    "500": 0.214,
+    "1000": 0.143
+   }
+  },
+  "nalar_k3_saja": {
+   "rupiah_pada_k": {
+    "50": 159952879,
+    "100": 160531773,
+    "250": 171426229,
+    "500": 181118271,
+    "1000": 229398974
+   },
+   "presisi_pada_k": {
+    "50": 0.38,
+    "100": 0.24,
+    "250": 0.164,
+    "500": 0.11,
+    "1000": 0.095
+   },
+   "peningkatan_atas_aturan": {
+    "50": 0.848,
+    "100": 0.798,
+    "250": 0.51,
+    "500": 0.521,
+    "1000": 0.626
+   },
+   "peningkatan_atas_nilai_klaim": {
+    "50": 0.486,
+    "100": 0.475,
+    "250": 0.484,
+    "500": 0.504,
+    "1000": 0.621
+   }
+  },
+  "nalar_k2_plus_k3": {
+   "rupiah_pada_k": {
+    "50": 290279763,
+    "100": 294665713,
+    "250": 304301435,
+    "500": 315336105,
+    "1000": 340694529
+   },
+   "presisi_pada_k": {
+    "50": 0.52,
+    "100": 0.33,
+    "250": 0.2,
+    "500": 0.132,
+    "1000": 0.105
+   },
+   "peningkatan_atas_aturan": {
+    "50": 1.54,
+    "100": 1.464,
+    "250": 0.905,
+    "500": 0.907,
+    "1000": 0.93
+   },
+   "peningkatan_atas_nilai_klaim": {
+    "50": 0.883,
+    "100": 0.871,
+    "250": 0.858,
+    "500": 0.877,
+    "1000": 0.922
+   }
+  },
+  "nalar_semua": {
+   "rupiah_pada_k": {
+    "50": 290279763,
+    "100": 294665713,
+    "250": 304301435,
+    "500": 315336105,
+    "1000": 340694529
+   },
+   "presisi_pada_k": {
+    "50": 0.52,
+    "100": 0.33,
+    "250": 0.2,
+    "500": 0.132,
+    "1000": 0.105
+   },
+   "peningkatan_atas_aturan": {
+    "50": 1.54,
+    "100": 1.464,
+    "250": 0.905,
+    "500": 0.907,
+    "1000": 0.93
+   },
+   "peningkatan_atas_nilai_klaim": {
+    "50": 0.883,
+    "100": 0.871,
+    "250": 0.858,
+    "500": 0.877,
+    "1000": 0.922
+   }
+  }
+ },
+ "keadilan_per_kepala": {
+  "kelas_faskes": {
+   "K2": {
+    "rasio_maks_min": 1.0,
+    "lulus_batas_dua_kali": true,
+    "laju_per_kelompok": {
+     "C": 1.0,
+     "FKTP": 1.0
+    }
+   },
+   "K3": {
+    "rasio_maks_min": 14.842,
+    "lulus_batas_dua_kali": false,
+    "laju_per_kelompok": {
+     "C": 0.04037,
+     "FKTP": 0.00272
+    }
+   },
+   "K7": {
+    "rasio_maks_min": 1.0,
+    "lulus_batas_dua_kali": true,
+    "laju_per_kelompok": {
+     "C": 1.0,
+     "FKTP": 1.0
+    }
+   },
+   "semua": {
+    "rasio_maks_min": 13.724,
+    "lulus_batas_dua_kali": false,
+    "laju_per_kelompok": {
+     "C": 0.02484,
+     "FKTP": 0.00181
+    }
+   },
+   "nilai_klaim": {
+    "rasio_maks_min": null,
+    "lulus_batas_dua_kali": false,
+    "laju_per_kelompok": {
+     "C": 0.02484,
+     "FKTP": 0.0
+    }
+   },
+   "mesin_aturan": {
+    "rasio_maks_min": 6.849,
+    "lulus_batas_dua_kali": false,
+    "laju_per_kelompok": {
+     "C": 0.01863,
+     "FKTP": 0.00272
+    }
+   }
+  },
+  "daerah_tertinggal": {
+   "K2": {
+    "rasio_maks_min": null,
+    "lulus_batas_dua_kali": null,
+    "laju_per_kelompok": {
+     "0": 1.0
+    }
+   },
+   "K3": {
+    "rasio_maks_min": null,
+    "lulus_batas_dua_kali": null,
+    "laju_per_kelompok": {
+     "0": 0.01122
+    }
+   },
+   "K7": {
+    "rasio_maks_min": null,
+    "lulus_batas_dua_kali": null,
+    "laju_per_kelompok": {
+     "0": 1.0
+    }
+   },
+   "semua": {
+    "rasio_maks_min": null,
+    "lulus_batas_dua_kali": null,
+    "laju_per_kelompok": {
+     "0": 0.00701
+    }
+   },
+   "nilai_klaim": {
+    "rasio_maks_min": null,
+    "lulus_batas_dua_kali": null,
+    "laju_per_kelompok": {
+     "0": 0.00561
+    }
+   },
+   "mesin_aturan": {
+    "rasio_maks_min": null,
+    "lulus_batas_dua_kali": null,
+    "laju_per_kelompok": {
+     "0": 0.00631
+    }
+   }
+  }
+ },
+ "waktu_total_detik": 182.5
+}

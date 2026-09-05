@@ -110,3 +110,36 @@ def keadilan_kelompok(tanda, kelompok, bersih):
         out["_rasio_maks_min"] = round(hi / lo, 3) if lo > 0 else None
         out["_lulus_batas_dua_kali"] = bool(lo > 0 and hi / lo <= 2.0)
     return out
+
+
+def keadilan_pada_anggaran(skor, kelompok, bersih, porsi=0.02):
+    """Laju penandaan per kelompok pada anggaran penandaan tetap.
+
+    Dipakai untuk menguraikan ketimpangan per kepala. Ambang konformal
+    bergantung pada himpunan kalibrasi tiap kepala, jadi membandingkan kepala
+    lewat ambang konformal mencampur dua hal sekaligus. Dengan anggaran tetap,
+    misalnya dua persen klaim teratas, yang dibandingkan murni bentuk sebaran
+    skornya.
+
+    Seluruh laju dihitung hanya pada klaim yang bersih, karena yang diukur
+    adalah gangguan terhadap faskes yang tidak berbuat apa apa.
+    """
+    skor = np.asarray(skor, dtype=np.float64)
+    n_tandai = max(1, int(round(len(skor) * porsi)))
+    ambang = np.partition(skor, -n_tandai)[-n_tandai]
+    tanda = skor >= ambang
+    return keadilan_kelompok(tanda, kelompok, bersih)
+
+
+def urai_keadilan(skor_dict, kelompok, bersih, porsi=0.02):
+    """Bandingkan ketimpangan beberapa penskor pada anggaran yang sama."""
+    keluar = {}
+    for nama, s in skor_dict.items():
+        h = keadilan_pada_anggaran(s, kelompok, bersih, porsi)
+        keluar[nama] = {
+            "rasio_maks_min": h.get("_rasio_maks_min"),
+            "lulus_batas_dua_kali": h.get("_lulus_batas_dua_kali"),
+            "laju_per_kelompok": {k: v["laju"] for k, v in h.items()
+                                  if not k.startswith("_")},
+        }
+    return keluar

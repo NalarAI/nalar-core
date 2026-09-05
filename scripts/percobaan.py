@@ -381,6 +381,25 @@ def utama():
                  "nalar_k7_saja", "mesin_aturan", "regresi_logistik",
                  "nilai_klaim")}
 
+    # --- 13. keadilan per kepala, dan pada skor yang sebenarnya dipakai ---
+    # Pengukuran keadilan sebelumnya hanya memakai skor K2, bukan skor
+    # gabungan yang akan benar benar dipasang. Itu keliru dua arah: yang
+    # dilaporkan bukan yang dipakai, dan ketimpangannya tidak bisa
+    # diatribusikan ke kepala mana.
+    print("[10] keadilan per kepala", flush=True)
+    skor_semua = skor_nalar + skor_k3 + np.clip(k7_selisih, 0, None)
+    for nama_kel, kel in (("kelas_faskes", kel_te),
+                          ("daerah_tertinggal",
+                           np.array([r["f_dtpk"] for r in eps_te]))):
+        catatan.setdefault("keadilan_per_kepala", {})[nama_kel] =             metrik.urai_keadilan(
+                {"K2": skor_nalar,
+                 "K3": skor_k3,
+                 "K7": np.clip(k7_selisih, 0, None),
+                 "semua": skor_semua,
+                 "nilai_klaim": penskor["nilai_klaim"],
+                 "mesin_aturan": skor_aturan},
+                kel, cur_te == 0, porsi=0.02)
+
     catatan["waktu_total_detik"] = round(time.time() - t_mulai, 1)
     os.makedirs(os.path.dirname(a.keluaran), exist_ok=True)
     with open(a.keluaran, "w", encoding="utf-8") as f:
