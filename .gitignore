@@ -5,3 +5,5 @@ data/raw/*.csv
 runs/*.pt
 runs/*.log
 install_torch.log
+rahasia/
+artefak/
