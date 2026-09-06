@@ -58,13 +58,35 @@ class Kebijakan:
     def __init__(self, n_fkrtl: int, n_fktp: int):
         self.rs = np.zeros(n_fkrtl, dtype=np.int64)
         self.fktp = np.zeros(n_fktp, dtype=np.int64)
+        # Kebijakan yang berubah di tengah jalan. Hari ganti -1 berarti tidak
+        # pernah berubah, dan itu perilaku bawaannya, supaya seluruh angka
+        # percobaan sebelumnya tidak bergeser. Dinyalakan hanya oleh uji
+        # kepala K6, yang memang tidak punya apa apa untuk ditemukan kalau
+        # tidak ada faskes yang berubah perilaku.
+        self.ganti_rs = np.full(n_fkrtl, -1, dtype=np.int64)
+        self.ganti_fktp = np.full(n_fktp, -1, dtype=np.int64)
+        self.awal_rs = np.zeros(n_fkrtl, dtype=np.int64)
+        self.awal_fktp = np.zeros(n_fktp, dtype=np.int64)
         # faskes rujukan favorit, dipakai modus M10
         self.rs_favorit = np.full(n_fktp, -1, dtype=np.int64)
+
+    def kode(self, jenis: int, idx: int, hari: int) -> int:
+        """Kebijakan yang berlaku bagi satu faskes pada satu hari."""
+        if jenis:
+            g, aw, ak = self.ganti_rs[idx], self.awal_rs[idx], self.rs[idx]
+        else:
+            g, aw, ak = (self.ganti_fktp[idx], self.awal_fktp[idx],
+                         self.fktp[idx])
+        if g >= 0 and hari < g:
+            return int(aw)
+        return int(ak)
 
 
 def tetapkan_kebijakan(jaringan, rng: np.random.Generator,
                        prevalensi: float = 0.22,
-                       minimal_per_jenis: int = 3) -> Kebijakan:
+                       minimal_per_jenis: int = 3,
+                       porsi_berubah: float = 0.0,
+                       total_hari: int = 1095) -> Kebijakan:
     """Tetapkan kebijakan per faskes, berstrata.
 
     Undian bebas menghasilkan masalah pada jaringan kecil. Dengan dua puluh
@@ -91,6 +113,24 @@ def tetapkan_kebijakan(jaringan, rng: np.random.Generator,
         for jenis, jml in zip((OPORTUNIS, SISTEMATIS, EKSTREM), target):
             arr[pilih[ofs:ofs + jml]] = jenis
             ofs += jml
+    # Sebagian faskes dibuat berubah perilaku di tengah rentang waktu, dari
+    # jujur menjadi nakal. Tanpa ini kepala K6 tidak bisa diuji, karena tidak
+    # ada satu pun titik perubahan yang benar benar terjadi untuk ditemukan.
+    if porsi_berubah > 0:
+        for arr, ganti, awal, n in ((keb.rs, keb.ganti_rs, keb.awal_rs,
+                                     jaringan.n_fkrtl),
+                                    (keb.fktp, keb.ganti_fktp, keb.awal_fktp,
+                                     jaringan.n_fktp)):
+            nakal = np.flatnonzero(arr > 0)
+            if not len(nakal):
+                continue
+            pilih = rng.permutation(nakal)[
+                : max(1, int(round(len(nakal) * porsi_berubah)))]
+            for i in pilih:
+                awal[i] = JUJUR
+                ganti[i] = int(rng.integers(int(0.25 * total_hari),
+                                            int(0.75 * total_hari)))
+
     # sebagian FKTP nakal punya rumah sakit favorit
     for i in np.flatnonzero(keb.fktp > 0):
         if rng.random() < 0.55:
@@ -111,7 +151,7 @@ def terapkan(rec: dict, keb: Kebijakan, jaringan, rng: np.random.Generator) -> N
 
     Menulis bidang yang diamati, daftar modus, dan selisih rupiah.
     """
-    kode = int(keb.rs[rec["faskes"]] if rec["f_jenis"] else keb.fktp[rec["faskes"]])
+    kode = keb.kode(int(rec["f_jenis"]), int(rec["faskes"]), int(rec["hari"]))
 
     dxs = list(rec["dxs_j"])
     prc = list(rec["prc_j"])

@@ -100,3 +100,45 @@ def periksa_jaminan(skor_uji: np.ndarray, bersih: np.ndarray,
                 batas_lulus=round(kal.alpha * 1.5, 5),
                 lulus=bool(laju <= kal.alpha * 1.5),
                 n_bersih=int(b.sum()), n_ditandai=int(tanda.sum()))
+
+
+def ambang_sadar_faskes(nilai, faskes_id, alpha: float,
+                        minimal_sisa: int = 100):
+    """Ambang konformal yang memperhitungkan sedikitnya jumlah faskes.
+
+    Jaminan konformal berlaku bila klaim kalibrasi dan klaim uji saling
+    terpertukarkan. Kami memisah latih dan uji menurut faskes, bukan menurut
+    klaim, karena pemisahan acak per klaim menyesatkan. Konsekuensinya sering
+    terlewat: ukuran contoh yang menentukan bukan lagi banyaknya klaim,
+    melainkan banyaknya faskes.
+
+    Terukurnya begini. Kelompok faskes di daerah tertinggal punya 1.522 klaim
+    uji, terdengar banyak, tapi klaim itu datang dari 19 faskes saja, dan
+    kalibrasinya dari 39. Ambang yang dihitung seolah olah dari 1.522 contoh
+    bebas ternyata menandai 2,53 persen klaim bersih, padahal alpha dua
+    persen. Selisihnya bukan kesialan, melainkan ragam antar faskes yang
+    tidak pernah masuk hitungan.
+
+    Caranya: satu faskes dikeluarkan bergantian, ambang dihitung ulang, lalu
+    yang terbesar dipakai. Pada kelompok dengan banyak faskes, mengeluarkan
+    satu faskes hampir tidak mengubah apa apa, jadi hasilnya kembali ke
+    ambang biasa. Pada kelompok dengan sedikit faskes, satu faskes yang
+    ekstrem akan terlihat, dan ambangnya melebar sesuai. Ongkosnya kelompok
+    kecil menandai lebih sedikit, dan itu memang harga yang benar untuk tidak
+    tahu banyak tentang mereka.
+    """
+    nilai = np.asarray(nilai, dtype=np.float64)
+    faskes_id = np.asarray(faskes_id)
+    dasar = ambang(nilai, alpha)
+    unik = np.unique(faskes_id)
+    if len(unik) < 2:
+        return dasar
+    tertinggi = dasar
+    for f in unik:
+        sisa = faskes_id != f
+        if sisa.sum() < minimal_sisa:
+            continue
+        t = ambang(nilai[sisa], alpha)
+        if t > tertinggi:
+            tertinggi = t
+    return tertinggi

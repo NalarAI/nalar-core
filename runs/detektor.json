@@ -94,10 +94,10 @@
  },
  "konformal": {
   "alpha": 0.02,
-  "laju_penandaan_klaim_bersih": 0.00673,
+  "laju_penandaan_klaim_bersih": 0.01103,
   "batas_lulus": 0.03,
   "lulus": true,
-  "n_ditandai": 713,
+  "n_ditandai": 897,
   "n_menahan_diri": 1537,
   "porsi_menahan_diri": 0.0361
  },
@@ -117,15 +117,15 @@
    },
    "FKTP": {
     "n": 29349,
-    "laju": 0.00331
+    "laju": 0.00927
    },
-   "_rasio_maks_min": 5.263,
-   "_lulus_batas_dua_kali": false
+   "_rasio_maks_min": 1.879,
+   "_lulus_batas_dua_kali": true
   },
   "simetris_daerah_tertinggal": {
    "0": {
     "n": 39249,
-    "laju": 0.00698
+    "laju": 0.01144
    },
    "1": {
     "n": 1462,
@@ -135,36 +135,36 @@
    "_lulus_batas_dua_kali": false
   },
   "berarah_kelas_faskes": {
-   "_laju_keseluruhan": 0.00673,
+   "_laju_keseluruhan": 0.01103,
    "B": {
     "n": 4363,
     "laju": 0.01742,
-    "rasio_thd_keseluruhan": 2.588
+    "rasio_thd_keseluruhan": 1.579
    },
    "C": {
     "n": 2586,
     "laju": 0.00967,
-    "rasio_thd_keseluruhan": 1.436
+    "rasio_thd_keseluruhan": 0.877
    },
    "D": {
     "n": 4413,
     "laju": 0.01722,
-    "rasio_thd_keseluruhan": 2.559
+    "rasio_thd_keseluruhan": 1.562
    },
    "FKTP": {
     "n": 29349,
-    "laju": 0.00331,
-    "rasio_thd_keseluruhan": 0.491
+    "laju": 0.00927,
+    "rasio_thd_keseluruhan": 0.84
    },
    "_kelompok_paling_sering_ditandai": "B",
-   "_kelebihan_maksimum": 2.588,
-   "_lulus_batas_dua_kali": false
+   "_kelebihan_maksimum": 1.579,
+   "_lulus_batas_dua_kali": true
   },
   "berarah_daerah_tertinggal": {
-   "_laju_keseluruhan": 0.00673,
+   "_laju_keseluruhan": 0.01103,
    "0": {
     "n": 39249,
-    "laju": 0.00698,
+    "laju": 0.01144,
     "rasio_thd_keseluruhan": 1.037
    },
    "1": {
@@ -184,6 +184,18 @@
   "porsi_batas_atas": 0.6227,
   "biaya_audit_total": 405750000,
   "rasio_pengembalian": 2.32
+ },
+ "profil_faskes": {
+  "n_dinilai": 238,
+  "prevalensi_dasar": 0.1807,
+  "presisi@10": 1.0,
+  "presisi@25": 1.0,
+  "presisi@50": 0.74
+ },
+ "penyaringan_kalibrasi": {
+  "z_saring": 1.0,
+  "n_faskes_dibuang": 19,
+  "porsi_klaim_dibuang": 0.0343
  },
  "contoh_penjelasan": [
   {

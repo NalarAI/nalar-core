@@ -36,7 +36,9 @@ class Detektor:
     """Penebak normatif berbasis pohon, plus seluruh perkakas di sekitarnya."""
 
     def __init__(self, alpha: float = 0.02, seed: int = 0,
-                 biaya_audit_rp: int = 750_000):
+                 biaya_audit_rp: int = 750_000,
+                 z_saring: float | None = 1.0,
+                 sadar_faskes: bool = False):
         self.alpha = alpha
         self.seed = seed
         # Biaya rata rata satu pemeriksaan berkas. Dipakai memotong antrean
@@ -78,6 +80,22 @@ class Detektor:
         # tapi faskesnya sedikit akan mendapat ambang yang tidak berlaku di
         # luar faskes yang itu itu saja.
         self.minimal_faskes = 3
+        # Batas skor baku di atas mana sebuah faskes dikeluarkan dari
+        # himpunan kalibrasi. None berarti tidak menyaring, yaitu perilaku
+        # lama, dan tetap bisa dipilih supaya perbandingannya bisa diulang.
+        self.z_saring = z_saring
+        # Ambang yang memperhitungkan sedikitnya jumlah faskes dalam satu
+        # kelompok, lewat mengeluarkan satu faskes bergantian lalu mengambil
+        # ambang terbesar. Matikan secara bawaan, karena diukur dan ternyata
+        # tidak menggerakkan apa apa: laju penandaan daerah tertinggal tetap
+        # 2,53 persen persis dengan dan tanpa. Sebabnya mengeluarkan satu dari
+        # tiga puluh faskes hanya membuang dua setengah persen klaim, dan
+        # persentil sembilan puluh delapan nyaris tidak bergeser sebanyak itu.
+        # Kodenya ditinggalkan supaya hasil negatifnya bisa diulang, bukan
+        # supaya dipakai.
+        self.sadar_faskes = sadar_faskes
+        self.n_faskes_dibuang = 0
+        self.porsi_klaim_dibuang = 0.0
         self._terlatih = False
         self._terkalibrasi = False
 
@@ -190,8 +208,55 @@ class Detektor:
         ambang tunggal, 1,8 dengan ambang per kelas.
         """
         from .konformal import ambang as ambang_konformal
+        from .konformal import ambang_sadar_faskes
 
         s = self.skor(episodes_bersih)["selisih"]
+
+        # Penyaringan kontaminasi.
+        #
+        # Nama parameternya berbunyi bersih, tapi di dunia nyata tidak ada
+        # tumpukan klaim yang sudah dipastikan bersih. Yang dipakai adalah
+        # klaim apa adanya, dan sebagiannya curang. Akibatnya terukur, dan
+        # jauh lebih besar daripada yang kami kira.
+        #
+        # Persentil 98 selisih klaim bersih FKTP adalah 7.415 rupiah, tapi
+        # ambang yang terhitung 18.719. Dua setengah kali lipat, terangkat
+        # oleh klaim curang yang ikut masuk himpunan kalibrasi. Pada rumah
+        # sakit kelas B pengangkatannya hanya 1,3 kali. Bukan karena kelas B
+        # lebih jujur, melainkan karena sebaran selisih klaim bersihnya sudah
+        # lebar sejak awal sehingga tambahan dari klaim curang tidak banyak
+        # menggeser ujung atasnya. Sebaran FKTP rapat, enam puluh persen
+        # selisihnya nol persis, jadi sedikit klaim curang langsung mengangkat
+        # ujungnya.
+        #
+        # Itulah sebab ketimpangan yang selama empat percobaan kami kejar di
+        # tempat yang salah. Bukan model yang berat sebelah terhadap rumah
+        # sakit besar, melainkan FKTP yang ditandai jauh di bawah jatah yang
+        # dijanjikan alpha, sehingga laju keseluruhan tertarik ke bawah dan
+        # semua kelas rumah sakit terlihat berlebih.
+        #
+        # Saringannya memakai profil faskes, yaitu kepala K4. Faskes yang
+        # selisih rata ratanya menonjol terhadap kelompok sebayanya
+        # dikeluarkan dari himpunan kalibrasi. Tidak ada label yang dipakai.
+        # Risikonya jelas dan kami tuliskan: model ikut memilih data yang
+        # mengkalibrasi dirinya sendiri. Karena itu batas pemotongannya
+        # disapu, dan hasilnya dilaporkan pada beberapa nilai, bukan hanya
+        # pada yang paling menguntungkan.
+        if self.z_saring is not None:
+            from .profil import profil_faskes
+            prof = profil_faskes(episodes_bersih, s, minimal_klaim=20,
+                                 minimal_sebaya=3)
+            buang = {k for k, v in prof.items() if v["z"] > self.z_saring}
+            simpan = np.array([
+                (int(r["f_jenis"]), int(r["faskes"])) not in buang
+                for r in episodes_bersih])
+            self.n_faskes_dibuang = len(buang)
+            self.porsi_klaim_dibuang = round(float(1 - simpan.mean()), 4)
+            if simpan.sum() >= self.minimal_kalibrasi:
+                episodes_bersih = [r for r, m in zip(episodes_bersih, simpan)
+                                   if m]
+                s = s[simpan]
+
         # Kalibrasi bertingkat. Kelompok terhalus dipakai bila datanya cukup.
         # Kalau tidak, mundur ke yang lebih kasar. Kalau yang paling kasar pun
         # tidak cukup, kelompok itu masuk daftar tahan diri.
@@ -203,9 +268,12 @@ class Detektor:
         # kelompok yang paling sedikit datanya dan paling rentan dipersoalkan.
         per_kunci: dict = {}
         faskes_kunci: dict = {}
+        asal_faskes: dict = {}
         for r, nilai in zip(episodes_bersih, s):
+            fid = f"{r['f_jenis']}:{r['faskes']}"
             for k in self.kunci_bertingkat(r):
                 per_kunci.setdefault(k, []).append(nilai)
+                asal_faskes.setdefault(k, []).append(fid)
                 faskes_kunci.setdefault(k, set()).add(
                     (r["faskes"], r["f_jenis"]))
 
@@ -221,12 +289,34 @@ class Detektor:
         # Terukurnya begini. Dengan syarat jumlah klaim saja, faskes daerah
         # tertinggal ditandai 2,53 persen padahal alpha dua persen, sedangkan
         # yang bukan 0,70 persen.
+        # Kunci yang ditolak khusus karena faskesnya kurang, bukan karena
+        # klaimnya kurang. Perbedaannya penting dan sempat kami lewatkan.
+        #
+        # Kalau kelompok terhalus milik sebuah klaim ditolak lalu klaim itu
+        # dibiarkan turun ke kelompok yang lebih kasar, yang terjadi bukan
+        # berhati hati melainkan sebaliknya: ia menerima ambang yang dihitung
+        # dari faskes yang tidak menyerupainya. Terukurnya begini. Dengan
+        # syarat empat puluh faskes, klaim di daerah tertinggal jatuh ke
+        # ambang FKTP umum dan laju penandaannya melonjak dari 2,5 persen ke
+        # 9,4 persen. Penjaganya bekerja terbalik.
+        #
+        # Jadi penolakan karena kurang faskes berarti menahan diri, titik.
+        # Kami tidak menyatakan faskes itu bersih. Kami menyatakan belum
+        # cukup tahu untuk berjanji apa apa tentang mereka, dan mereka tetap
+        # masuk pemeriksaan lewat porsi sampel acak.
+        self.kunci_kurang_faskes = set()
         self.ambang_tingkat = {}
         for k, v in per_kunci.items():
             if (len(v) >= self.minimal_kalibrasi
+                    and len(faskes_kunci[k]) < self.minimal_faskes):
+                self.kunci_kurang_faskes.add(k)
+        for k, v in per_kunci.items():
+            if (len(v) >= self.minimal_kalibrasi
                     and len(faskes_kunci[k]) >= self.minimal_faskes):
-                self.ambang_tingkat[k] = ambang_konformal(
-                    np.asarray(v), self.alpha)
+                self.ambang_tingkat[k] = (
+                    ambang_sadar_faskes(v, asal_faskes[k], self.alpha)
+                    if self.sadar_faskes
+                    else ambang_konformal(np.asarray(v), self.alpha))
         self.ambang_umum = ambang_konformal(s, self.alpha)
         self._terkalibrasi = True
         return self
@@ -245,8 +335,13 @@ class Detektor:
                 amb.append(float("inf"))
                 tahan.append(True)
                 continue
+            tingkat = self.kunci_bertingkat(r)
+            if tingkat and tingkat[0] in self.kunci_kurang_faskes:
+                amb.append(float("inf"))
+                tahan.append(True)
+                continue
             ketemu = None
-            for k in self.kunci_bertingkat(r):
+            for k in tingkat:
                 if k in self.ambang_tingkat:
                     ketemu = self.ambang_tingkat[k]
                     break

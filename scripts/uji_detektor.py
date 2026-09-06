@@ -122,7 +122,29 @@ def utama(n_peserta=20000, tahun=3, seed=7, fktp=900, fkrtl=150,
             rp_antre / max(det.biaya_audit_rp * len(antre), 1), 2),
     }
 
-    print("[7] contoh penjelasan")
+    print("[7] profil faskes, kepala K4 yang ditulis ulang")
+    from nalar.profil import peringkat_faskes, profil_faskes
+    prof = profil_faskes(e_te, s, minimal_klaim=20, minimal_sebaya=3)
+    keb = {}
+    for r in e_te:
+        keb[(int(r["f_jenis"]), int(r["faskes"]))] = 1 if r["kebijakan"] else 0
+    urut = [k for k, _ in peringkat_faskes(prof)]
+    dasar = float(np.mean([keb[k] for k in prof])) if prof else 0.0
+    catatan["profil_faskes"] = {
+        "n_dinilai": len(prof), "prevalensi_dasar": round(dasar, 4),
+        **{f"presisi@{k}": round(float(np.mean(
+            [keb.get(x, 0) for x in urut[:k]])), 4)
+           for k in (10, 25, 50) if len(urut) >= k},
+    }
+    print(f"    {catatan['profil_faskes']}")
+
+    catatan["penyaringan_kalibrasi"] = {
+        "z_saring": det.z_saring,
+        "n_faskes_dibuang": det.n_faskes_dibuang,
+        "porsi_klaim_dibuang": det.porsi_klaim_dibuang,
+    }
+
+    print("[8] contoh penjelasan")
     urut = np.argsort(-s)
     contoh = []
     for j in urut[:3]:

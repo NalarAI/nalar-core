@@ -1,0 +1,105 @@
+{
+ "ukuran": {
+  "klaim_amerika": 64492,
+  "klaim_amerika_uji": 15059,
+  "faskes_amerika": 2669,
+  "episode_karangan": 164301,
+  "rawat_inap_karangan": 3514,
+  "nilai_biaya_unik_amerika": 75
+ },
+ "sebaran_kolom": {
+  "umur": {
+   "karangan_rata": 4.098,
+   "amerika_rata": 7.449,
+   "karangan_sd": 2.449,
+   "amerika_sd": 1.286
+  },
+  "sex": {
+   "karangan_rata": 0.599,
+   "amerika_rata": 0.565,
+   "karangan_sd": 0.49,
+   "amerika_sd": 0.496
+  },
+  "los": {
+   "karangan_rata": 6.759,
+   "amerika_rata": 6.68,
+   "karangan_sd": 4.263,
+   "amerika_sd": 5.626
+  },
+  "n_dxs": {
+   "karangan_rata": 1.096,
+   "amerika_rata": 7.066,
+   "karangan_sd": 1.055,
+   "amerika_sd": 1.853
+  },
+  "n_prc": {
+   "karangan_rata": 1.262,
+   "amerika_rata": 1.434,
+   "karangan_sd": 0.819,
+   "amerika_sd": 1.745
+  }
+ },
+ "hasil": {
+  "pindah": {
+   "r2": -0.0018,
+   "spearman": 0.2696,
+   "mae": 0.783
+  },
+  "pribumi": {
+   "r2": 0.2907,
+   "spearman": 0.5404,
+   "mae": 0.6322
+  },
+  "tebakan": {
+   "r2": -0.0001,
+   "spearman": -0.0004,
+   "mae": 0.774
+  },
+  "pindah_ditera": {
+   "r2": 0.073,
+   "spearman": 0.2696,
+   "mae": 0.7409,
+   "kemiringan": 0.8232
+  }
+ },
+ "penilaian": {
+  "jauh_di_atas_tebakan": true,
+  "penurunan_r2_terhadap_pribumi": 0.7489,
+  "penurunan_spearman_terhadap_pribumi": 0.5011,
+  "batas_penurunan": 0.3333,
+  "lulus_r2": false,
+  "lulus_spearman": false
+ },
+ "pentingnya_kolom_saat_pindah": {
+  "umur": -0.003,
+  "sex": -0.0001,
+  "los": 0.0347,
+  "n_dxs": 0.0144,
+  "n_prc": 0.2005
+ },
+ "tanpa_n_dxs": {
+  "pindah_ditera": {
+   "r2": 0.0646,
+   "spearman": 0.2336,
+   "mae": 0.745
+  },
+  "pribumi": {
+   "r2": 0.2828,
+   "spearman": 0.5297,
+   "mae": 0.6388
+  },
+  "penurunan_spearman": 0.559,
+  "lulus_spearman": false
+ },
+ "arah_sebaliknya": {
+  "pindah_ditera": {
+   "r2": 0.0065,
+   "spearman": 0.0554
+  },
+  "pribumi": {
+   "r2": 0.3335,
+   "spearman": 0.3632
+  },
+  "penurunan_spearman": 0.8475
+ }
+}

@@ -59,7 +59,8 @@ class Pembangkit:
                  seed: int = 7, prevalensi_faskes_nakal: float = 0.22,
                  pengali_utilisasi: float | None = None,
                  tilt_tempat: dict | None = None,
-                 n_fktp: int | None = None, n_fkrtl: int | None = None):
+                 n_fktp: int | None = None, n_fkrtl: int | None = None,
+                 porsi_faskes_berubah: float = 0.0):
         self.rng = np.random.default_rng(seed)
         self.n_peserta = n_peserta
         self.tahun = tahun
@@ -72,7 +73,8 @@ class Pembangkit:
         self.n_hari = tahun * HARI_PER_TAHUN
         self.jaringan = Jaringan(n_peserta, self.rng, n_fktp, n_fkrtl)
         self.kebijakan = F.tetapkan_kebijakan(
-            self.jaringan, self.rng, prevalensi_faskes_nakal)
+            self.jaringan, self.rng, prevalensi_faskes_nakal,
+            porsi_berubah=porsi_faskes_berubah, total_hari=self.n_hari)
         self._siapkan_populasi()
         self._siapkan_tabel_kondisi()
 

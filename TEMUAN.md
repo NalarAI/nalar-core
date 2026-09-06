@@ -1013,3 +1013,264 @@ mengganti definisi setelah melihat hasil.
   belum diperbaiki dan belum dipensiunkan resmi
 - Kepala K6 titik perubahan, belum ditulis
 - Ketimpangan pada rumah sakit kelas B, 2,588 kali
+
+---
+
+## Menutup empat lubang yang tersisa, 6 September 2026
+
+Empat hal yang ditinggalkan pada catatan sebelumnya dikerjakan. Dua selesai,
+satu gagal dengan sebab yang bisa ditunjuk, satu terhalang data.
+
+### Uji latih di sintetis uji di nyata. Gagal.
+
+Rancangan bagian 12.6 menuliskan uji ini sebagai syarat kelulusan. Tugasnya
+menebak biaya klaim rawat inap dari umur, jenis kelamin, lama rawat, banyak
+diagnosis, dan banyak prosedur. Kode diagnosis tidak ikut, karena Amerika
+memakai ICD-9 dan kami ICD-10.
+
+Satu peringatan harus ikut setiap kali angka di bawah dikutip. DE-SynPUF
+sendiri sudah disintesis CMS dari klaim asli demi privasi. Jadi yang diadu
+bukan karangan melawan nyata, melainkan karangan kami melawan sintetis yang
+diturunkan dari klaim betulan.
+
+| Model | Spearman | R² |
+|---|---:|---:|
+| tebakan rata rata | 0,000 | 0,000 |
+| dilatih di data kami, diuji di klaim Amerika | 0,270 | 0,073 |
+| dilatih dan diuji di klaim Amerika | 0,540 | 0,291 |
+
+Penurunannya 50 persen pada Spearman dan 75 persen pada R². Batas yang kami
+tetapkan sebelum melihat data adalah sepertiga. **Gagal, pada dua ukuran.**
+
+Yang bisa dinyatakan: data karangan kami memuat struktur biaya yang benar
+benar berpindah ke klaim betulan, terukur pada lima belas ribu klaim dari
+enam ratus tujuh puluh rumah sakit yang tidak pernah dilihat model. Itu bukan
+nol dan bukan hal yang dijamin sebelumnya. Yang tidak bisa dinyatakan: bahwa
+data kami wakil yang setia. Ia mencapai separuh sinyal peringkat yang didapat
+model yang belajar dari klaim betulan.
+
+Dua hal yang muncul dari uji ini lebih berguna daripada nilai lulus gagalnya.
+
+Pertama, kami sempat menyimpulkan generator kami kurang mengode penyakit
+penyerta. Milik kami satu koma satu diagnosis sekunder per klaim rawat inap,
+Amerika tujuh koma nol tujuh, dan bedanya tetap di setiap pita umur. Tapi
+sebaran Amerika ternyata memusat: lima puluh sembilan persen klaim berisi
+persis delapan diagnosis dari sembilan slot yang tersedia. Itu perilaku
+mengisi slot, bukan gambaran klinis, dan korelasinya dengan biaya hanya nol
+koma lima belas melawan nol koma empat enam milik jumlah prosedur. Kolom yang
+sebarannya begitu tidak bisa dipakai menghakimi generator siapa pun.
+
+Kedua, arah sebaliknya dicoba. Model yang belajar dari klaim Amerika lalu
+diuji pada data kami jatuh delapan puluh lima persen, jauh lebih buruk
+daripada arah pertama yang lima puluh persen. Kalau data kami sekadar versi
+miskin dari kenyataan, arah itu seharusnya mulus. Yang terjadi kebalikannya.
+Sebabnya kelihatan pada langit langit masing masing: dengan lima kolom yang
+sama, model yang dilatih dan diuji di data kami hanya sampai nol koma tiga
+enam, sedangkan di data Amerika nol koma lima empat. Lima kolom bersama itu
+memerikan dunia mereka jauh lebih baik daripada dunia kami, karena tarif
+INA-CBG ditentukan pencarian kode, bukan lama rawat.
+
+Jadi ambang sepertiga yang kami tulis mengandaikan dua dunia yang lebih mirip
+daripada kenyataannya. Kami tidak mengganti ambangnya sesudah melihat hasil.
+Kami melaporkan gagal, dan menuliskan sebabnya.
+
+### Kontrol negatif LEIE. Terhalang, dan bukan karena kurang usaha.
+
+LEIE terunduh, delapan ribu enam ratus NPI sah dari delapan puluh tiga ribu
+baris. Rencananya disambungkan ke DE-SynPUF lewat NPI dokter.
+
+Irisannya nol persis. NPI dokter DE-SynPUF diawali angka nol, di luar rentang
+NPI yang sah, jadi memang pengganti buatan CMS. Sambungan itu mustahil, dan
+kami tahu itu dari mengukur, bukan dari membaca dokumentasi.
+
+Sumber publik satu satunya yang memuat NPI sungguhan beserta pola penagihan
+adalah tabel pemanfaatan dokter Medicare di data.cms.gov. Situs itu menolak
+setiap klien dengan 403 dari Akamai: urllib, curl dengan tajuk peramban penuh,
+Chromium tanpa jendela, dan Chromium berjendela sekalian. Empat cara, semuanya
+tertutup di sisi tepi jaringan.
+
+Jadi uji ini tetap terbuka, dan kami menuliskannya sebagai terhalang, bukan
+sebagai belum sempat. Kalimat yang kami tulis sendiri di catatan sebelumnya
+tetap berlaku: kalau arsitektur kami tidak bisa menemukan kecurangan nyata
+pada data nyata, keberhasilannya pada data sintetis kami tidak berarti apa
+apa.
+
+### Kepala K4 ditulis ulang. Dari 1,5 kali menjadi 5,5 kali.
+
+Versi lama membentuk kelompok sebaya dari representasi transformer lalu
+membandingkan sebaran kode INA-CBG dengan divergensi Jensen Shannon.
+Presisinya pada sepuluh teratas 0,2 sampai 0,3 melawan tebakan acak 0,16.
+
+Sebabnya bisa ditunjuk. Divergensi itu dihitung atas sebaran sepanjang 885
+kode yang ditaksir dari empat puluh klaim. Sebagian besar yang terukur adalah
+derau pencuplikan, dan statistiknya tidak pernah mengoreksi banyaknya klaim.
+Yang diurutkan pada akhirnya adalah kekecilan faskes.
+
+Versi baru mengganti keduanya. Kelompok sebaya dari sifat administratif yang
+bisa dilihat siapa saja, yaitu kelas, wilayah, kepemilikan, dan status daerah
+tertinggal. Statistiknya penyusutan Bayes empiris, yang pekerjaannya justru
+menarik taksiran dari sedikit data mendekat ke rata rata kelompoknya.
+
+| Cara memberi peringkat | presisi@10 | presisi@25 | presisi@50 |
+|---|---:|---:|---:|
+| urutkan menurut total nilai klaim | 0,300 | 0,280 | 0,200 |
+| rata rata selisih, tanpa penyusutan | 0,500 | 0,600 | 0,660 |
+| **dengan penyusutan** | **1,000** | **1,000** | **0,740** |
+
+Prevalensi faskes nakal di antara yang dinilai 0,181, jadi angka satu itu
+lima koma lima kali tebakan acak. Penyusutannya bekerja: tanpa itu presisi
+pada sepuluh teratas cuma separuh.
+
+Yang tertangkap juga masuk akal. Seluruh faskes berkebijakan sistematis dan
+ekstrem masuk dua puluh lima teratas, sembilan dari sembilan dan lima dari
+lima. Yang oportunis sebelas dari dua puluh sembilan. Tidak ada satu pun
+faskes jujur di dalamnya.
+
+Angka sesempurna itu wajib dicurigai, jadi dua kebocoran diperiksa. Pemisahan
+latih dan uji memang per faskes, jadi faskes uji tidak pernah dilihat saat
+latih. Dan fitur pohonnya memuat sifat faskes, bukan identitasnya. Yang
+tersisa satu peringatan jujur: mencurigai faskes memang lebih mudah daripada
+mencurigai klaim. Faskes sistematis menaikkan tarif pada enam dari sepuluh
+klaim yang memenuhi syarat, dan dengan dua ratus klaim tandanya terang.
+
+### Ketimpangan kelas B. Selesai, dan sebabnya bukan yang kami kejar.
+
+Empat percobaan sebelumnya salah sasaran. Yang kelima berhasil karena
+diukur lebih dulu.
+
+Dugaan pertama dipatahkan cepat. Membatasi hitungan hanya pada faskes jujur
+justru memperburuk, dari 2,588 ke 2,868. Jadi ini bukan soal klaim bersih di
+faskes nakal.
+
+Angka mentahnya yang menunjukkan jalan. Kelas B ditandai 2,10 persen dan
+kelas D 1,78 persen, keduanya persis di sekitar alpha dua persen yang memang
+dijanjikan. Yang menyimpang FKTP, di 0,34 persen, seperenam jatahnya. FKTP
+memikul tujuh puluh dua persen klaim, jadi laju keseluruhan tertarik turun ke
+0,73 persen dan setiap kelas rumah sakit otomatis terlihat berlebih.
+
+Ketimpangannya bukan rumah sakit ditandai terlalu sering. Ketimpangannya
+FKTP ditandai terlalu jarang.
+
+Sebabnya kontaminasi himpunan kalibrasi. Nama parameternya berbunyi bersih,
+tapi yang masuk adalah klaim apa adanya dan sebagiannya curang. Persentil
+sembilan puluh delapan selisih klaim bersih FKTP 7.415 rupiah, sedangkan
+ambang yang terhitung 18.719. Pada kelas B pengangkatannya hanya sepertiga.
+Bukan karena kelas B lebih jujur, melainkan karena sebaran selisih bersihnya
+sudah lebar sejak awal sehingga tambahan klaim curang tidak banyak menggeser
+ujungnya. Sebaran FKTP rapat, enam puluh persen selisihnya nol persis, jadi
+sedikit klaim curang langsung mengangkatnya.
+
+Perbaikannya memakai kepala K4 yang baru untuk menyaring: faskes yang
+selisihnya menonjol terhadap sebayanya dikeluarkan dari himpunan kalibrasi.
+Tidak ada label yang dipakai. Batas pemotongannya disapu, dan seluruh
+sapuannya dilaporkan, bukan hanya yang paling menguntungkan.
+
+| Batas z | Klaim dibuang | FKTP | Kelas B | Kelebihan berarah | Rupiah pada seribu |
+|---|---:|---:|---:|---:|---:|
+| tidak menyaring | 0% | 0,003 | 0,017 | 2,588 | 1.249,3 jt |
+| 2,00 | 1% | 0,005 | 0,017 | 2,202 | 1.249,3 jt |
+| 1,50 | 2% | 0,007 | 0,017 | 1,866 | 1.249,3 jt |
+| **1,00** | **3%** | **0,009** | **0,017** | **1,579** | **1.249,3 jt** |
+| 0,50 | 6% | 0,012 | 0,017 | 1,361 | 1.249,3 jt |
+
+Kelas rumah sakit hampir tidak bergerak, FKTP naik menuju jatahnya, dan
+rupiah yang ditemukan tidak berubah satu digit pun karena peringkatnya memang
+tidak disentuh. Yang dipilih 1,00, satu simpangan baku di atas rata rata
+sebaya, membuang tiga persen klaim kalibrasi dan lulus dengan jarak, bukan
+lulus tipis.
+
+Risikonya kami tuliskan: model ikut memilih data yang mengkalibrasi dirinya
+sendiri. Itu sebabnya sapuannya dilaporkan utuh.
+
+Hasil akhir pada target T5:
+
+| Ukuran | Sebelum | Sesudah | Batas | Lulus |
+|---|---:|---:|---:|---|
+| Rasio simetris antar kelas faskes | 5,263 | **1,879** | 2,0 | ya |
+| Kelebihan berarah | 2,588 | **1,579** | 2,0 | ya |
+
+Sisa detektornya tidak bergeser. Rupiah pada seribu tetap 1.249,3 juta, porsi
+batas atas 0,713, rasio pengembalian audit 2,32.
+
+### Daerah tertinggal. Tiga aturan umum dicoba, ketiganya gagal.
+
+Pengecualian kebijakan untuk daerah tertinggal masih ada, dan kami mencoba
+menggantinya dengan aturan umum supaya tidak perlu menyebut satu kelompok
+secara khusus. Tiga cara dicoba dan ketiganya diukur.
+
+Ambang yang mengeluarkan satu faskes bergantian lalu mengambil yang terbesar
+tidak menggerakkan apa pun. Laju penandaan daerah tertinggal tetap 2,53
+persen dengan dan tanpa. Mengeluarkan satu dari tiga puluh faskes hanya
+membuang dua setengah persen klaim, dan persentil sembilan puluh delapan
+tidak bergeser sebanyak itu.
+
+Menaikkan syarat jumlah faskes minimum salah sasaran, sama seperti percobaan
+sebelumnya. Pada dua puluh, kelas B yang menahan diri sementara daerah
+tertinggal tidak bergerak.
+
+Membuat penolakan karena kurang faskes berarti menahan diri, bukan turun ke
+kelompok yang lebih kasar, juga gagal. Pada empat puluh, laju daerah
+tertinggal justru melonjak ke 9,4 persen, karena klaim yang kelompok
+halusnya ditolak karena kurang klaim tetap jatuh ke ambang FKTP umum yang
+terlalu ketat baginya.
+
+Sesudah tiga kegagalan itu, sebabnya diukur langsung pada kelompoknya. FKTP
+daerah tertinggal punya tiga puluh faskes kalibrasi dan delapan belas faskes
+uji, dan persentil sembilan puluh delapan klaim bersihnya 15.233 di kalibrasi
+melawan 30.937 di uji. Dua kali lipat. Bandingkan dengan kelompok yang sehat:
+FKTP biasa tanpa laboratorium punya enam ratus empat puluh faskes kalibrasi
+dan rasionya 1,08.
+
+Jaminan konformal menuntut klaim kalibrasi dan klaim uji saling
+terpertukarkan. Kami memisah per faskes, jadi ukuran contoh yang menentukan
+bukan seribu lima ratus klaim melainkan delapan belas faskes. Pada jumlah
+itu, tidak ada penaksir yang bisa memindahkan ambang dengan andal.
+
+Jadi pengecualiannya tetap, dan sekarang punya alasan terukur. Kami tidak
+menyatakan faskes di daerah tertinggal bersih. Kami menyatakan belum cukup
+tahu untuk berjanji apa apa tentang mereka. Mereka tetap masuk pemeriksaan
+lewat porsi sampel acak lima persen.
+
+### Kepala K6 ditulis. Terkalibrasi, tapi lemah.
+
+Generator diberi saklar supaya sebagian faskes nakal baru mulai nakal di
+tengah rentang waktu. Tanpa itu K6 tidak punya apa apa untuk ditemukan.
+Saklarnya mati secara bawaan, jadi seluruh angka percobaan lain tidak
+bergeser.
+
+Kendali positif palsu dijalankan lebih dulu, sebelum melihat daya temunya.
+Pada data tanpa satu pun perubahan, 6,1 persen faskes ditandai berubah pada
+ambang lima persen dan 0,9 persen pada ambang satu persen. Uji permutasinya
+sah.
+
+Satu jebakan ditemukan di jalan, dan pantas dicatat. Versi pertama memakai
+peringkat tanpa memutus nilai yang seri. Enam puluh persen selisih klaim
+bernilai nol persis, dan pengurutan yang stabil memberi klaim nol itu
+peringkat menurut urutan kemunculannya, yaitu urutan waktu. Urutan waktu
+tersuntik ke dalam nilai yang seharusnya tidak membawanya, dan tujuh puluh
+satu persen faskes ditandai berubah pada data yang tidak memuat perubahan
+apa pun. Diputus acak, angkanya kembali ke enam koma satu.
+
+Daya temunya lemah, dan kami tidak membungkusnya:
+
+| Kebijakan sesudah berubah | Ada | Tertangkap |
+|---|---:|---:|
+| oportunis | 8 | 12% |
+| sistematis | 6 | 33% |
+| ekstrem | 4 | 25% |
+
+Tanggal tebakannya meleset dua ratus lima puluh dua hari dari rentang seribu
+sembilan puluh lima hari. Terlalu kasar untuk ditindak langsung. Dan dari
+delapan belas faskes yang berubah, sepuluh sudah tertangkap K4, sehingga
+tambahan bersih K6 hanya dua faskes.
+
+Jadi K6 dikirim sebagai isyarat pendamping dengan angkanya ditulis apa
+adanya, bukan sebagai kemampuan yang dijual. Ia benar secara statistik dan
+kecil secara guna.
+
+### Yang masih terbuka
+
+- Kontrol negatif LEIE, terhalang di sisi data
+- T1 pada seribu klaim, 1,896 kali melawan target dua kali
+- T3, pohon normatif tetap mengalahkan NALAR
+- Uji transfer gagal, dan sebabnya sudah ditulis di atas
