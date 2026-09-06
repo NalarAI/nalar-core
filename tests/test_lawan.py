@@ -297,7 +297,69 @@ cek(
     str(len(lawan.sisakan_yang_berbeda(kembar))),
 )
 
-print("\n8. Pencarian menyeluruh tanpa model bahasa")
+print("\n8. Apa yang boleh dilihat pelaku")
+
+# Tingkat pengetahuan pelaku ini yang paling menentukan angka T6, jadi
+# mekanismenya diuji sendiri. Yang tidak bisa diuji di sini besarnya
+# pengaruh: pada keadaan sekecil ini hampir seluruh kelompok menahan diri
+# dan tidak ada yang pernah tertangkap, jadi bertanya tidak ada gunanya.
+# Angkanya diukur tangan lewat scripts/pengetahuan_pelaku.py.
+for tahu in arena.PENGETAHUAN:
+    h = arena.jalankan(
+        EPS, temu, penskor, amb, tahan, s1, maks_klaim=40, pengetahuan=tahu
+    )
+    cek(
+        f"tingkat pengetahuan {tahu} dilaporkan apa adanya",
+        h.get("pengetahuan") == tahu,
+    )
+
+try:
+    arena.jalankan(EPS, temu, penskor, amb, tahan, s1, pengetahuan="mahatahu")
+    ditolak = False
+except ValueError:
+    ditolak = True
+cek("tingkat pengetahuan yang tidak dikenal ditolak", ditolak)
+
+# Pelaku buta tidak bisa memakai cara memilih yang butuh skor, jadi siasat
+# apa pun jatuh ke mengambil yang paling menguntungkan.
+buta_hati = arena.jalankan(
+    EPS, temu, penskor, amb, tahan, s1, maks_klaim=40, pengetahuan="buta"
+)
+buta_serakah = arena.jalankan(
+    EPS, temu, penskor, amb, tahan, arena.BAKU[0], maks_klaim=40, pengetahuan="buta"
+)
+cek(
+    "tanpa skor, cara memilih tidak lagi membedakan apa pun",
+    buta_hati.get("lolos_rp") == buta_serakah.get("lolos_rp"),
+    f"{buta_hati.get('lolos_rp')} lawan {buta_serakah.get('lolos_rp')}",
+)
+
+# Tanpa satu pun berkas untuk diamati, batas yang disimpulkan nol, jadi
+# tidak ada yang bisa diambil sama sekali.
+tanpa_amat = arena.jalankan(
+    EPS,
+    temu,
+    penskor,
+    amb,
+    tahan,
+    s1,
+    maks_klaim=40,
+    pengetahuan="belajar",
+    n_belajar=0,
+)
+cek(
+    "pelaku yang tidak sempat mengamati tidak mengambil apa apa",
+    tanpa_amat.get("n_diserang", 0) == 0,
+    str(tanpa_amat.get("n_diserang")),
+)
+
+cek(
+    "siasat yang ditemukan lapisan lawan ikut disimpan jadi kasus uji",
+    len(arena.DITEMUKAN) >= 3 and arena.SELURUH == arena.BAKU + arena.DITEMUKAN,
+)
+
+
+print("\n9. Pencarian menyeluruh tanpa model bahasa")
 
 cari = lawan.cari_menyeluruh(g, batas=12)
 cek("pencarian mengembalikan hasil", len(cari) >= 8, str(len(cari)))

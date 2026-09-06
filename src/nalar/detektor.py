@@ -163,8 +163,12 @@ class Detektor:
         Sebabnya sekarang bisa ditunjuk. Pelaku yang punya akses ke skor tidak
         bergantung pada satu pengungkit. Ditutup satu, ia memakai yang lain,
         dan ambang konformal yang bergeser mengikuti sebaran skor justru
-        memberinya ruang baru. Yang harus dibatasi bukan pengungkitnya,
-        melainkan seberapa banyak pelaku boleh menanyai skornya.
+        memberinya ruang baru.
+
+        Membatasi berapa banyak pelaku boleh menanyai skor diukur terpisah dan
+        menolong lebih banyak, sepertiga, tapi tidak menutup lubangnya juga. Dua
+        pertiga uangnya tetap lolos terhadap pelaku yang tidak bisa bertanya
+        sama sekali.
 
         Mesinnya dibiarkan hidup karena ia yang menghasilkan angka di atas dan
         yang akan menguji tambalan berikutnya. Menyalakannya dengan mengisi

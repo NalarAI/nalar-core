@@ -1819,12 +1819,11 @@ lain. Dan ambang konformal bergeser mengikuti sebaran skor: menaikkan seluruh
 selisih menaikkan pula ambangnya, sehingga ruang di bawah garis kembali
 seperti semula.
 
-Jadi yang membuat serangan ini bekerja bukan bukti penyerta, melainkan
-kemampuan menanyai skor sampai tahu apa yang lolos. Itu asumsi terburuk yang
-kami pilih sendiri saat merancang pengujian, dan sekarang ia berbalik jadi
-jawabannya: pertahanan terhadap pelaku yang bisa bertanya bukan rekayasa
-penciri, melainkan membatasi berapa banyak ia boleh bertanya, dan menjaga
-porsi sampel acak supaya tidak ada berkas yang bisa dipastikan aman.
+Dugaan kami waktu itu: yang membuat serangan bekerja bukan bukti penyerta,
+melainkan kemampuan menanyai skor sampai tahu apa yang lolos. Dugaan itu
+langsung diukur, dan hasilnya ada di bagian berikutnya. Ia benar arahnya dan
+terlalu besar kalau ditulis begitu saja: kemampuan bertanya bernilai
+sepertiga dari uang yang lolos, bukan sebagian besarnya.
 
 ### Papan skor A5
 
@@ -1835,3 +1834,102 @@ porsi sampel acak supaya tidak ada berkas yang bisa dipastikan aman.
 Kegagalan keempat proyek ini, dan sebabnya bisa ditunjuk. Rancangan sudah
 menuliskan apa yang dilakukan bila A5 gagal, dan ini pelaksanaannya:
 ditulis seperti tiga kegagalan sebelumnya, bukan disembunyikan.
+
+
+---
+
+## Berapa nilai kemampuan bertanya, 7 September 2026
+
+`runs/pengetahuan_pelaku.json`
+
+Percobaan sebelumnya berakhir dengan satu dugaan, dan dugaan itu terdengar
+benar. Terdengar benar bukan alasan menuliskannya sebagai temuan, jadi ia
+diukur. Yang diubah cuma satu hal, dan bukan detektornya, melainkan apa yang
+boleh dilihat pelaku.
+
+Penuh berarti pelaku melihat skor tiap varian sebelum memilih, sebanyak yang
+ia mau. Ini asumsi terburuk, dan yang dipakai seluruh pengujian kami sampai
+sekarang. Belajar berarti ia melihat skor pada lima puluh berkas pertama,
+menyimpulkan satu batas keuntungan yang aman, lalu memakainya pada sisanya
+tanpa bertanya lagi. Buta berarti tidak melihat sama sekali.
+
+Yang kedua paling mendekati keadaan sebenarnya. Rumah sakit tidak punya
+tombol yang mengembalikan skor sebuah berkas. Yang ia punya hasil berkas yang
+sudah dikirim, satu pengamatan per berkas, dan itu datang belakangan.
+
+### Uang yang lolos
+
+| Siasat | Penuh | Belajar | Buta |
+|---|---:|---:|---:|
+| serakah | 195,7 jt | 177,0 jt | 195,7 jt |
+| hati hati | 275,3 jt | 186,0 jt | 195,7 jt |
+| menyebar | 232,6 jt | 184,3 jt | 195,7 jt |
+| upcode berlapis bukti | **384,2 jt** | 230,7 jt | 263,4 jt |
+| upcode berlapis bukti, berkas kecil | 367,6 jt | 258,9 jt | 256,3 jt |
+| upcode berlapis bukti, menyebar | 312,7 jt | 226,3 jt | 263,4 jt |
+| upcode berlapis barang | 280,2 jt | 184,7 jt | 190,8 jt |
+| berteduh di kelompok menahan diri | 5,1 jt | 5,1 jt | 5,1 jt |
+
+Pelaku terburuk turun dari Rp 384,2 juta ke Rp 258,9 juta. Yang tersisa 67,4
+persen.
+
+### Dugaannya benar arahnya, dan terlalu besar
+
+Sepertiga jauh lebih banyak daripada yang diberikan tambalan penciri, yang
+cuma 0,8 sampai 4,2 persen. Jadi arah dugaannya benar dan pantas dikerjakan.
+
+Tapi dua pertiga uangnya tetap lolos terhadap pelaku yang tidak bisa bertanya
+sama sekali. Menambah diagnosis sekunder bekerja tanpa perlu tahu apa pun,
+karena diagnosis sekunder memang bukan penciri. Jadi kalimat "pertahanannya
+membatasi berapa banyak ia boleh bertanya" terlalu besar, dan sudah diralat
+di bagian sebelumnya.
+
+### Kenapa turun, dan ini yang tidak terduga
+
+| Siasat | Tingkat | Diambil | Tertangkap |
+|---|---|---:|---:|
+| hati hati | penuh | 275,3 jt | 0,0% |
+| hati hati | belajar | 310,9 jt | 34,2% |
+| upcode berlapis bukti | penuh | 384,2 jt | 0,0% |
+| upcode berlapis bukti | belajar | 429,4 jt | 39,6% |
+| upcode berlapis barang | penuh | 280,2 jt | 0,0% |
+| upcode berlapis barang | belajar | 327,0 jt | 38,5% |
+
+Pelaku yang berhenti bisa bertanya tidak jadi lebih hati hati. Ia mengambil
+lebih banyak, lalu kehilangan hampir empat puluh persennya. Uang yang lolos
+turun bukan karena ia menahan diri, melainkan karena detektornya benar benar
+menangkapnya.
+
+Itu kabar baik yang selama ini tertutup asumsi terburuk. Diukur pada pelaku
+yang punya akses penuh ke skor, detektor terlihat tidak menangkap apa apa,
+nol persen pada empat siasat sekaligus. Diukur pada pelaku yang cuma bisa
+belajar dari hasil, ia menangkap sekitar empat dari sepuluh berkas yang
+diserang.
+
+### Satu cacat yang ditemukan sebelum angkanya dipakai
+
+Versi pertama pengukuran ini menyimpulkan batas pelaku di dalam cabang berkas
+yang tidak tertangkap, pada pengamatan terakhir. Kalau pengamatan terakhir
+kebetulan tertangkap, batasnya tidak pernah tersimpul, dan pelaku diam diam
+kembali punya akses penuh ke skor untuk sisa berkasnya.
+
+Ketahuan dari uji yang memberi nol berkas pengamatan lalu memeriksa bahwa
+pelakunya tidak mengambil apa apa. Ia mengambil enam belas. Angka yang
+terlanjur terhitung meleset sekitar empat persen, dan yang lebih parah, kolom
+diambil melaporkan Rp 1,8 miliar padahal seharusnya Rp 430 juta. Diperbaiki,
+diukur ulang, dan yang tertulis di atas hasil pengukuran ulang.
+
+### Yang berubah dari daftar pekerjaan
+
+Dua hal, dan keduanya bukan model.
+
+Pertama, portal faskes tidak boleh jadi tempat mencoba coba. Ia sudah
+menghitung ulang selisih ketika bukti dicentang, dan itu memang gunanya. Yang
+belum ada batas berapa kali sebuah berkas boleh dihitung ulang, dan catatan
+siapa yang menghitung ulang berapa kali. Rumah sakit yang mengulang tiga
+puluh kali pada satu berkas sedang mencari garis, bukan melengkapi bukti.
+
+Kedua, angka T6 kami selama ini diukur pada pelaku yang paling kuat yang bisa
+dibayangkan. Itu tetap yang dilaporkan, karena melaporkan yang lebih lemah
+berarti menghibur diri sendiri. Tapi sekarang ada dua angka, dan yang kedua
+menunjukkan detektornya bekerja lebih baik daripada yang tertulis.

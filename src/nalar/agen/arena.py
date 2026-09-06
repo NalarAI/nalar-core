@@ -45,6 +45,9 @@ def _lantai_biaya(biaya_audit_rp: int) -> int:
     return int(biaya_audit_rp)
 
 
+PENGETAHUAN = ("penuh", "buta", "belajar")
+
+
 def jalankan(
     episodes: list[dict],
     idx,
@@ -54,12 +57,31 @@ def jalankan(
     siasat: dict,
     biaya_audit_rp: int = 750_000,
     maks_klaim: int = 400,
+    pengetahuan: str = "penuh",
+    n_belajar: int = 50,
 ) -> dict:
     """Ukur satu siasat pada satu himpunan berkas.
 
     penskor  fungsi yang menerima daftar berkas dan mengembalikan selisihnya
     ambang   ambang penandaan per berkas, dihitung sebelum serangan
     tahan    penanda kelompok yang menahan diri, per berkas
+
+    Argumen pengetahuan menentukan apa yang boleh dilihat pelaku, dan itu
+    yang paling menentukan hasilnya. Tiga tingkat:
+
+    penuh    pelaku melihat skor tiap varian sebelum memilih, sebanyak yang
+             ia mau. Ini asumsi terburuk, dan yang dipakai seluruh pengujian
+             kami sampai sekarang.
+    buta     pelaku tidak melihat skor sama sekali dan hanya bisa memilih
+             yang paling menguntungkan.
+    belajar  pelaku melihat skor pada n_belajar berkas pertama, menyimpulkan
+             satu batas keuntungan yang aman dari situ, lalu memakai batas itu
+             pada sisanya tanpa bertanya lagi.
+
+    Yang ketiga yang paling mendekati keadaan sebenarnya. Rumah sakit tidak
+    punya tombol yang mengembalikan skor sebuah berkas. Yang ia punya hasil
+    berkas yang sudah dikirim, satu pengamatan per berkas, dan itu datang
+    belakangan.
     """
     periksa(siasat)
     gerakan = siasat["gerakan"]
@@ -105,10 +127,21 @@ def jalankan(
 
     skor_semua = np.asarray(penskor(semua), dtype=np.float64)
 
+    if pengetahuan not in PENGETAHUAN:
+        raise ValueError(f"pengetahuan {pengetahuan} tidak dikenal")
+
     diambil, lolos, per_klaim, per_klaim_lolos = 0.0, 0.0, [], []
     n_tertangkap = 0
 
-    for pos, a, b in batas:
+    # Pelaku yang belajar: berkas pertama dipakai mengamati, sisanya dipakai
+    # mengambil. Batas yang disimpulkan satu angka saja, yaitu keuntungan
+    # terbesar yang pada pengamatan tidak pernah tertangkap. Pelaku sungguhan
+    # tidak punya lebih banyak daripada ini, dan sering punya lebih sedikit.
+    batas_dipelajari = float("inf")
+    batas_siap = False
+    aman_teramati: list[float] = []
+
+    for urut, (pos, a, b) in enumerate(batas):
         i = calon[pos]
         r = episodes[i]
         vs = semua[a:b]
@@ -121,7 +154,34 @@ def jalankan(
             dtype=np.float64,
         )
         skor = skor_semua[a:b]
-        k = pilih(cara, untung, skor, float(skor_asli[pos]), float(ambang[i]))
+
+        mengamati = pengetahuan == "belajar" and urut < n_belajar
+        if pengetahuan == "penuh" or mengamati:
+            k = pilih(cara, untung, skor, float(skor_asli[pos]), float(ambang[i]))
+        elif pengetahuan == "buta":
+            # Tanpa skor, satu satunya yang bisa dibandingkan keuntungannya.
+            k = pilih({"jenis": "paling_untung"}, untung, skor, 0.0, np.inf)
+        else:
+            # Sudah selesai mengamati. Batasnya disimpulkan di sini, sekali,
+            # dari apa pun yang sempat teramati.
+            #
+            # Versi pertama menyimpulkannya di dalam cabang berkas yang tidak
+            # tertangkap, pada pengamatan terakhir. Itu salah dua kali. Kalau
+            # pengamatan terakhir kebetulan tertangkap, batasnya tidak pernah
+            # tersimpul dan pelaku diam diam kembali punya akses penuh ke
+            # skor untuk sisa berkasnya. Dan kalau tidak ada pengamatan sama
+            # sekali, ia juga punya akses penuh, padahal seharusnya tidak
+            # tahu apa apa.
+            if not batas_siap:
+                batas_dipelajari = max(aman_teramati) if aman_teramati else 0.0
+                batas_siap = True
+            k = pilih(
+                {"jenis": "untung_dibatasi", "batas_rp": batas_dipelajari},
+                untung,
+                skor,
+                0.0,
+                np.inf,
+            )
         if k is None or untung[k] <= 0:
             continue
 
@@ -139,10 +199,13 @@ def jalankan(
         else:
             lolos += float(untung[k])
             per_klaim_lolos.append(float(untung[k]))
+            if mengamati:
+                aman_teramati.append(float(untung[k]))
 
     n = len(per_klaim)
     return {
         "nama": siasat["nama"],
+        "pengetahuan": pengetahuan,
         "n_sasaran": len(sasar),
         "n_diserang": n,
         "diambil_rp": round(diambil),
@@ -181,6 +244,61 @@ BAKU = [
         "pilihan": {"jenis": "kenaikan_skor_terkecil"},
     },
 ]
+
+
+# Siasat yang ditemukan lapisan lawan pada 7 September 2026, dan bertahan di
+# himpunan yang tidak dipakai menemukannya. Ini kasus uji, bukan resep. Ia
+# ditaruh di sini supaya tambalan berikutnya diuji melawan serangan yang
+# benar benar pernah menembus, bukan melawan serangan yang kami karang lagi.
+#
+# Yang pertama meloloskan Rp 427,2 juta tanpa satu berkas pun tertangkap,
+# melawan Rp 314,2 juta milik pelaku terbaik yang kami tulis sendiri.
+DITEMUKAN = [
+    {
+        "nama": "upcode berlapis bukti",
+        "sasaran": {"jenis": "semua_rawat_inap"},
+        "gerakan": [
+            {"jenis": "tambah_diagnosis"},
+            {"jenis": "lampirkan_lab", "n": 3},
+        ],
+        "pilihan": {"jenis": "aman_di_bawah_ambang"},
+    },
+    {
+        "nama": "upcode berlapis bukti, berkas kecil",
+        "sasaran": {"jenis": "selisih_awal_kecil", "batas_rp": 1_000_000},
+        "gerakan": [
+            {"jenis": "tambah_diagnosis"},
+            {"jenis": "lampirkan_lab", "n": 3},
+        ],
+        "pilihan": {"jenis": "aman_di_bawah_ambang"},
+    },
+    {
+        "nama": "upcode berlapis bukti, menyebar",
+        "sasaran": {"jenis": "semua_rawat_inap"},
+        "gerakan": [
+            {"jenis": "tambah_diagnosis"},
+            {"jenis": "lampirkan_lab", "n": 3},
+        ],
+        "pilihan": {"jenis": "kenaikan_skor_terkecil"},
+    },
+    {
+        "nama": "upcode berlapis barang",
+        "sasaran": {"jenis": "semua_rawat_inap"},
+        "gerakan": [
+            {"jenis": "tambah_diagnosis"},
+            {"jenis": "gelembungkan_barang", "persen": 30},
+        ],
+        "pilihan": {"jenis": "aman_di_bawah_ambang"},
+    },
+    {
+        "nama": "berteduh di kelompok yang menahan diri",
+        "sasaran": {"jenis": "kelompok_menahan_diri"},
+        "gerakan": [{"jenis": "tambah_diagnosis"}],
+        "pilihan": {"jenis": "paling_untung"},
+    },
+]
+
+SELURUH = BAKU + DITEMUKAN
 
 
 def garis_dasar(episodes, idx, penskor, ambang, tahan, **kw) -> dict:

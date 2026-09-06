@@ -45,48 +45,6 @@ from nalar.dataset import bangun_meta, pisah_menurut_entitas  # noqa: E402
 from nalar.detektor import Detektor  # noqa: E402
 from nalar.generator import Pembangkit  # noqa: E402
 
-# Siasat yang ditemukan lapisan lawan, disalin apa adanya dari
-# runs/agen_lawan.json. Ditulis di sini supaya skrip ini bisa dijalankan
-# sendiri, dan supaya yang diuji tambalannya persis siasat yang menembusnya.
-SIASAT_BARU = [
-    {
-        "nama": "upcode berlapis bukti",
-        "sasaran": {"jenis": "semua_rawat_inap"},
-        "gerakan": [
-            {"jenis": "tambah_diagnosis"},
-            {"jenis": "lampirkan_lab", "n": 3},
-        ],
-        "pilihan": {"jenis": "aman_di_bawah_ambang"},
-    },
-    {
-        "nama": "upcode berlapis bukti, berkas kecil",
-        "sasaran": {"jenis": "selisih_awal_kecil", "batas_rp": 1_000_000},
-        "gerakan": [
-            {"jenis": "tambah_diagnosis"},
-            {"jenis": "lampirkan_lab", "n": 3},
-        ],
-        "pilihan": {"jenis": "aman_di_bawah_ambang"},
-    },
-    {
-        "nama": "upcode berlapis bukti, menyebar",
-        "sasaran": {"jenis": "semua_rawat_inap"},
-        "gerakan": [
-            {"jenis": "tambah_diagnosis"},
-            {"jenis": "lampirkan_lab", "n": 3},
-        ],
-        "pilihan": {"jenis": "kenaikan_skor_terkecil"},
-    },
-    {
-        "nama": "upcode berlapis barang",
-        "sasaran": {"jenis": "semua_rawat_inap"},
-        "gerakan": [
-            {"jenis": "tambah_diagnosis"},
-            {"jenis": "gelembungkan_barang", "persen": 30},
-        ],
-        "pilihan": {"jenis": "aman_di_bawah_ambang"},
-    },
-]
-
 
 def jt(x) -> str:
     return f"{(x or 0) / 1e6:8.1f} jt"
@@ -121,7 +79,7 @@ def ukur_lawan(eps, idx, det, klaim: int) -> dict:
         return det.skor(daftar)["selisih"]
 
     hasil = {}
-    for s in arena.BAKU + SIASAT_BARU:
+    for s in arena.BAKU + arena.DITEMUKAN:
         h = arena.jalankan(eps, idx, penskor, amb, tahan, s, maks_klaim=klaim)
         hasil[s["nama"]] = h
     return hasil
