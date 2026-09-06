@@ -4,7 +4,7 @@ Model deteksi ketidaksesuaian klaim JKN, dibangun dari nol.
 Untuk Healthkathon BPJS Kesehatan 2026, kategori Efisiensi Risiko pada
 Fasilitas Kesehatan.
 
-Rancangan lengkapnya ada di `../rancangan_model_ai_nalar_jkn.yaml`.
+Rancangan lengkapnya ada di `../docs/rancangan_model_ai_nalar_jkn.yaml`.
 Seluruh hasil percobaan beserta kegagalannya ada di `TEMUAN.md`.
 Berkas ini hanya menjelaskan kode yang sudah jalan.
 
