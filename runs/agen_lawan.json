@@ -1,0 +1,2310 @@
+{
+  "pengaturan": {
+    "peserta": 20000,
+    "tahun": 3,
+    "benih": 7,
+    "klaim": 400,
+    "cari": 120,
+    "giliran": 10,
+    "model": "nalar-qwen3-4b",
+    "keluar": "runs/agen_lawan.json"
+  },
+  "garis_dasar_penemuan": {
+    "baris": [
+      {
+        "nama": "serakah",
+        "n_sasaran": 400,
+        "n_diserang": 275,
+        "diambil_rp": 1936750400,
+        "lolos_rp": 175445200,
+        "maks_per_klaim_rp": 40670400,
+        "maks_lolos_rp": 22466800,
+        "rerata_per_klaim_rp": 7042729,
+        "porsi_tertangkap": 0.7127
+      },
+      {
+        "nama": "hati hati",
+        "n_sasaran": 400,
+        "n_diserang": 126,
+        "diambil_rp": 255024200,
+        "lolos_rp": 255024200,
+        "maks_per_klaim_rp": 22466800,
+        "maks_lolos_rp": 22466800,
+        "rerata_per_klaim_rp": 2024002,
+        "porsi_tertangkap": 0.0
+      },
+      {
+        "nama": "menyebar",
+        "n_sasaran": 400,
+        "n_diserang": 275,
+        "diambil_rp": 1345115900,
+        "lolos_rp": 210211000,
+        "maks_per_klaim_rp": 29575800,
+        "maks_lolos_rp": 15877700,
+        "rerata_per_klaim_rp": 4891331,
+        "porsi_tertangkap": 0.5345
+      }
+    ],
+    "lolos_terbaik_rp": 255024200,
+    "maks_lolos_terbaik_rp": 22466800,
+    "nama_terbaik": "hati hati"
+  },
+  "garis_dasar_pengesahan": {
+    "baris": [
+      {
+        "nama": "serakah",
+        "n_sasaran": 400,
+        "n_diserang": 283,
+        "diambil_rp": 1957609700,
+        "lolos_rp": 227554400,
+        "maks_per_klaim_rp": 31732800,
+        "maks_lolos_rp": 18254300,
+        "rerata_per_klaim_rp": 6917349,
+        "porsi_tertangkap": 0.6396
+      },
+      {
+        "nama": "hati hati",
+        "n_sasaran": 400,
+        "n_diserang": 157,
+        "diambil_rp": 314215400,
+        "lolos_rp": 314215400,
+        "maks_per_klaim_rp": 18254300,
+        "maks_lolos_rp": 18254300,
+        "rerata_per_klaim_rp": 2001372,
+        "porsi_tertangkap": 0.0
+      },
+      {
+        "nama": "menyebar",
+        "n_sasaran": 400,
+        "n_diserang": 283,
+        "diambil_rp": 1353297600,
+        "lolos_rp": 247003700,
+        "maks_per_klaim_rp": 31732800,
+        "maks_lolos_rp": 12942500,
+        "rerata_per_klaim_rp": 4781970,
+        "porsi_tertangkap": 0.4382
+      }
+    ],
+    "lolos_terbaik_rp": 314215400,
+    "maks_lolos_terbaik_rp": 18254300,
+    "nama_terbaik": "hati hati"
+  },
+  "pencarian": [
+    {
+      "siasat": {
+        "nama": "cari-26",
+        "sasaran": {
+          "jenis": "semua_rawat_inap"
+        },
+        "gerakan": [
+          {
+            "jenis": "tambah_diagnosis"
+          },
+          {
+            "jenis": "lampirkan_lab",
+            "n": 3
+          }
+        ],
+        "pilihan": {
+          "jenis": "aman_di_bawah_ambang"
+        }
+      },
+      "temu": {
+        "nama": "cari-26",
+        "n_sasaran": 400,
+        "n_diserang": 142,
+        "diambil_rp": 349051500,
+        "lolos_rp": 349051500,
+        "maks_per_klaim_rp": 22466800,
+        "maks_lolos_rp": 22466800,
+        "rerata_per_klaim_rp": 2458109,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": 94027300,
+        "lebih_maks_rp": 0,
+        "menang_jumlah": true,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": true
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-106",
+        "sasaran": {
+          "jenis": "selisih_awal_kecil",
+          "batas_rp": 1000000
+        },
+        "gerakan": [
+          {
+            "jenis": "tambah_diagnosis"
+          },
+          {
+            "jenis": "lampirkan_lab",
+            "n": 3
+          }
+        ],
+        "pilihan": {
+          "jenis": "aman_di_bawah_ambang"
+        }
+      },
+      "temu": {
+        "nama": "cari-106",
+        "n_sasaran": 260,
+        "n_diserang": 134,
+        "diambil_rp": 332579300,
+        "lolos_rp": 332579300,
+        "maks_per_klaim_rp": 22466800,
+        "maks_lolos_rp": 22466800,
+        "rerata_per_klaim_rp": 2481935,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": 77555100,
+        "lebih_maks_rp": 0,
+        "menang_jumlah": true,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": true
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-27",
+        "sasaran": {
+          "jenis": "semua_rawat_inap"
+        },
+        "gerakan": [
+          {
+            "jenis": "tambah_diagnosis"
+          },
+          {
+            "jenis": "lampirkan_lab",
+            "n": 3
+          }
+        ],
+        "pilihan": {
+          "jenis": "kenaikan_skor_terkecil"
+        }
+      },
+      "temu": {
+        "nama": "cari-27",
+        "n_sasaran": 400,
+        "n_diserang": 275,
+        "diambil_rp": 1345115900,
+        "lolos_rp": 285360600,
+        "maks_per_klaim_rp": 29575800,
+        "maks_lolos_rp": 18154800,
+        "rerata_per_klaim_rp": 4891331,
+        "porsi_tertangkap": 0.4764,
+        "lebih_jumlah_rp": 30336400,
+        "lebih_maks_rp": -4312000,
+        "menang_jumlah": true,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": true
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-107",
+        "sasaran": {
+          "jenis": "selisih_awal_kecil",
+          "batas_rp": 1000000
+        },
+        "gerakan": [
+          {
+            "jenis": "tambah_diagnosis"
+          },
+          {
+            "jenis": "lampirkan_lab",
+            "n": 3
+          }
+        ],
+        "pilihan": {
+          "jenis": "kenaikan_skor_terkecil"
+        }
+      },
+      "temu": {
+        "nama": "cari-107",
+        "n_sasaran": 260,
+        "n_diserang": 228,
+        "diambil_rp": 940986900,
+        "lolos_rp": 268888400,
+        "maks_per_klaim_rp": 27238400,
+        "maks_lolos_rp": 18154800,
+        "rerata_per_klaim_rp": 4127136,
+        "porsi_tertangkap": 0.4035,
+        "lebih_jumlah_rp": 13864200,
+        "lebih_maks_rp": -4312000,
+        "menang_jumlah": true,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": true
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-31",
+        "sasaran": {
+          "jenis": "semua_rawat_inap"
+        },
+        "gerakan": [
+          {
+            "jenis": "tambah_diagnosis"
+          },
+          {
+            "jenis": "gelembungkan_barang",
+            "persen": 30
+          }
+        ],
+        "pilihan": {
+          "jenis": "aman_di_bawah_ambang"
+        }
+      },
+      "temu": {
+        "nama": "cari-31",
+        "n_sasaran": 400,
+        "n_diserang": 170,
+        "diambil_rp": 257650333,
+        "lolos_rp": 257650333,
+        "maks_per_klaim_rp": 22486000,
+        "maks_lolos_rp": 22486000,
+        "rerata_per_klaim_rp": 1515590,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": 2626133,
+        "lebih_maks_rp": 19200,
+        "menang_jumlah": true,
+        "menang_maks": true,
+        "mengalahkan_garis_dasar": true
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-111",
+        "sasaran": {
+          "jenis": "selisih_awal_kecil",
+          "batas_rp": 1000000
+        },
+        "gerakan": [
+          {
+            "jenis": "tambah_diagnosis"
+          },
+          {
+            "jenis": "gelembungkan_barang",
+            "persen": 30
+          }
+        ],
+        "pilihan": {
+          "jenis": "aman_di_bawah_ambang"
+        }
+      },
+      "temu": {
+        "nama": "cari-111",
+        "n_sasaran": 260,
+        "n_diserang": 150,
+        "diambil_rp": 248168936,
+        "lolos_rp": 248168936,
+        "maks_per_klaim_rp": 22486000,
+        "maks_lolos_rp": 22486000,
+        "rerata_per_klaim_rp": 1654460,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -6855264,
+        "lebih_maks_rp": 19200,
+        "menang_jumlah": false,
+        "menang_maks": true,
+        "mengalahkan_garis_dasar": true
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-81",
+        "sasaran": {
+          "jenis": "selisih_awal_kecil",
+          "batas_rp": 1000000
+        },
+        "gerakan": [
+          {
+            "jenis": "tambah_diagnosis"
+          }
+        ],
+        "pilihan": {
+          "jenis": "aman_di_bawah_ambang"
+        }
+      },
+      "temu": {
+        "nama": "cari-81",
+        "n_sasaran": 260,
+        "n_diserang": 120,
+        "diambil_rp": 246184900,
+        "lolos_rp": 246184900,
+        "maks_per_klaim_rp": 22466800,
+        "maks_lolos_rp": 22466800,
+        "rerata_per_klaim_rp": 2051541,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -8839300,
+        "lebih_maks_rp": 0,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-28",
+        "sasaran": {
+          "jenis": "semua_rawat_inap"
+        },
+        "gerakan": [
+          {
+            "jenis": "tambah_diagnosis"
+          },
+          {
+            "jenis": "lampirkan_lab",
+            "n": 3
+          }
+        ],
+        "pilihan": {
+          "jenis": "untung_di_bawah_porsi_ambang",
+          "porsi": 0.7
+        }
+      },
+      "temu": {
+        "nama": "cari-28",
+        "n_sasaran": 400,
+        "n_diserang": 116,
+        "diambil_rp": 239536700,
+        "lolos_rp": 239536700,
+        "maks_per_klaim_rp": 18154800,
+        "maks_lolos_rp": 18154800,
+        "rerata_per_klaim_rp": 2064972,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -15487500,
+        "lebih_maks_rp": -4312000,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-25",
+        "sasaran": {
+          "jenis": "semua_rawat_inap"
+        },
+        "gerakan": [
+          {
+            "jenis": "tambah_diagnosis"
+          },
+          {
+            "jenis": "lampirkan_lab",
+            "n": 3
+          }
+        ],
+        "pilihan": {
+          "jenis": "paling_untung"
+        }
+      },
+      "temu": {
+        "nama": "cari-25",
+        "n_sasaran": 400,
+        "n_diserang": 275,
+        "diambil_rp": 1936750400,
+        "lolos_rp": 232692500,
+        "maks_per_klaim_rp": 40670400,
+        "maks_lolos_rp": 22466800,
+        "rerata_per_klaim_rp": 7042729,
+        "porsi_tertangkap": 0.6764,
+        "lebih_jumlah_rp": -22331700,
+        "lebih_maks_rp": 0,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-108",
+        "sasaran": {
+          "jenis": "selisih_awal_kecil",
+          "batas_rp": 1000000
+        },
+        "gerakan": [
+          {
+            "jenis": "tambah_diagnosis"
+          },
+          {
+            "jenis": "lampirkan_lab",
+            "n": 3
+          }
+        ],
+        "pilihan": {
+          "jenis": "untung_di_bawah_porsi_ambang",
+          "porsi": 0.7
+        }
+      },
+      "temu": {
+        "nama": "cari-108",
+        "n_sasaran": 260,
+        "n_diserang": 110,
+        "diambil_rp": 226323400,
+        "lolos_rp": 226323400,
+        "maks_per_klaim_rp": 18154800,
+        "maks_lolos_rp": 18154800,
+        "rerata_per_klaim_rp": 2057485,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -28700800,
+        "lebih_maks_rp": -4312000,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-105",
+        "sasaran": {
+          "jenis": "selisih_awal_kecil",
+          "batas_rp": 1000000
+        },
+        "gerakan": [
+          {
+            "jenis": "tambah_diagnosis"
+          },
+          {
+            "jenis": "lampirkan_lab",
+            "n": 3
+          }
+        ],
+        "pilihan": {
+          "jenis": "paling_untung"
+        }
+      },
+      "temu": {
+        "nama": "cari-105",
+        "n_sasaran": 260,
+        "n_diserang": 228,
+        "diambil_rp": 1354214200,
+        "lolos_rp": 223853200,
+        "maks_per_klaim_rp": 35261200,
+        "maks_lolos_rp": 22466800,
+        "rerata_per_klaim_rp": 5939536,
+        "porsi_tertangkap": 0.636,
+        "lebih_jumlah_rp": -31171000,
+        "lebih_maks_rp": 0,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-32",
+        "sasaran": {
+          "jenis": "semua_rawat_inap"
+        },
+        "gerakan": [
+          {
+            "jenis": "tambah_diagnosis"
+          },
+          {
+            "jenis": "gelembungkan_barang",
+            "persen": 30
+          }
+        ],
+        "pilihan": {
+          "jenis": "kenaikan_skor_terkecil"
+        }
+      },
+      "temu": {
+        "nama": "cari-32",
+        "n_sasaran": 400,
+        "n_diserang": 393,
+        "diambil_rp": 1415728767,
+        "lolos_rp": 217610483,
+        "maks_per_klaim_rp": 29618550,
+        "maks_lolos_rp": 15916400,
+        "rerata_per_klaim_rp": 3602363,
+        "porsi_tertangkap": 0.5623,
+        "lebih_jumlah_rp": -37413717,
+        "lebih_maks_rp": -6550400,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-112",
+        "sasaran": {
+          "jenis": "selisih_awal_kecil",
+          "batas_rp": 1000000
+        },
+        "gerakan": [
+          {
+            "jenis": "tambah_diagnosis"
+          },
+          {
+            "jenis": "gelembungkan_barang",
+            "persen": 30
+          }
+        ],
+        "pilihan": {
+          "jenis": "kenaikan_skor_terkecil"
+        }
+      },
+      "temu": {
+        "nama": "cari-112",
+        "n_sasaran": 260,
+        "n_diserang": 260,
+        "diambil_rp": 965938967,
+        "lolos_rp": 208129086,
+        "maks_per_klaim_rp": 27282200,
+        "maks_lolos_rp": 15916400,
+        "rerata_per_klaim_rp": 3715150,
+        "porsi_tertangkap": 0.4154,
+        "lebih_jumlah_rp": -46895114,
+        "lebih_maks_rp": -6550400,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-10",
+        "sasaran": {
+          "jenis": "semua_rawat_inap"
+        },
+        "gerakan": [
+          {
+            "jenis": "naikkan_kelas"
+          }
+        ],
+        "pilihan": {
+          "jenis": "paling_untung"
+        }
+      },
+      "temu": {
+        "nama": "cari-10",
+        "n_sasaran": 400,
+        "n_diserang": 341,
+        "diambil_rp": 602717000,
+        "lolos_rp": 207262100,
+        "maks_per_klaim_rp": 18962000,
+        "maks_lolos_rp": 11933300,
+        "rerata_per_klaim_rp": 1767499,
+        "porsi_tertangkap": 0.3724,
+        "lebih_jumlah_rp": -47762100,
+        "lebih_maks_rp": -10533500,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-12",
+        "sasaran": {
+          "jenis": "semua_rawat_inap"
+        },
+        "gerakan": [
+          {
+            "jenis": "naikkan_kelas"
+          }
+        ],
+        "pilihan": {
+          "jenis": "kenaikan_skor_terkecil"
+        }
+      },
+      "temu": {
+        "nama": "cari-12",
+        "n_sasaran": 400,
+        "n_diserang": 341,
+        "diambil_rp": 602717000,
+        "lolos_rp": 207262100,
+        "maks_per_klaim_rp": 18962000,
+        "maks_lolos_rp": 11933300,
+        "rerata_per_klaim_rp": 1767499,
+        "porsi_tertangkap": 0.3724,
+        "lebih_jumlah_rp": -47762100,
+        "lebih_maks_rp": -10533500,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-11",
+        "sasaran": {
+          "jenis": "semua_rawat_inap"
+        },
+        "gerakan": [
+          {
+            "jenis": "naikkan_kelas"
+          }
+        ],
+        "pilihan": {
+          "jenis": "aman_di_bawah_ambang"
+        }
+      },
+      "temu": {
+        "nama": "cari-11",
+        "n_sasaran": 400,
+        "n_diserang": 212,
+        "diambil_rp": 206053700,
+        "lolos_rp": 206053700,
+        "maks_per_klaim_rp": 11933300,
+        "maks_lolos_rp": 11933300,
+        "rerata_per_klaim_rp": 971951,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -48970500,
+        "lebih_maks_rp": -10533500,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-82",
+        "sasaran": {
+          "jenis": "selisih_awal_kecil",
+          "batas_rp": 1000000
+        },
+        "gerakan": [
+          {
+            "jenis": "tambah_diagnosis"
+          }
+        ],
+        "pilihan": {
+          "jenis": "kenaikan_skor_terkecil"
+        }
+      },
+      "temu": {
+        "nama": "cari-82",
+        "n_sasaran": 260,
+        "n_diserang": 228,
+        "diambil_rp": 940986900,
+        "lolos_rp": 201371700,
+        "maks_per_klaim_rp": 27238400,
+        "maks_lolos_rp": 15877700,
+        "rerata_per_klaim_rp": 4127136,
+        "porsi_tertangkap": 0.4649,
+        "lebih_jumlah_rp": -53652500,
+        "lebih_maks_rp": -6589100,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-90",
+        "sasaran": {
+          "jenis": "selisih_awal_kecil",
+          "batas_rp": 1000000
+        },
+        "gerakan": [
+          {
+            "jenis": "naikkan_kelas"
+          }
+        ],
+        "pilihan": {
+          "jenis": "paling_untung"
+        }
+      },
+      "temu": {
+        "nama": "cari-90",
+        "n_sasaran": 260,
+        "n_diserang": 235,
+        "diambil_rp": 322957900,
+        "lolos_rp": 189192600,
+        "maks_per_klaim_rp": 15480700,
+        "maks_lolos_rp": 11933300,
+        "rerata_per_klaim_rp": 1374289,
+        "porsi_tertangkap": 0.1574,
+        "lebih_jumlah_rp": -65831600,
+        "lebih_maks_rp": -10533500,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-92",
+        "sasaran": {
+          "jenis": "selisih_awal_kecil",
+          "batas_rp": 1000000
+        },
+        "gerakan": [
+          {
+            "jenis": "naikkan_kelas"
+          }
+        ],
+        "pilihan": {
+          "jenis": "kenaikan_skor_terkecil"
+        }
+      },
+      "temu": {
+        "nama": "cari-92",
+        "n_sasaran": 260,
+        "n_diserang": 235,
+        "diambil_rp": 322957900,
+        "lolos_rp": 189192600,
+        "maks_per_klaim_rp": 15480700,
+        "maks_lolos_rp": 11933300,
+        "rerata_per_klaim_rp": 1374289,
+        "porsi_tertangkap": 0.1574,
+        "lebih_jumlah_rp": -65831600,
+        "lebih_maks_rp": -10533500,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-91",
+        "sasaran": {
+          "jenis": "selisih_awal_kecil",
+          "batas_rp": 1000000
+        },
+        "gerakan": [
+          {
+            "jenis": "naikkan_kelas"
+          }
+        ],
+        "pilihan": {
+          "jenis": "aman_di_bawah_ambang"
+        }
+      },
+      "temu": {
+        "nama": "cari-91",
+        "n_sasaran": 260,
+        "n_diserang": 196,
+        "diambil_rp": 187984200,
+        "lolos_rp": 187984200,
+        "maks_per_klaim_rp": 11933300,
+        "maks_lolos_rp": 11933300,
+        "rerata_per_klaim_rp": 959103,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -67040000,
+        "lebih_maks_rp": -10533500,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    }
+  ],
+  "agen": {
+    "sumber": "agen",
+    "sebab_berhenti": "alat coba_siasat dipanggil berulang dengan argumen yang sama",
+    "dicoba": 3,
+    "temuan": [],
+    "penyelia": {
+      "giliran": 6,
+      "panggilan_alat": 5,
+      "token_masuk": 13695,
+      "token_keluar": 689,
+      "biaya_rp": 83.659,
+      "dalam_anggaran": false,
+      "sebab_putus": "alat coba_siasat dipanggil berulang dengan argumen yang sama"
+    },
+    "ringkas_jejak": {
+      "perkara": "lawan",
+      "n_panggilan": 5,
+      "alat": [
+        "coba_siasat",
+        "coba_siasat",
+        "coba_siasat",
+        "coba_siasat",
+        "coba_siasat"
+      ],
+      "ms_total": 456.295,
+      "n_galat": 2,
+      "sidik_akhir": "06ee5d1883f8ce26ea197a06fdcd9c7f68d82c88dc5f29ea1be8b5cf65a11a69"
+    }
+  },
+  "siasat_baru": [
+    {
+      "siasat": {
+        "nama": "cari-26",
+        "sasaran": {
+          "jenis": "semua_rawat_inap"
+        },
+        "gerakan": [
+          {
+            "jenis": "tambah_diagnosis"
+          },
+          {
+            "jenis": "lampirkan_lab",
+            "n": 3
+          }
+        ],
+        "pilihan": {
+          "jenis": "aman_di_bawah_ambang"
+        }
+      },
+      "temu": {
+        "nama": "cari-26",
+        "n_sasaran": 400,
+        "n_diserang": 142,
+        "diambil_rp": 349051500,
+        "lolos_rp": 349051500,
+        "maks_per_klaim_rp": 22466800,
+        "maks_lolos_rp": 22466800,
+        "rerata_per_klaim_rp": 2458109,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": 94027300,
+        "lebih_maks_rp": 0,
+        "menang_jumlah": true,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": true
+      },
+      "sahih": {
+        "nama": "cari-26",
+        "n_sasaran": 400,
+        "n_diserang": 173,
+        "diambil_rp": 427210500,
+        "lolos_rp": 427210500,
+        "maks_per_klaim_rp": 18254300,
+        "maks_lolos_rp": 18254300,
+        "rerata_per_klaim_rp": 2469425,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": 112995100,
+        "lebih_maks_rp": 0,
+        "menang_jumlah": true,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": true
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-106",
+        "sasaran": {
+          "jenis": "selisih_awal_kecil",
+          "batas_rp": 1000000
+        },
+        "gerakan": [
+          {
+            "jenis": "tambah_diagnosis"
+          },
+          {
+            "jenis": "lampirkan_lab",
+            "n": 3
+          }
+        ],
+        "pilihan": {
+          "jenis": "aman_di_bawah_ambang"
+        }
+      },
+      "temu": {
+        "nama": "cari-106",
+        "n_sasaran": 260,
+        "n_diserang": 134,
+        "diambil_rp": 332579300,
+        "lolos_rp": 332579300,
+        "maks_per_klaim_rp": 22466800,
+        "maks_lolos_rp": 22466800,
+        "rerata_per_klaim_rp": 2481935,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": 77555100,
+        "lebih_maks_rp": 0,
+        "menang_jumlah": true,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": true
+      },
+      "sahih": {
+        "nama": "cari-106",
+        "n_sasaran": 277,
+        "n_diserang": 166,
+        "diambil_rp": 400550400,
+        "lolos_rp": 400550400,
+        "maks_per_klaim_rp": 18254300,
+        "maks_lolos_rp": 18254300,
+        "rerata_per_klaim_rp": 2412954,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": 86335000,
+        "lebih_maks_rp": 0,
+        "menang_jumlah": true,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": true
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-27",
+        "sasaran": {
+          "jenis": "semua_rawat_inap"
+        },
+        "gerakan": [
+          {
+            "jenis": "tambah_diagnosis"
+          },
+          {
+            "jenis": "lampirkan_lab",
+            "n": 3
+          }
+        ],
+        "pilihan": {
+          "jenis": "kenaikan_skor_terkecil"
+        }
+      },
+      "temu": {
+        "nama": "cari-27",
+        "n_sasaran": 400,
+        "n_diserang": 275,
+        "diambil_rp": 1345115900,
+        "lolos_rp": 285360600,
+        "maks_per_klaim_rp": 29575800,
+        "maks_lolos_rp": 18154800,
+        "rerata_per_klaim_rp": 4891331,
+        "porsi_tertangkap": 0.4764,
+        "lebih_jumlah_rp": 30336400,
+        "lebih_maks_rp": -4312000,
+        "menang_jumlah": true,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": true
+      },
+      "sahih": {
+        "nama": "cari-27",
+        "n_sasaran": 400,
+        "n_diserang": 283,
+        "diambil_rp": 1353297600,
+        "lolos_rp": 341017000,
+        "maks_per_klaim_rp": 31732800,
+        "maks_lolos_rp": 18154800,
+        "rerata_per_klaim_rp": 4781970,
+        "porsi_tertangkap": 0.3816,
+        "lebih_jumlah_rp": 26801600,
+        "lebih_maks_rp": -99500,
+        "menang_jumlah": true,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": true
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-31",
+        "sasaran": {
+          "jenis": "semua_rawat_inap"
+        },
+        "gerakan": [
+          {
+            "jenis": "tambah_diagnosis"
+          },
+          {
+            "jenis": "gelembungkan_barang",
+            "persen": 30
+          }
+        ],
+        "pilihan": {
+          "jenis": "aman_di_bawah_ambang"
+        }
+      },
+      "temu": {
+        "nama": "cari-31",
+        "n_sasaran": 400,
+        "n_diserang": 170,
+        "diambil_rp": 257650333,
+        "lolos_rp": 257650333,
+        "maks_per_klaim_rp": 22486000,
+        "maks_lolos_rp": 22486000,
+        "rerata_per_klaim_rp": 1515590,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": 2626133,
+        "lebih_maks_rp": 19200,
+        "menang_jumlah": true,
+        "menang_maks": true,
+        "mengalahkan_garis_dasar": true
+      },
+      "sahih": {
+        "nama": "cari-31",
+        "n_sasaran": 400,
+        "n_diserang": 218,
+        "diambil_rp": 320414833,
+        "lolos_rp": 320414833,
+        "maks_per_klaim_rp": 18265250,
+        "maks_lolos_rp": 18265250,
+        "rerata_per_klaim_rp": 1469793,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": 6199433,
+        "lebih_maks_rp": 10950,
+        "menang_jumlah": true,
+        "menang_maks": true,
+        "mengalahkan_garis_dasar": true
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-107",
+        "sasaran": {
+          "jenis": "selisih_awal_kecil",
+          "batas_rp": 1000000
+        },
+        "gerakan": [
+          {
+            "jenis": "tambah_diagnosis"
+          },
+          {
+            "jenis": "lampirkan_lab",
+            "n": 3
+          }
+        ],
+        "pilihan": {
+          "jenis": "kenaikan_skor_terkecil"
+        }
+      },
+      "temu": {
+        "nama": "cari-107",
+        "n_sasaran": 260,
+        "n_diserang": 228,
+        "diambil_rp": 940986900,
+        "lolos_rp": 268888400,
+        "maks_per_klaim_rp": 27238400,
+        "maks_lolos_rp": 18154800,
+        "rerata_per_klaim_rp": 4127136,
+        "porsi_tertangkap": 0.4035,
+        "lebih_jumlah_rp": 13864200,
+        "lebih_maks_rp": -4312000,
+        "menang_jumlah": true,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": true
+      },
+      "sahih": {
+        "nama": "cari-107",
+        "n_sasaran": 277,
+        "n_diserang": 237,
+        "diambil_rp": 1003936300,
+        "lolos_rp": 314356900,
+        "maks_per_klaim_rp": 24394800,
+        "maks_lolos_rp": 18154800,
+        "rerata_per_klaim_rp": 4236018,
+        "porsi_tertangkap": 0.2911,
+        "lebih_jumlah_rp": 141500,
+        "lebih_maks_rp": -99500,
+        "menang_jumlah": true,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": true
+      }
+    }
+  ],
+  "tak_pernah_tertangkap": [
+    {
+      "siasat": {
+        "nama": "cari-28",
+        "sasaran": {
+          "jenis": "semua_rawat_inap"
+        },
+        "gerakan": [
+          {
+            "jenis": "tambah_diagnosis"
+          },
+          {
+            "jenis": "lampirkan_lab",
+            "n": 3
+          }
+        ],
+        "pilihan": {
+          "jenis": "untung_di_bawah_porsi_ambang",
+          "porsi": 0.7
+        }
+      },
+      "temu": {
+        "nama": "cari-28",
+        "n_sasaran": 400,
+        "n_diserang": 116,
+        "diambil_rp": 239536700,
+        "lolos_rp": 239536700,
+        "maks_per_klaim_rp": 18154800,
+        "maks_lolos_rp": 18154800,
+        "rerata_per_klaim_rp": 2064972,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -15487500,
+        "lebih_maks_rp": -4312000,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      },
+      "sahih": {
+        "nama": "cari-28",
+        "n_sasaran": 400,
+        "n_diserang": 145,
+        "diambil_rp": 330162300,
+        "lolos_rp": 330162300,
+        "maks_per_klaim_rp": 18254300,
+        "maks_lolos_rp": 18254300,
+        "rerata_per_klaim_rp": 2276981,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": 15946900,
+        "lebih_maks_rp": 0,
+        "menang_jumlah": true,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": true
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-108",
+        "sasaran": {
+          "jenis": "selisih_awal_kecil",
+          "batas_rp": 1000000
+        },
+        "gerakan": [
+          {
+            "jenis": "tambah_diagnosis"
+          },
+          {
+            "jenis": "lampirkan_lab",
+            "n": 3
+          }
+        ],
+        "pilihan": {
+          "jenis": "untung_di_bawah_porsi_ambang",
+          "porsi": 0.7
+        }
+      },
+      "temu": {
+        "nama": "cari-108",
+        "n_sasaran": 260,
+        "n_diserang": 110,
+        "diambil_rp": 226323400,
+        "lolos_rp": 226323400,
+        "maks_per_klaim_rp": 18154800,
+        "maks_lolos_rp": 18154800,
+        "rerata_per_klaim_rp": 2057485,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -28700800,
+        "lebih_maks_rp": -4312000,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      },
+      "sahih": {
+        "nama": "cari-108",
+        "n_sasaran": 277,
+        "n_diserang": 143,
+        "diambil_rp": 327565300,
+        "lolos_rp": 327565300,
+        "maks_per_klaim_rp": 18254300,
+        "maks_lolos_rp": 18254300,
+        "rerata_per_klaim_rp": 2290666,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": 13349900,
+        "lebih_maks_rp": 0,
+        "menang_jumlah": true,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": true
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-111",
+        "sasaran": {
+          "jenis": "selisih_awal_kecil",
+          "batas_rp": 1000000
+        },
+        "gerakan": [
+          {
+            "jenis": "tambah_diagnosis"
+          },
+          {
+            "jenis": "gelembungkan_barang",
+            "persen": 30
+          }
+        ],
+        "pilihan": {
+          "jenis": "aman_di_bawah_ambang"
+        }
+      },
+      "temu": {
+        "nama": "cari-111",
+        "n_sasaran": 260,
+        "n_diserang": 150,
+        "diambil_rp": 248168936,
+        "lolos_rp": 248168936,
+        "maks_per_klaim_rp": 22486000,
+        "maks_lolos_rp": 22486000,
+        "rerata_per_klaim_rp": 1654460,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -6855264,
+        "lebih_maks_rp": 19200,
+        "menang_jumlah": false,
+        "menang_maks": true,
+        "mengalahkan_garis_dasar": true
+      },
+      "sahih": {
+        "nama": "cari-111",
+        "n_sasaran": 277,
+        "n_diserang": 190,
+        "diambil_rp": 312423656,
+        "lolos_rp": 312423656,
+        "maks_per_klaim_rp": 18265250,
+        "maks_lolos_rp": 18265250,
+        "rerata_per_klaim_rp": 1644335,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -1791744,
+        "lebih_maks_rp": 10950,
+        "menang_jumlah": false,
+        "menang_maks": true,
+        "mengalahkan_garis_dasar": true
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-81",
+        "sasaran": {
+          "jenis": "selisih_awal_kecil",
+          "batas_rp": 1000000
+        },
+        "gerakan": [
+          {
+            "jenis": "tambah_diagnosis"
+          }
+        ],
+        "pilihan": {
+          "jenis": "aman_di_bawah_ambang"
+        }
+      },
+      "temu": {
+        "nama": "cari-81",
+        "n_sasaran": 260,
+        "n_diserang": 120,
+        "diambil_rp": 246184900,
+        "lolos_rp": 246184900,
+        "maks_per_klaim_rp": 22466800,
+        "maks_lolos_rp": 22466800,
+        "rerata_per_klaim_rp": 2051541,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -8839300,
+        "lebih_maks_rp": 0,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      },
+      "sahih": {
+        "nama": "cari-81",
+        "n_sasaran": 277,
+        "n_diserang": 153,
+        "diambil_rp": 307836700,
+        "lolos_rp": 307836700,
+        "maks_per_klaim_rp": 18254300,
+        "maks_lolos_rp": 18254300,
+        "rerata_per_klaim_rp": 2012005,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -6378700,
+        "lebih_maks_rp": 0,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-33",
+        "sasaran": {
+          "jenis": "semua_rawat_inap"
+        },
+        "gerakan": [
+          {
+            "jenis": "tambah_diagnosis"
+          },
+          {
+            "jenis": "gelembungkan_barang",
+            "persen": 30
+          }
+        ],
+        "pilihan": {
+          "jenis": "untung_di_bawah_porsi_ambang",
+          "porsi": 0.7
+        }
+      },
+      "temu": {
+        "nama": "cari-33",
+        "n_sasaran": 400,
+        "n_diserang": 130,
+        "diambil_rp": 166447190,
+        "lolos_rp": 166447190,
+        "maks_per_klaim_rp": 22486000,
+        "maks_lolos_rp": 22486000,
+        "rerata_per_klaim_rp": 1280363,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -88577010,
+        "lebih_maks_rp": 19200,
+        "menang_jumlah": false,
+        "menang_maks": true,
+        "mengalahkan_garis_dasar": true
+      },
+      "sahih": {
+        "nama": "cari-33",
+        "n_sasaran": 400,
+        "n_diserang": 165,
+        "diambil_rp": 222094706,
+        "lolos_rp": 222094706,
+        "maks_per_klaim_rp": 18265250,
+        "maks_lolos_rp": 18265250,
+        "rerata_per_klaim_rp": 1346029,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -92120694,
+        "lebih_maks_rp": 10950,
+        "menang_jumlah": false,
+        "menang_maks": true,
+        "mengalahkan_garis_dasar": true
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-113",
+        "sasaran": {
+          "jenis": "selisih_awal_kecil",
+          "batas_rp": 1000000
+        },
+        "gerakan": [
+          {
+            "jenis": "tambah_diagnosis"
+          },
+          {
+            "jenis": "gelembungkan_barang",
+            "persen": 30
+          }
+        ],
+        "pilihan": {
+          "jenis": "untung_di_bawah_porsi_ambang",
+          "porsi": 0.7
+        }
+      },
+      "temu": {
+        "nama": "cari-113",
+        "n_sasaran": 260,
+        "n_diserang": 120,
+        "diambil_rp": 164881193,
+        "lolos_rp": 164881193,
+        "maks_per_klaim_rp": 22486000,
+        "maks_lolos_rp": 22486000,
+        "rerata_per_klaim_rp": 1374010,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -90143007,
+        "lebih_maks_rp": 19200,
+        "menang_jumlah": false,
+        "menang_maks": true,
+        "mengalahkan_garis_dasar": true
+      },
+      "sahih": {
+        "nama": "cari-113",
+        "n_sasaran": 277,
+        "n_diserang": 155,
+        "diambil_rp": 220349706,
+        "lolos_rp": 220349706,
+        "maks_per_klaim_rp": 18265250,
+        "maks_lolos_rp": 18265250,
+        "rerata_per_klaim_rp": 1421611,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -93865694,
+        "lebih_maks_rp": 10950,
+        "menang_jumlah": false,
+        "menang_maks": true,
+        "mengalahkan_garis_dasar": true
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-03",
+        "sasaran": {
+          "jenis": "semua_rawat_inap"
+        },
+        "gerakan": [
+          {
+            "jenis": "tambah_diagnosis"
+          }
+        ],
+        "pilihan": {
+          "jenis": "untung_di_bawah_porsi_ambang",
+          "porsi": 0.7
+        }
+      },
+      "temu": {
+        "nama": "cari-03",
+        "n_sasaran": 400,
+        "n_diserang": 96,
+        "diambil_rp": 167399000,
+        "lolos_rp": 167399000,
+        "maks_per_klaim_rp": 22466800,
+        "maks_lolos_rp": 22466800,
+        "rerata_per_klaim_rp": 1743740,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -87625200,
+        "lebih_maks_rp": 0,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      },
+      "sahih": {
+        "nama": "cari-03",
+        "n_sasaran": 400,
+        "n_diserang": 123,
+        "diambil_rp": 219858200,
+        "lolos_rp": 219858200,
+        "maks_per_klaim_rp": 18254300,
+        "maks_lolos_rp": 18254300,
+        "rerata_per_klaim_rp": 1787465,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -94357200,
+        "lebih_maks_rp": 0,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-83",
+        "sasaran": {
+          "jenis": "selisih_awal_kecil",
+          "batas_rp": 1000000
+        },
+        "gerakan": [
+          {
+            "jenis": "tambah_diagnosis"
+          }
+        ],
+        "pilihan": {
+          "jenis": "untung_di_bawah_porsi_ambang",
+          "porsi": 0.7
+        }
+      },
+      "temu": {
+        "nama": "cari-83",
+        "n_sasaran": 260,
+        "n_diserang": 95,
+        "diambil_rp": 166176000,
+        "lolos_rp": 166176000,
+        "maks_per_klaim_rp": 22466800,
+        "maks_lolos_rp": 22466800,
+        "rerata_per_klaim_rp": 1749221,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -88848200,
+        "lebih_maks_rp": 0,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      },
+      "sahih": {
+        "nama": "cari-83",
+        "n_sasaran": 277,
+        "n_diserang": 122,
+        "diambil_rp": 218635200,
+        "lolos_rp": 218635200,
+        "maks_per_klaim_rp": 18254300,
+        "maks_lolos_rp": 18254300,
+        "rerata_per_klaim_rp": 1792092,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -95580200,
+        "lebih_maks_rp": 0,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-11",
+        "sasaran": {
+          "jenis": "semua_rawat_inap"
+        },
+        "gerakan": [
+          {
+            "jenis": "naikkan_kelas"
+          }
+        ],
+        "pilihan": {
+          "jenis": "aman_di_bawah_ambang"
+        }
+      },
+      "temu": {
+        "nama": "cari-11",
+        "n_sasaran": 400,
+        "n_diserang": 212,
+        "diambil_rp": 206053700,
+        "lolos_rp": 206053700,
+        "maks_per_klaim_rp": 11933300,
+        "maks_lolos_rp": 11933300,
+        "rerata_per_klaim_rp": 971951,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -48970500,
+        "lebih_maks_rp": -10533500,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      },
+      "sahih": {
+        "nama": "cari-11",
+        "n_sasaran": 400,
+        "n_diserang": 233,
+        "diambil_rp": 215579000,
+        "lolos_rp": 215579000,
+        "maks_per_klaim_rp": 11811500,
+        "maks_lolos_rp": 11811500,
+        "rerata_per_klaim_rp": 925232,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -98636400,
+        "lebih_maks_rp": -6442800,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-91",
+        "sasaran": {
+          "jenis": "selisih_awal_kecil",
+          "batas_rp": 1000000
+        },
+        "gerakan": [
+          {
+            "jenis": "naikkan_kelas"
+          }
+        ],
+        "pilihan": {
+          "jenis": "aman_di_bawah_ambang"
+        }
+      },
+      "temu": {
+        "nama": "cari-91",
+        "n_sasaran": 260,
+        "n_diserang": 196,
+        "diambil_rp": 187984200,
+        "lolos_rp": 187984200,
+        "maks_per_klaim_rp": 11933300,
+        "maks_lolos_rp": 11933300,
+        "rerata_per_klaim_rp": 959103,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -67040000,
+        "lebih_maks_rp": -10533500,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      },
+      "sahih": {
+        "nama": "cari-91",
+        "n_sasaran": 277,
+        "n_diserang": 219,
+        "diambil_rp": 199297300,
+        "lolos_rp": 199297300,
+        "maks_per_klaim_rp": 11811500,
+        "maks_lolos_rp": 11811500,
+        "rerata_per_klaim_rp": 910033,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -114918100,
+        "lebih_maks_rp": -6442800,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-13",
+        "sasaran": {
+          "jenis": "semua_rawat_inap"
+        },
+        "gerakan": [
+          {
+            "jenis": "naikkan_kelas"
+          }
+        ],
+        "pilihan": {
+          "jenis": "untung_di_bawah_porsi_ambang",
+          "porsi": 0.7
+        }
+      },
+      "temu": {
+        "nama": "cari-13",
+        "n_sasaran": 400,
+        "n_diserang": 182,
+        "diambil_rp": 177733200,
+        "lolos_rp": 177733200,
+        "maks_per_klaim_rp": 11933300,
+        "maks_lolos_rp": 11933300,
+        "rerata_per_klaim_rp": 976556,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -77291000,
+        "lebih_maks_rp": -10533500,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      },
+      "sahih": {
+        "nama": "cari-13",
+        "n_sasaran": 400,
+        "n_diserang": 205,
+        "diambil_rp": 186262100,
+        "lolos_rp": 186262100,
+        "maks_per_klaim_rp": 11811500,
+        "maks_lolos_rp": 11811500,
+        "rerata_per_klaim_rp": 908596,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -127953300,
+        "lebih_maks_rp": -6442800,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-93",
+        "sasaran": {
+          "jenis": "selisih_awal_kecil",
+          "batas_rp": 1000000
+        },
+        "gerakan": [
+          {
+            "jenis": "naikkan_kelas"
+          }
+        ],
+        "pilihan": {
+          "jenis": "untung_di_bawah_porsi_ambang",
+          "porsi": 0.7
+        }
+      },
+      "temu": {
+        "nama": "cari-93",
+        "n_sasaran": 260,
+        "n_diserang": 177,
+        "diambil_rp": 172629700,
+        "lolos_rp": 172629700,
+        "maks_per_klaim_rp": 11933300,
+        "maks_lolos_rp": 11933300,
+        "rerata_per_klaim_rp": 975309,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -82394500,
+        "lebih_maks_rp": -10533500,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      },
+      "sahih": {
+        "nama": "cari-93",
+        "n_sasaran": 277,
+        "n_diserang": 202,
+        "diambil_rp": 183414400,
+        "lolos_rp": 183414400,
+        "maks_per_klaim_rp": 11811500,
+        "maks_lolos_rp": 11811500,
+        "rerata_per_klaim_rp": 907992,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -130801000,
+        "lebih_maks_rp": -6442800,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-36",
+        "sasaran": {
+          "jenis": "semua_rawat_inap"
+        },
+        "gerakan": [
+          {
+            "jenis": "perpanjang_rawat"
+          },
+          {
+            "jenis": "lampirkan_lab",
+            "n": 2
+          }
+        ],
+        "pilihan": {
+          "jenis": "aman_di_bawah_ambang"
+        }
+      },
+      "temu": {
+        "nama": "cari-36",
+        "n_sasaran": 400,
+        "n_diserang": 20,
+        "diambil_rp": 38997000,
+        "lolos_rp": 38997000,
+        "maks_per_klaim_rp": 12800600,
+        "maks_lolos_rp": 12800600,
+        "rerata_per_klaim_rp": 1949850,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -216027200,
+        "lebih_maks_rp": -9666200,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      },
+      "sahih": {
+        "nama": "cari-36",
+        "n_sasaran": 400,
+        "n_diserang": 25,
+        "diambil_rp": 44750900,
+        "lolos_rp": 44750900,
+        "maks_per_klaim_rp": 6660800,
+        "maks_lolos_rp": 6660800,
+        "rerata_per_klaim_rp": 1790036,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -269464500,
+        "lebih_maks_rp": -11593500,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-116",
+        "sasaran": {
+          "jenis": "selisih_awal_kecil",
+          "batas_rp": 1000000
+        },
+        "gerakan": [
+          {
+            "jenis": "perpanjang_rawat"
+          },
+          {
+            "jenis": "lampirkan_lab",
+            "n": 2
+          }
+        ],
+        "pilihan": {
+          "jenis": "aman_di_bawah_ambang"
+        }
+      },
+      "temu": {
+        "nama": "cari-116",
+        "n_sasaran": 260,
+        "n_diserang": 16,
+        "diambil_rp": 33336700,
+        "lolos_rp": 33336700,
+        "maks_per_klaim_rp": 12800600,
+        "maks_lolos_rp": 12800600,
+        "rerata_per_klaim_rp": 2083544,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -221687500,
+        "lebih_maks_rp": -9666200,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      },
+      "sahih": {
+        "nama": "cari-116",
+        "n_sasaran": 277,
+        "n_diserang": 21,
+        "diambil_rp": 39600600,
+        "lolos_rp": 39600600,
+        "maks_per_klaim_rp": 6660800,
+        "maks_lolos_rp": 6660800,
+        "rerata_per_klaim_rp": 1885743,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -274614800,
+        "lebih_maks_rp": -11593500,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-06",
+        "sasaran": {
+          "jenis": "semua_rawat_inap"
+        },
+        "gerakan": [
+          {
+            "jenis": "perpanjang_rawat"
+          }
+        ],
+        "pilihan": {
+          "jenis": "aman_di_bawah_ambang"
+        }
+      },
+      "temu": {
+        "nama": "cari-06",
+        "n_sasaran": 400,
+        "n_diserang": 16,
+        "diambil_rp": 20393100,
+        "lolos_rp": 20393100,
+        "maks_per_klaim_rp": 2095500,
+        "maks_lolos_rp": 2095500,
+        "rerata_per_klaim_rp": 1274569,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -234631100,
+        "lebih_maks_rp": -20371300,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      },
+      "sahih": {
+        "nama": "cari-06",
+        "n_sasaran": 400,
+        "n_diserang": 25,
+        "diambil_rp": 39256100,
+        "lolos_rp": 39256100,
+        "maks_per_klaim_rp": 3729200,
+        "maks_lolos_rp": 3729200,
+        "rerata_per_klaim_rp": 1570244,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -274959300,
+        "lebih_maks_rp": -14525100,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-38",
+        "sasaran": {
+          "jenis": "semua_rawat_inap"
+        },
+        "gerakan": [
+          {
+            "jenis": "perpanjang_rawat"
+          },
+          {
+            "jenis": "lampirkan_lab",
+            "n": 2
+          }
+        ],
+        "pilihan": {
+          "jenis": "untung_di_bawah_porsi_ambang",
+          "porsi": 0.7
+        }
+      },
+      "temu": {
+        "nama": "cari-38",
+        "n_sasaran": 400,
+        "n_diserang": 14,
+        "diambil_rp": 18047700,
+        "lolos_rp": 18047700,
+        "maks_per_klaim_rp": 2095500,
+        "maks_lolos_rp": 2095500,
+        "rerata_per_klaim_rp": 1289121,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -236976500,
+        "lebih_maks_rp": -20371300,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      },
+      "sahih": {
+        "nama": "cari-38",
+        "n_sasaran": 400,
+        "n_diserang": 21,
+        "diambil_rp": 34753400,
+        "lolos_rp": 34753400,
+        "maks_per_klaim_rp": 3729200,
+        "maks_lolos_rp": 3729200,
+        "rerata_per_klaim_rp": 1654924,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -279462000,
+        "lebih_maks_rp": -14525100,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-08",
+        "sasaran": {
+          "jenis": "semua_rawat_inap"
+        },
+        "gerakan": [
+          {
+            "jenis": "perpanjang_rawat"
+          }
+        ],
+        "pilihan": {
+          "jenis": "untung_di_bawah_porsi_ambang",
+          "porsi": 0.7
+        }
+      },
+      "temu": {
+        "nama": "cari-08",
+        "n_sasaran": 400,
+        "n_diserang": 12,
+        "diambil_rp": 14925100,
+        "lolos_rp": 14925100,
+        "maks_per_klaim_rp": 2095500,
+        "maks_lolos_rp": 2095500,
+        "rerata_per_klaim_rp": 1243758,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -240099100,
+        "lebih_maks_rp": -20371300,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      },
+      "sahih": {
+        "nama": "cari-08",
+        "n_sasaran": 400,
+        "n_diserang": 21,
+        "diambil_rp": 34526700,
+        "lolos_rp": 34526700,
+        "maks_per_klaim_rp": 3729200,
+        "maks_lolos_rp": 3729200,
+        "rerata_per_klaim_rp": 1644129,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -279688700,
+        "lebih_maks_rp": -14525100,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-86",
+        "sasaran": {
+          "jenis": "selisih_awal_kecil",
+          "batas_rp": 1000000
+        },
+        "gerakan": [
+          {
+            "jenis": "perpanjang_rawat"
+          }
+        ],
+        "pilihan": {
+          "jenis": "aman_di_bawah_ambang"
+        }
+      },
+      "temu": {
+        "nama": "cari-86",
+        "n_sasaran": 260,
+        "n_diserang": 12,
+        "diambil_rp": 14732800,
+        "lolos_rp": 14732800,
+        "maks_per_klaim_rp": 2095500,
+        "maks_lolos_rp": 2095500,
+        "rerata_per_klaim_rp": 1227733,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -240291400,
+        "lebih_maks_rp": -20371300,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      },
+      "sahih": {
+        "nama": "cari-86",
+        "n_sasaran": 277,
+        "n_diserang": 21,
+        "diambil_rp": 34105800,
+        "lolos_rp": 34105800,
+        "maks_per_klaim_rp": 3729200,
+        "maks_lolos_rp": 3729200,
+        "rerata_per_klaim_rp": 1624086,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -280109600,
+        "lebih_maks_rp": -14525100,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-88",
+        "sasaran": {
+          "jenis": "selisih_awal_kecil",
+          "batas_rp": 1000000
+        },
+        "gerakan": [
+          {
+            "jenis": "perpanjang_rawat"
+          }
+        ],
+        "pilihan": {
+          "jenis": "untung_di_bawah_porsi_ambang",
+          "porsi": 0.7
+        }
+      },
+      "temu": {
+        "nama": "cari-88",
+        "n_sasaran": 260,
+        "n_diserang": 10,
+        "diambil_rp": 12578300,
+        "lolos_rp": 12578300,
+        "maks_per_klaim_rp": 2095500,
+        "maks_lolos_rp": 2095500,
+        "rerata_per_klaim_rp": 1257830,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -242445900,
+        "lebih_maks_rp": -20371300,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      },
+      "sahih": {
+        "nama": "cari-88",
+        "n_sasaran": 277,
+        "n_diserang": 19,
+        "diambil_rp": 31929700,
+        "lolos_rp": 31929700,
+        "maks_per_klaim_rp": 3729200,
+        "maks_lolos_rp": 3729200,
+        "rerata_per_klaim_rp": 1680511,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -282285700,
+        "lebih_maks_rp": -14525100,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-118",
+        "sasaran": {
+          "jenis": "selisih_awal_kecil",
+          "batas_rp": 1000000
+        },
+        "gerakan": [
+          {
+            "jenis": "perpanjang_rawat"
+          },
+          {
+            "jenis": "lampirkan_lab",
+            "n": 2
+          }
+        ],
+        "pilihan": {
+          "jenis": "untung_di_bawah_porsi_ambang",
+          "porsi": 0.7
+        }
+      },
+      "temu": {
+        "nama": "cari-118",
+        "n_sasaran": 260,
+        "n_diserang": 11,
+        "diambil_rp": 13554800,
+        "lolos_rp": 13554800,
+        "maks_per_klaim_rp": 2095500,
+        "maks_lolos_rp": 2095500,
+        "rerata_per_klaim_rp": 1232255,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -241469400,
+        "lebih_maks_rp": -20371300,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      },
+      "sahih": {
+        "nama": "cari-118",
+        "n_sasaran": 277,
+        "n_diserang": 18,
+        "diambil_rp": 30963100,
+        "lolos_rp": 30963100,
+        "maks_per_klaim_rp": 3729200,
+        "maks_lolos_rp": 3729200,
+        "rerata_per_klaim_rp": 1720172,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -283252300,
+        "lebih_maks_rp": -14525100,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-21",
+        "sasaran": {
+          "jenis": "semua_rawat_inap"
+        },
+        "gerakan": [
+          {
+            "jenis": "gelembungkan_barang"
+          }
+        ],
+        "pilihan": {
+          "jenis": "aman_di_bawah_ambang"
+        }
+      },
+      "temu": {
+        "nama": "cari-21",
+        "n_sasaran": 400,
+        "n_diserang": 282,
+        "diambil_rp": 12709455,
+        "lolos_rp": 12709455,
+        "maks_per_klaim_rp": 1580720,
+        "maks_lolos_rp": 1580720,
+        "rerata_per_klaim_rp": 45069,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -242314745,
+        "lebih_maks_rp": -20886080,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      },
+      "sahih": {
+        "nama": "cari-21",
+        "n_sasaran": 400,
+        "n_diserang": 322,
+        "diambil_rp": 13708740,
+        "lolos_rp": 13708740,
+        "maks_per_klaim_rp": 1680000,
+        "maks_lolos_rp": 1680000,
+        "rerata_per_klaim_rp": 42574,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -300506660,
+        "lebih_maks_rp": -16574300,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-23",
+        "sasaran": {
+          "jenis": "semua_rawat_inap"
+        },
+        "gerakan": [
+          {
+            "jenis": "gelembungkan_barang"
+          }
+        ],
+        "pilihan": {
+          "jenis": "untung_di_bawah_porsi_ambang",
+          "porsi": 0.7
+        }
+      },
+      "temu": {
+        "nama": "cari-23",
+        "n_sasaran": 400,
+        "n_diserang": 261,
+        "diambil_rp": 11313501,
+        "lolos_rp": 11313501,
+        "maks_per_klaim_rp": 1561920,
+        "maks_lolos_rp": 1561920,
+        "rerata_per_klaim_rp": 43347,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -243710699,
+        "lebih_maks_rp": -20904880,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      },
+      "sahih": {
+        "nama": "cari-23",
+        "n_sasaran": 400,
+        "n_diserang": 298,
+        "diambil_rp": 12447936,
+        "lolos_rp": 12447936,
+        "maks_per_klaim_rp": 1680000,
+        "maks_lolos_rp": 1680000,
+        "rerata_per_klaim_rp": 41772,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -301767464,
+        "lebih_maks_rp": -16574300,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-101",
+        "sasaran": {
+          "jenis": "selisih_awal_kecil",
+          "batas_rp": 1000000
+        },
+        "gerakan": [
+          {
+            "jenis": "gelembungkan_barang"
+          }
+        ],
+        "pilihan": {
+          "jenis": "aman_di_bawah_ambang"
+        }
+      },
+      "temu": {
+        "nama": "cari-101",
+        "n_sasaran": 260,
+        "n_diserang": 251,
+        "diambil_rp": 11629287,
+        "lolos_rp": 11629287,
+        "maks_per_klaim_rp": 1580720,
+        "maks_lolos_rp": 1580720,
+        "rerata_per_klaim_rp": 46332,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -243394913,
+        "lebih_maks_rp": -20886080,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      },
+      "sahih": {
+        "nama": "cari-101",
+        "n_sasaran": 277,
+        "n_diserang": 276,
+        "diambil_rp": 11711755,
+        "lolos_rp": 11711755,
+        "maks_per_klaim_rp": 1680000,
+        "maks_lolos_rp": 1680000,
+        "rerata_per_klaim_rp": 42434,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -302503645,
+        "lebih_maks_rp": -16574300,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    },
+    {
+      "siasat": {
+        "nama": "cari-103",
+        "sasaran": {
+          "jenis": "selisih_awal_kecil",
+          "batas_rp": 1000000
+        },
+        "gerakan": [
+          {
+            "jenis": "gelembungkan_barang"
+          }
+        ],
+        "pilihan": {
+          "jenis": "untung_di_bawah_porsi_ambang",
+          "porsi": 0.7
+        }
+      },
+      "temu": {
+        "nama": "cari-103",
+        "n_sasaran": 260,
+        "n_diserang": 240,
+        "diambil_rp": 10579385,
+        "lolos_rp": 10579385,
+        "maks_per_klaim_rp": 1561920,
+        "maks_lolos_rp": 1561920,
+        "rerata_per_klaim_rp": 44081,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -244444815,
+        "lebih_maks_rp": -20904880,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      },
+      "sahih": {
+        "nama": "cari-103",
+        "n_sasaran": 277,
+        "n_diserang": 272,
+        "diambil_rp": 11654565,
+        "lolos_rp": 11654565,
+        "maks_per_klaim_rp": 1680000,
+        "maks_lolos_rp": 1680000,
+        "rerata_per_klaim_rp": 42848,
+        "porsi_tertangkap": 0.0,
+        "lebih_jumlah_rp": -302560835,
+        "lebih_maks_rp": -16574300,
+        "menang_jumlah": false,
+        "menang_maks": false,
+        "mengalahkan_garis_dasar": false
+      }
+    }
+  ],
+  "A4": {
+    "n": 5,
+    "batas": 3,
+    "lulus": true
+  }
+}

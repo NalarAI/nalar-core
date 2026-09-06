@@ -1659,3 +1659,95 @@ bersama. Ada satu pengecualian yang harus ditulis: selisih dijepit di nol
 mengikuti penebak, jadi berkas yang ditagihkan lebih kecil daripada yang
 didukung bukti memang tidak bisa dikurangkan. Kalimatnya dibedakan untuk
 berkas seperti itu, bukan dipaksa memuat tiga angka yang tidak bertemu.
+
+---
+
+## Lapisan lawan, 7 September 2026: lubang yang kami buat sendiri
+
+`runs/agen_lawan.json`
+
+Pengaturan: 160.455 episode, 41.741 masuk uji, detektor yang benar benar
+dikirim. Himpunan uji dibelah dua menurut faskes: separuh untuk menemukan
+siasat, separuh untuk mengesahkannya. Pelaku diberi akses penuh ke skor
+detektor, dan ambangnya diambil sebelum satu serangan pun.
+
+Ketiga pelaku yang selama ini dipakai mengukur T6 kami tulis sendiri, dan
+ketiganya memakai satu modus saja. Pertanyaan yang tidak bisa dijawab
+pengujian seperti itu: apakah ada siasat yang tidak terpikir oleh kami.
+
+### Ada, dan yang terbaik bukan yang paling rumit
+
+Siasatnya ditulis sebagai data, bukan sebagai program, memakai
+perbendaharaan enam gerakan, empat sasaran, dan lima cara memilih. Seluruh
+ruangnya seratus dua puluh siasat, dan seratus dua puluhnya ditelusuri habis
+dalam tiga puluh detik tanpa model bahasa sama sekali.
+
+Lima siasat mengalahkan garis dasar di kedua himpunan. Yang terbaik satu
+kalimat panjangnya: tambahkan diagnosis sekunder, lalu lampirkan tiga hasil
+pemeriksaan penunjang, dan berhenti sebelum ambang.
+
+| Pelaku | Uang yang lolos | Tertangkap |
+|---|---:|---:|
+| serakah | 227,6 jt | 64,0% |
+| hati hati | 314,2 jt | 0,0% |
+| menyebar | 247,0 jt | 43,8% |
+| **upcode berlapis bukti** | **427,2 jt** | **0,0%** |
+
+Angka itu dari himpunan pengesahan, yang tidak pernah dilihat selama
+pencarian. Seratus tiga belas juta lebih banyak daripada pelaku terbaik yang
+kami tulis sendiri, dan tidak satu berkas pun tertangkap.
+
+### Kenapa ia bekerja, dan kenapa kami seharusnya sudah tahu
+
+Diagnosis sekunder sengaja dibuang dari penciri penebak. Itu keputusan sadar
+dan benar: kalau ia jadi penciri, menambahkannya menaikkan tebakan dan
+selisihnya menghilang.
+
+Pemeriksaan penunjang justru dipakai sebagai penciri. Melampirkannya
+menaikkan tarif yang dianggap wajar tanpa menaikkan satu rupiah pun tarif
+yang ditagihkan.
+
+Gabungan keduanya menaikkan tagihan lewat pintu yang tidak diawasi, lalu
+menurunkan kecurigaan lewat pintu yang diawasi. Kami sudah menulis sendiri di
+pustaka aturan bahwa lama rawat, kelas rawat, dan bukti penyerta adalah titik
+buta penebak normatif. Yang tidak kami lakukan menguji titik buta itu sebagai
+serangan.
+
+### Dua puluh empat siasat yang tidak pernah tertangkap sama sekali
+
+Dilaporkan terpisah dan tidak dihitung sebagai temuan, karena sebagian besar
+mengambil lebih sedikit daripada garis dasar. Tapi bentuknya perlu ditulis:
+menyasar berkas yang selisih awalnya kecil, dan menyasar kelompok yang
+sistemnya sendiri menahan diri. Menahan diri adalah keputusan yang benar
+ketika pembandingnya kurang dari tiga, dan ia juga tempat berteduh yang kami
+sediakan sendiri dan umumkan di dokumen.
+
+### Agen Lawan sendiri tidak menemukan apa pun
+
+Model 4B mencoba tiga siasat lalu mengulang siasat yang sama, dan penyelia
+memutus rantainya. Nol temuan. Papan skornya diberikan utuh tiap giliran,
+lengkap dengan daftar siasat yang sudah dicoba, dan ia tetap mengulang.
+
+Satu kegagalan sebelumnya adalah kesalahan kami, bukan kesalahan model. Agen
+diberi alat kedua untuk membaca papan skor, padahal papan skornya sudah ada
+di dalam arahan. Memanggilnya adalah hal pertama yang masuk akal dilakukan,
+dan karena tiap giliran disusun ulang dari nol ia tidak ingat sudah
+memanggilnya, jadi penyelia memutus rantainya sebelum satu siasat pun dicoba.
+Alatnya dibuang, dan sesudah itu barulah kegagalannya milik model.
+
+Jadi yang menemukan kelima siasat itu pencarian biasa, bukan agen. Ditulis
+apa adanya: pada tahap ini model bahasa tidak menambah apa pun di atas
+menelusuri ruang yang kecil sampai habis.
+
+### Papan skor sesudah percobaan ini
+
+| Target | Hasil |
+|---|---|
+| A4 tiga siasat penghindaran baru yang bisa diulang | **tercapai**, lima siasat bertahan di himpunan pengesahan |
+| A5 T6 naik dari 25,6 persen ke 40 persen | belum diuji, kasus ujinya baru ada sekarang |
+
+Yang berubah dari percobaan ini bukan angkanya, melainkan daftar pekerjaan.
+Sebelum ini kami tahu T6 gagal. Sekarang kami tahu satu sebab yang bisa
+ditunjuk dan diulang, dan tambalannya punya bentuk: bukti penyerta tidak
+boleh menurunkan kecurigaan pada berkas yang tarifnya baru saja naik karena
+diagnosis sekunder.

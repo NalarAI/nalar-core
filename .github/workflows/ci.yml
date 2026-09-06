@@ -57,6 +57,13 @@ jobs:
       - name: uji agen berkas dan agen sanggah
         run: python tests/test_agen_dua.py
 
+      # Tahap tiga. Bahasa siasat penghindaran dan gelanggangnya. Yang
+      # dijalankan di sini juru bacanya, bukan model bahasanya, karena
+      # keluaran agen lawan berupa kasus uji dan diukur tangan lewat
+      # scripts/agen_lawan.py.
+      - name: uji lapisan lawan
+        run: python tests/test_lawan.py
+
   # Menjaga agar tidak ada jejak perkakas bantu yang ikut terkirim. Ini bukan
   # soal rapi, ini soal karya yang dinilai harus jelas siapa penulisnya.
   bersih:
