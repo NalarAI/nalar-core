@@ -207,12 +207,17 @@ class RegresiLogistik:
 #              sesungguhnya.
 
 
-def fitur_bukti(episodes) -> np.ndarray:
+def fitur_bukti(episodes, tanpa_penunjang: bool = False) -> np.ndarray:
     """Fitur yang hanya memuat bukti, tanpa tarif dan tanpa diagnosis sekunder.
 
     Diagnosis sekunder sengaja dibuang, dengan alasan yang sama seperti pada
     kepala K2: upcoding bekerja dengan menambahnya, jadi memberikannya kepada
     penebak berarti membocorkan jawabannya.
+
+    Argumen tanpa_penunjang menghitung baris yang sama tetapi seolah berkasnya
+    tidak melampirkan satu pun pemeriksaan penunjang. Dipakai detektor untuk
+    mengukur berapa banyak tebakan tarifnya naik karena lampiran, dan
+    kenaikan itu yang dibatasi. Alasannya di detektor.py.
     """
     from .katalog import ICD_LIST, PEMERIKSAAN, pita_lab
 
@@ -225,10 +230,11 @@ def fitur_bukti(episodes) -> np.ndarray:
         satu_dxp = np.zeros(len(peta_dxp) + 1)
         satu_dxp[peta_dxp.get(r["dxp"], len(peta_dxp))] = 1.0
         pita = np.zeros(n_lab)
-        for kode, nilai in r["lab"]:
-            j = peta_lab.get(kode)
-            if j is not None:
-                pita[j] = pita_lab(kode, nilai) + 1
+        if not tanpa_penunjang:
+            for kode, nilai in r["lab"]:
+                j = peta_lab.get(kode)
+                if j is not None:
+                    pita[j] = pita_lab(kode, nilai) + 1
         dasar = [
             r["umur"],
             r["sex"],
@@ -243,7 +249,7 @@ def fitur_bukti(episodes) -> np.ndarray:
             r["f_milik"],
             len(r["prc"]),
             len(r["obt"]),
-            len(r["lab"]),
+            0 if tanpa_penunjang else len(r["lab"]),
             len(r["bhp"]),
             sum(n for _, n in r["bhp"]),
             max(r["d_prev"], 0),

@@ -49,6 +49,11 @@ class Detektor:
         self.biaya_audit_rp = biaya_audit_rp
         self.m_tarif = None
         self.m_bhp = None
+        # Batas berapa banyak lampiran pemeriksaan penunjang boleh menaikkan
+        # tarif yang dianggap wajar. Mati secara bawaan, dan itu keputusan
+        # hasil percobaan, bukan kelalaian. Alasannya di _pelajari_batas_bukti.
+        self.batas_bukti = float("inf")
+        self.kuantil_batas: float | None = None
         self.kal = None
         self.ambang_tingkat: dict = {}
         self.ambang_umum = float("inf")
@@ -130,7 +135,54 @@ class Detektor:
         self.m_tarif = buat().fit(X, np.log1p(tarif))
         self.m_bhp = buat().fit(X, np.log1p(bhp))
         self._terlatih = True
+        self._pelajari_batas_bukti(episodes)
         return self
+
+    def _pelajari_batas_bukti(self, episodes) -> None:
+        """Batas seberapa jauh lampiran penunjang boleh menurunkan kecurigaan.
+
+        **Mati secara bawaan. Diuji, tidak menolong, dan tidak dipasang.**
+
+        Lapisan lawan menemukan siasat yang menembus detektor: tambahkan
+        diagnosis sekunder, lalu lampirkan hasil pemeriksaan penunjang.
+        Diagnosis sekunder sengaja dibuang dari penciri, jadi menambahnya
+        menaikkan tagihan tanpa menaikkan tebakan. Pemeriksaan penunjang
+        justru dipakai sebagai penciri, jadi melampirkannya menaikkan tebakan.
+        Naik lewat pintu yang tidak diawasi, turun lewat pintu yang diawasi.
+
+        Tambalan yang masuk akal: batasi seberapa jauh lampiran boleh
+        menurunkan kecurigaan, sebanyak yang biasanya diturunkannya pada
+        berkas jujur, dan tidak lebih.
+
+        Diukur pada 160 ribu episode, tambalan itu hampir tidak menolong.
+        Uang yang lolos pelaku terburuk turun 0,8 persen pada larangan penuh
+        dan 4,2 persen pada potongan ekor, sedangkan siasat lain justru
+        meloloskan lebih banyak karena ambangnya ikut naik. Ongkosnya nyata:
+        presisi pada anggaran seribu berkas turun dari 0,551 ke 0,496.
+
+        Sebabnya sekarang bisa ditunjuk. Pelaku yang punya akses ke skor tidak
+        bergantung pada satu pengungkit. Ditutup satu, ia memakai yang lain,
+        dan ambang konformal yang bergeser mengikuti sebaran skor justru
+        memberinya ruang baru. Yang harus dibatasi bukan pengungkitnya,
+        melainkan seberapa banyak pelaku boleh menanyai skornya.
+
+        Mesinnya dibiarkan hidup karena ia yang menghasilkan angka di atas dan
+        yang akan menguji tambalan berikutnya. Menyalakannya dengan mengisi
+        kuantil_batas sebelum latih.
+        """
+        if self.kuantil_batas is None:
+            return
+        naik = self._sumbangan_bukti(episodes)
+        if naik.size:
+            self.batas_bukti = float(np.quantile(naik, self.kuantil_batas))
+
+    def _sumbangan_bukti(self, episodes) -> np.ndarray:
+        """Selisih tebakan tarif dengan lampiran penunjang dan tanpanya."""
+        X = fitur_bukti(episodes)
+        X0 = fitur_bukti(episodes, tanpa_penunjang=True)
+        penuh = np.expm1(self.m_tarif.predict(X))
+        kosong = np.expm1(self.m_tarif.predict(X0))
+        return np.clip(penuh - kosong, 0, None)
 
     # -- penskoran ----------------------------------------------------------
 
@@ -149,6 +201,17 @@ class Detektor:
         bhp = np.array([r.get("tagih_bhp", 0) for r in episodes], dtype=np.float64)
         harap_tarif = np.expm1(self.m_tarif.predict(X))
         harap_bhp = np.expm1(self.m_bhp.predict(X))
+
+        # Sumbangan lampiran penunjang dipotong pada batas yang dipelajari.
+        # Satu angka dipakai di mana mana: yang menandai, yang ditampilkan,
+        # dan yang dihitung ulang portal. Memakai angka berbeda untuk
+        # menandai dan untuk menjelaskan berarti faskes dibantah dengan
+        # angka yang bukan angka yang menjatuhkannya.
+        if np.isfinite(self.batas_bukti):
+            X0 = fitur_bukti(episodes, tanpa_penunjang=True)
+            kosong = np.expm1(self.m_tarif.predict(X0))
+            naik = np.clip(harap_tarif - kosong, 0, None)
+            harap_tarif = kosong + np.minimum(naik, self.batas_bukti)
         s_tarif = tarif - harap_tarif
         s_bhp = bhp - harap_bhp
         return {
@@ -583,6 +646,8 @@ class Detektor:
                     "ambang_tingkat": self.ambang_tingkat,
                     "ambang_umum": self.ambang_umum,
                     "minimal_kalibrasi": self.minimal_kalibrasi,
+                    "batas_bukti": self.batas_bukti,
+                    "kuantil_batas": self.kuantil_batas,
                     "minimal_faskes": self.minimal_faskes,
                     "kecualikan_dtpk": self.kecualikan_dtpk,
                     "alpha": self.alpha,
@@ -603,6 +668,11 @@ class Detektor:
         o.ambang_tingkat = d["ambang_tingkat"]
         o.ambang_umum = d["ambang_umum"]
         o.minimal_kalibrasi = d["minimal_kalibrasi"]
+        # Model lama tidak punya batas ini. Bawaannya tak hingga, artinya
+        # tanpa potongan, sehingga berkas yang disimpan sebelum tambalan
+        # tetap memberi angka yang sama persis seperti dulu.
+        o.batas_bukti = d.get("batas_bukti", float("inf"))
+        o.kuantil_batas = d.get("kuantil_batas")
         o.minimal_faskes = d.get("minimal_faskes", 3)
         o.kecualikan_dtpk = d.get("kecualikan_dtpk", True)
         o._terlatih = o._terkalibrasi = True

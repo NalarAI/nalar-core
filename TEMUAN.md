@@ -1751,3 +1751,87 @@ Sebelum ini kami tahu T6 gagal. Sekarang kami tahu satu sebab yang bisa
 ditunjuk dan diulang, dan tambalannya punya bentuk: bukti penyerta tidak
 boleh menurunkan kecurigaan pada berkas yang tarifnya baru saja naik karena
 diagnosis sekunder.
+
+---
+
+## Tambalan yang diuji lalu tidak dipasang, 7 September 2026
+
+`runs/tambal_bukti.json`, `runs/tambal_bukti_p99.json`
+
+Lapisan lawan menemukan siasat yang meloloskan Rp 427,2 juta tanpa satu
+berkas pun tertangkap: tambahkan diagnosis sekunder, lalu lampirkan hasil
+pemeriksaan penunjang. Naik lewat pintu yang tidak diawasi, turun lewat pintu
+yang diawasi.
+
+Tambalan yang masuk akal langsung terlihat. Batasi seberapa jauh lampiran
+boleh menurunkan kecurigaan, sebanyak yang biasanya diturunkannya pada berkas
+jujur, dan tidak lebih. Batasnya dipelajari dari himpunan latih, jadi tidak
+ada angka rupiah yang ditulis tangan.
+
+Dua detektor dilatih pada data yang sama persis, 160.455 episode, satu
+bertambal dan satu tidak.
+
+### Sumbangan bukti ternyata berekor sangat panjang
+
+| Kuantil | Sumbangan lampiran pada tebakan tarif |
+|---|---:|
+| p50 | Rp 0 |
+| p80 | Rp 0 |
+| p95 | Rp 36.494 |
+| p99 | Rp 452.970 |
+| maksimum | Rp 24.422.284 |
+
+Pada delapan puluh persen berkas, membuang seluruh lampiran tidak menggeser
+tebakan tarif sama sekali. Ekornya yang menggeser, dan di ekor itulah
+serangan hidup. Jadi batas pada kuantil 0,8 bukan potongan, itu larangan
+penuh.
+
+### Diuji dua kali, dan dua duanya hampir tidak menolong
+
+| Siasat | Polos | Larangan penuh | Potongan ekor p99 |
+|---|---:|---:|---:|
+| serakah | 195,7 jt | 295,0 jt | 271,6 jt |
+| hati hati | 275,3 jt | 380,1 jt | 352,8 jt |
+| menyebar | 232,6 jt | 279,6 jt | 268,1 jt |
+| upcode berlapis bukti | **384,2 jt** | 381,1 jt | 368,2 jt |
+| upcode berlapis bukti, berkas kecil | 367,6 jt | 357,6 jt | 356,9 jt |
+| upcode berlapis bukti, menyebar | 312,7 jt | 280,6 jt | 269,9 jt |
+| upcode berlapis barang | 280,2 jt | 371,3 jt | 346,3 jt |
+
+Uang yang lolos pelaku terburuk turun 0,8 persen pada larangan penuh dan 4,2
+persen pada potongan ekor. Sementara itu siasat yang tidak memakai bukti
+justru meloloskan jauh lebih banyak, sampai seratus juta lebih.
+
+Ongkosnya nyata. Presisi pada anggaran seribu berkas turun dari 0,551 ke
+0,496 pada larangan penuh, dan ke 0,543 pada potongan ekor. Laju penandaan
+berkas bersih tetap aman, 0,0091 menjadi 0,0098 dan 0,0103, jauh di bawah
+batas 0,03.
+
+**Tambalannya tidak dipasang.** Mesinnya dibiarkan hidup dan mati secara
+bawaan, karena ia yang menghasilkan angka di atas dan yang akan menguji
+tambalan berikutnya.
+
+### Kenapa gagal, dan ini yang paling berguna dari percobaan ini
+
+Menutup satu pengungkit tidak menolong karena pelaku tidak bergantung pada
+satu pengungkit. Ia punya akses ke skor, jadi ditutup satu ia memakai yang
+lain. Dan ambang konformal bergeser mengikuti sebaran skor: menaikkan seluruh
+selisih menaikkan pula ambangnya, sehingga ruang di bawah garis kembali
+seperti semula.
+
+Jadi yang membuat serangan ini bekerja bukan bukti penyerta, melainkan
+kemampuan menanyai skor sampai tahu apa yang lolos. Itu asumsi terburuk yang
+kami pilih sendiri saat merancang pengujian, dan sekarang ia berbalik jadi
+jawabannya: pertahanan terhadap pelaku yang bisa bertanya bukan rekayasa
+penciri, melainkan membatasi berapa banyak ia boleh bertanya, dan menjaga
+porsi sampel acak supaya tidak ada berkas yang bisa dipastikan aman.
+
+### Papan skor A5
+
+| Target | Hasil |
+|---|---|
+| A5 T6 naik dari 25,6 persen ke minimal 40 persen | **gagal lewat jalur ini**, turun 0,8 sampai 4,2 persen saja |
+
+Kegagalan keempat proyek ini, dan sebabnya bisa ditunjuk. Rancangan sudah
+menuliskan apa yang dilakukan bila A5 gagal, dan ini pelaksanaannya:
+ditulis seperti tiga kegagalan sebelumnya, bukan disembunyikan.
