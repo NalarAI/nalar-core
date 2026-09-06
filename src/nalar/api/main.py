@@ -228,13 +228,20 @@ def penjelasan(kid: str) -> Penjelasan:
         for b in j["bukti_yang_bila_ada_akan_mengubah_penilaian"]
     ]
     selisih = int(a["selisih_rp"])
+
+    def rp(n: int) -> str:
+        # Pemisah ribuan Indonesia memakai titik. Sebelumnya seluruh koma pada
+        # kalimat ikut diganti titik, sehingga kalimatnya patah di tengah.
+        # Sekarang yang diubah hanya angkanya.
+        return "Rp " + f"{int(n):,}".replace(",", ".")
+
     kalimat = (
-        f"Tarif yang ditagihkan Rp {a['tarif_ditagihkan']:,} sedangkan yang "
-        f"dapat dijelaskan bukti pada klaim ini Rp "
-        f"{a['tarif_didukung_bukti']:,}. Selisihnya Rp {selisih:,}. "
+        f"Tarif yang ditagihkan {rp(a['tarif_ditagihkan'])} sedangkan yang "
+        f"dapat dijelaskan bukti pada klaim ini "
+        f"{rp(a['tarif_didukung_bukti'])}. Selisihnya {rp(selisih)}. "
         "Mohon melengkapi bukti berikut bila tersedia, atau menyampaikan "
         "alasan klinisnya."
-    ).replace(",", ".")
+    )
     return Penjelasan(
         id=kid,
         tarif_ditagihkan_rp=int(a["tarif_ditagihkan"]),

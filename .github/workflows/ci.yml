@@ -39,6 +39,12 @@ jobs:
       - name: uji peladen
         run: python tests/test_api.py
 
+      # Angka yang dilayani peladen harus sama dengan angka yang dihitung
+      # model. Peladen menyusun ulang, membulatkan, dan menamai ulang
+      # keluarannya, dan tiap langkah itu tempat angka bisa bergeser diam diam.
+      - name: uji konsistensi angka
+        run: python tests/test_konsistensi.py
+
   # Menjaga agar tidak ada jejak perkakas bantu yang ikut terkirim. Ini bukan
   # soal rapi, ini soal karya yang dinilai harus jelas siapa penulisnya.
   bersih:
