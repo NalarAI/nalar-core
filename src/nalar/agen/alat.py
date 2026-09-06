@@ -21,6 +21,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
+from ..pembulatan import bulat_berkas
 from . import aturan as pustaka_aturan
 from .jejak import Jejak
 
@@ -173,21 +174,23 @@ class Perkakas:
         i = self._indeks(id)
         j = self.k.detektor.jelaskan(self.k.episodes, i)
         a = j["angka"]
-        # Penjumlahan tarif paket dan barang dikerjakan di sini, bukan oleh
-        # yang menyusun kalimat. Penjaga A1 menolak angka yang tidak
-        # dikembalikan alat, dan penolakannya benar: nilai yang tidak
-        # pernah dihitung alat tidak punya jejak yang bisa diaudit.
+        # Penjumlahan dan pengurangan dikerjakan di sini, bukan oleh yang
+        # menyusun kalimat. Penjaga A1 menolak angka yang tidak dikembalikan
+        # alat, dan penolakannya benar: nilai yang tidak pernah dihitung alat
+        # tidak punya jejak yang bisa diaudit.
+        #
+        # Seluruhnya diturunkan dari empat angka yang sudah dibulatkan
+        # bersama, supaya tiap pasangan yang muncul di layar cocok
+        # pengurangannya. Alasan panjangnya ada di nalar/pembulatan.py.
+        n = bulat_berkas(
+            a["tarif_ditagihkan"],
+            a["tarif_didukung_bukti"],
+            a["tagihan_barang_ditagihkan"],
+            a["tagihan_barang_wajar"],
+        )
         return {
             "id": id,
-            "tarif_ditagihkan_rp": int(a["tarif_ditagihkan"]),
-            "tarif_didukung_bukti_rp": int(a["tarif_didukung_bukti"]),
-            "barang_ditagihkan_rp": int(a["tagihan_barang_ditagihkan"]),
-            "barang_wajar_rp": int(a["tagihan_barang_wajar"]),
-            "total_diajukan_rp": int(a["tarif_ditagihkan"])
-            + int(a["tagihan_barang_ditagihkan"]),
-            "total_didukung_bukti_rp": int(a["tarif_didukung_bukti"])
-            + int(a["tagihan_barang_wajar"]),
-            "selisih_rp": int(a["selisih_rp"]),
+            **n,
             "bukti": [
                 {
                     "kode": b["bukti"],

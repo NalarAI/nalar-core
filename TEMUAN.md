@@ -1633,3 +1633,29 @@ Empat puluh berkas, satu model, satu benih. Model yang lebih besar hampir
 pasti lebih patuh, dan yang belum diuji berapa besar yang cukup. Yang bisa
 disimpulkan cuma satu: 4B tidak cukup, dan lapisan penjaganya menahan
 ketidakcukupan itu tanpa satu pun surat salah keluar.
+
+### Satu cacat yang ketahuan dari membaca layarnya, bukan dari uji
+
+Berkas perkara yang tayang di halaman klaim berbunyi diajukan Rp 3.498.300,
+didukung bukti Rp 3.086.958, selisih Rp 411.341. Pengurangannya memberi
+Rp 411.342.
+
+Sebabnya tiap bagian dibulatkan sendiri sendiri. Selisih dihitung dalam
+pecahan lalu dibulatkan, dan jumlah bagian yang dibulatkan tidak selalu sama
+dengan pembulatan jumlahnya. Bedanya satu rupiah, dan satu rupiah itu tidak
+penting sama sekali bagi penilaiannya. Yang penting akibatnya: verifikator
+yang mengurangkan dua angka pertama dan mendapat angka ketiga yang berbeda
+akan berhenti mempercayai seluruh suratnya, dan ia benar berhenti.
+
+Diukur sesudahnya, tiga puluh dua dari empat ratus berkas meleset. Uji
+peladen sudah memeriksa pengurangan ini sejak lama, tapi hanya pada satu
+berkas, dan berkas itu kebetulan cocok. Sekarang diperiksa pada enam puluh
+berkas untuk penilaian, empat puluh untuk kalimat faskes, dan empat puluh
+untuk berkas perkara.
+
+Pembulatannya sekarang dikerjakan sekali di `nalar/pembulatan.py`, dan
+seluruh angka turunan disusun dari empat angka yang sudah dibulatkan
+bersama. Ada satu pengecualian yang harus ditulis: selisih dijepit di nol
+mengikuti penebak, jadi berkas yang ditagihkan lebih kecil daripada yang
+didukung bukti memang tidak bisa dikurangkan. Kalimatnya dibedakan untuk
+berkas seperti itu, bukan dipaksa memuat tiga angka yang tidak bertemu.

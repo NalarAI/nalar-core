@@ -63,7 +63,14 @@ def susun(keadaan, id_berkas: str) -> dict:
         "",
         f"Diajukan {_rp(hitung['total_diajukan_rp'])}, "
         f"didukung bukti {_rp(hitung['total_didukung_bukti_rp'])}, "
-        f"selisih {_rp(hitung['selisih_rp'])}.",
+        f"selisih {_rp(hitung['selisih_rp'])}."
+        if hitung["selisih_mentah_rp"] > 0
+        else (
+            f"Diajukan {_rp(hitung['total_diajukan_rp'])}, "
+            f"didukung bukti {_rp(hitung['total_didukung_bukti_rp'])}. "
+            "Yang diajukan tidak melampaui yang didukung bukti, jadi tidak "
+            "ada selisih pada berkas ini."
+        ),
     ]
 
     if tarif is not None:

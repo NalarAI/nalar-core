@@ -17,6 +17,7 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from ..agen import susun
+from ..pembulatan import bulat_berkas
 from ..profil import peringkat_faskes, perubahan_faskes, profil_faskes
 from .keadaan import KEADAAN, PERINGATAN_RUPIAH
 from .skema import (
@@ -83,6 +84,15 @@ def _penilaian(i: int) -> Penilaian:
     r = KEADAAN.episodes[i]
     s = KEADAAN.skor
     tahan = bool(KEADAAN.tahan[i])
+    # Keempat angka dibulatkan bersama, dan selisihnya diturunkan dari
+    # keempatnya. Membulatkan selisih sendiri membuat pengurangan di layar
+    # meleset satu rupiah pada sekitar satu dari dua belas berkas.
+    n = bulat_berkas(
+        r["tarif"],
+        s["harapan_tarif"][i],
+        r.get("tagih_bhp", 0),
+        s["harapan_tagihan"][i],
+    )
     return Penilaian(
         id=KEADAAN.id_klaim(i),
         faskes=KEADAAN.nama_faskes(r),
@@ -91,11 +101,11 @@ def _penilaian(i: int) -> Penilaian:
         hari=int(r["hari"]),
         rawat_inap=bool(r["rawat_inap"]),
         kelompok_tarif=r["cbg"],
-        tarif_ditagihkan_rp=int(r["tarif"]),
-        tarif_didukung_bukti_rp=round(float(s["harapan_tarif"][i])),
-        barang_ditagihkan_rp=int(r.get("tagih_bhp", 0)),
-        barang_wajar_rp=round(float(s["harapan_tagihan"][i])),
-        selisih_rp=round(float(KEADAAN.selisih[i])),
+        tarif_ditagihkan_rp=n["tarif_ditagihkan_rp"],
+        tarif_didukung_bukti_rp=n["tarif_didukung_bukti_rp"],
+        barang_ditagihkan_rp=n["barang_ditagihkan_rp"],
+        barang_wajar_rp=n["barang_wajar_rp"],
+        selisih_rp=n["selisih_rp"],
         ambang_rp=None if tahan else round(float(KEADAAN.ambang[i])),
         ditandai=bool(KEADAAN.tanda[i]),
         menahan_diri=tahan,
@@ -230,7 +240,13 @@ def penjelasan(kid: str) -> Penjelasan:
         )
         for b in j["bukti_yang_bila_ada_akan_mengubah_penilaian"]
     ]
-    selisih = int(a["selisih_rp"])
+    n = bulat_berkas(
+        a["tarif_ditagihkan"],
+        a["tarif_didukung_bukti"],
+        a["tagihan_barang_ditagihkan"],
+        a["tagihan_barang_wajar"],
+    )
+    selisih = n["selisih_rp"]
 
     def rp(n: int) -> str:
         # Pemisah ribuan Indonesia memakai titik. Sebelumnya seluruh koma pada
@@ -245,18 +261,31 @@ def penjelasan(kid: str) -> Penjelasan:
     # pengurangannya tidak pernah cocok. Fasilitas kesehatan yang menghitung
     # ulang akan menemukan angka yang tidak bertemu, dan itu alasan yang sah
     # untuk tidak mempercayai seluruh suratnya.
-    diajukan = int(a["tarif_ditagihkan"]) + int(a["tagihan_barang_ditagihkan"])
-    wajar = int(a["tarif_didukung_bukti"]) + int(a["tagihan_barang_wajar"])
-    kalimat = (
-        f"Nilai yang diajukan {rp(diajukan)}, sedangkan yang didukung bukti "
-        f"pada berkas ini {rp(wajar)}. Selisih {rp(selisih)}, mencakup tarif "
-        "paket dan barang habis pakai. Mohon melengkapi bukti berikut bila "
-        "tersedia, atau menyampaikan alasan klinisnya."
-    )
+    diajukan = n["total_diajukan_rp"]
+    wajar = n["total_didukung_bukti_rp"]
+    # Kalimatnya dibedakan ketika tidak ada selisih. Selisih dijepit di nol
+    # mengikuti penebak, jadi berkas yang ditagihkan lebih kecil daripada
+    # yang didukung bukti akan menghasilkan tiga angka yang tidak bisa
+    # dikurangkan. Faskes yang menghitung ulang akan menemukan angka yang
+    # tidak bertemu, dan itu alasan yang sah untuk tidak mempercayainya.
+    if n["selisih_mentah_rp"] > 0:
+        kalimat = (
+            f"Nilai yang diajukan {rp(diajukan)}, sedangkan yang didukung bukti "
+            f"pada berkas ini {rp(wajar)}. Selisih {rp(selisih)}, mencakup tarif "
+            "paket dan barang habis pakai. Mohon melengkapi bukti berikut bila "
+            "tersedia, atau menyampaikan alasan klinisnya."
+        )
+    else:
+        kalimat = (
+            f"Nilai yang diajukan {rp(diajukan)}, sedangkan yang didukung bukti "
+            f"pada berkas ini {rp(wajar)}. Yang diajukan tidak melampaui yang "
+            "didukung bukti, jadi tidak ada selisih yang perlu dikonfirmasi "
+            "pada berkas ini."
+        )
     return Penjelasan(
         id=kid,
-        tarif_ditagihkan_rp=int(a["tarif_ditagihkan"]),
-        tarif_didukung_bukti_rp=int(a["tarif_didukung_bukti"]),
+        tarif_ditagihkan_rp=n["tarif_ditagihkan_rp"],
+        tarif_didukung_bukti_rp=n["tarif_didukung_bukti_rp"],
         selisih_rp=selisih,
         pengandaian=pengandaian,
         status=j["status"],

@@ -101,12 +101,12 @@ with TestClient(app) as c:
         cek("klaim bisa diambil menurut pengenalnya", p["id"] == kid)
         cek(
             "selisih sama dengan tagihan dikurangi yang didukung bukti",
-            abs(
+            max(
+                0,
                 (p["tarif_ditagihkan_rp"] - p["tarif_didukung_bukti_rp"])
-                + (p["barang_ditagihkan_rp"] - p["barang_wajar_rp"])
-                - p["selisih_rp"]
+                + (p["barang_ditagihkan_rp"] - p["barang_wajar_rp"]),
             )
-            <= max(2, p["selisih_rp"] * 0.001),
+            == p["selisih_rp"],
             f"selisih {p['selisih_rp']}",
         )
         cek(
@@ -200,6 +200,63 @@ with TestClient(app) as c:
             "berkas perkara klaim yang tidak ada menjawab 404",
             c.get("/klaim/KTIDAKADA/perkara").status_code == 404,
         )
+
+    # Pengurangannya diperiksa pada banyak berkas, bukan tiga. Versi
+    # sebelumnya memeriksa tiga saja dan ketiganya kebetulan cocok, padahal
+    # tiga puluh dua dari empat ratus berkas meleset satu rupiah karena tiap
+    # bagian dibulatkan sendiri sendiri. Verifikator yang mengurangkan dua
+    # angka pertama dan mendapat angka ketiga yang berbeda akan berhenti
+    # mempercayai seluruh suratnya, dan ia benar berhenti.
+    meleset = []
+    for b in a["baris"][:60]:
+        n = b["penilaian"]
+        d = n["tarif_ditagihkan_rp"] + n["barang_ditagihkan_rp"]
+        w = n["tarif_didukung_bukti_rp"] + n["barang_wajar_rp"]
+        if max(0, d - w) != n["selisih_rp"]:
+            meleset.append((n["id"], d - w, n["selisih_rp"]))
+    cek(
+        "pengurangan pada penilaian cocok di enam puluh berkas",
+        not meleset,
+        f"{len(meleset)} meleset, contoh {meleset[:2]}",
+    )
+
+    meleset_kalimat = []
+    for b in a["baris"][:40]:
+        kid = b["penilaian"]["id"]
+        j = c.get(f"/klaim/{kid}/penjelasan").json()
+        angka = [
+            int(x.replace(".", ""))
+            for x in re.findall(r"Rp ([\d.]+)", j["kalimat_untuk_faskes"])
+        ]
+        if len(angka) == 2 and angka[0] <= angka[1]:
+            continue  # tidak ada selisih, kalimatnya memang berbeda
+        if len(angka) != 3 or angka[0] - angka[1] != angka[2]:
+            meleset_kalimat.append((kid, angka))
+    cek(
+        "pengurangan pada kalimat untuk faskes cocok di empat puluh berkas",
+        not meleset_kalimat,
+        f"{len(meleset_kalimat)} meleset, contoh {meleset_kalimat[:2]}",
+    )
+
+    meleset_perkara = []
+    for b in a["baris"][:40]:
+        kid = b["penilaian"]["id"]
+        t = c.get(f"/klaim/{kid}/perkara").json()["teks"]
+        m = re.search(
+            r"Diajukan Rp ([\d.]+), didukung bukti Rp ([\d.]+), selisih Rp ([\d.]+)",
+            t,
+        )
+        if not m:
+            meleset_perkara.append((kid, "bentuk kalimatnya berubah"))
+            continue
+        x, y, z = (int(g.replace(".", "")) for g in m.groups())
+        if x - y != z:
+            meleset_perkara.append((kid, (x, y, z)))
+    cek(
+        "pengurangan pada berkas perkara cocok di empat puluh berkas",
+        not meleset_perkara,
+        f"{len(meleset_perkara)} meleset, contoh {meleset_perkara[:2]}",
+    )
 
     cek(
         "klaim yang tidak ada menghasilkan 404",
