@@ -1442,3 +1442,109 @@ muncul.
 - Kontrol negatif LEIE, terhalang di sisi data
 - Uji latih di sintetis uji di nyata, gagal
 - T3, pohon normatif tetap mengalahkan transformer yang kami rancang
+
+---
+
+## Dua daftar yang saling melengkapi, dan satu kalibrasi yang akhirnya benar
+
+### Profil rupiah dan profil posisi menangkap hal yang berbeda
+
+Sesudah tahu bahwa serangan menempel garis berada di bawah lantai derau
+rupiah, ukuran posisi diuji sebagai profil faskes. Hasilnya bukan pengganti,
+melainkan pelengkap, dan masing masing buruk persis di tempat yang lain kuat.
+
+| | Presisi pada 25 teratas, tugas biasa | Terhadap pelaku beradaptasi |
+|---|---:|---|
+| diurut menurut rupiah | **1,000** | buta, peringkat 221 tetap 221 |
+| diurut menurut posisi | 0,240 | peringkat 223 naik ke **87** dari 238 |
+
+Jadi keduanya dikirim sebagai dua daftar terpisah, bukan digabung jadi satu
+skor. Menggabungkannya akan merusak keduanya. Daftar pertama bertanya siapa
+menagih lebih daripada yang didukung bukti. Daftar kedua bertanya siapa
+menagih terus menerus persis sebanyak yang masih diizinkan.
+
+Daftar kedua bukan tuduhan, dan itu ditulis di dalam keluarannya. Menagih
+menempel batas bisa berarti pengodean yang rapi dan bisa berarti sesuatu yang
+lain. Yang dituntut darinya penjelasan, bukan pengembalian.
+
+Peringkat 87 dari 238 masih di luar antrean audit dua puluh lima teratas, jadi
+ini peredaman sebagian dan bukan penyelesaian. Tapi pergerakan dari 223 ke 87
+pada pencurian sepuluh persen tagihan itu nyata, sedangkan daftar rupiah
+memberi nol pergerakan.
+
+### Satu perbaikan yang dicoba dan gagal
+
+Sampel audit acak dicoba ditimbang menurut posisi, dengan harapan mengejar
+pelaku yang menempel garis. Hasilnya lebih buruk daripada acak seragam, 3,3
+persen melawan 4,4 persen uang tertangkap. Sebabnya klaim yang diserang
+berkerumun pada posisi yang mirip mirip, jadi menimbang menurut posisi tidak
+memusatkan anggaran ke klaim yang nilainya paling besar. Acak seragam justru
+menyebar peluang sebanding dengan uangnya.
+
+### Kalibrasi uji permutasi akhirnya benar, dan itu menurunkan angka kami sendiri
+
+Ukuran posisi menandai 9,2 persen faskes berubah pada data yang tidak memuat
+perubahan apa pun, hampir dua kali nominal. Dua dugaan diuji dan gugur, yaitu
+klaim yang menahan diri dan nilai yang seri.
+
+Yang ketiga benar. Posisi dua klaim milik pasien yang sama berkorelasi 0,135,
+sedangkan dua klaim yang diambil acak berkorelasi nol. Pasien yang sama datang
+berdekatan waktunya, jadi korelasi itu tersalin menjadi struktur waktu yang
+tidak pernah dihancurkan oleh pengacakan per klaim. Uji permutasi
+mengandaikan klaim saling terpertukarkan, dan klaim dari satu pasien memang
+tidak.
+
+Perbaikannya mengacak urutan blok pasien, bukan isinya:
+
+| | p<0,05 sebelum | p<0,05 sesudah |
+|---|---:|---:|
+| ukuran posisi | 9,2% | **6,1%** |
+| selisih rupiah | 6,1% | **4,8%** |
+
+Dan inilah bagian yang tidak menyenangkan. Kalibrasi yang benar menurunkan
+angka daya temu kami sendiri. Kepala K6 pada selisih rupiah yang tadinya
+tertangkap 22 persen turun menjadi 16,7 persen, dan pada ambang satu persen
+menjadi nol. Pecahan menurut kebijakan yang tadinya terlihat naik seiring
+keparahan sekarang berantakan, dan dengan empat sampai delapan faskes per
+kelompok memang itu yang seharusnya terlihat.
+
+Jadi kesimpulan tentang K6 diperbaiki ke bawah. Pada tugas menemukan
+kemunculan kecurangan, kepala ini praktis tidak punya daya pada ukuran faskes
+yang kami punya. Angka 22 sampai 33 persen yang kami tulis sebelumnya
+dibesarkan oleh uji yang mis-kalibrasi.
+
+Yang bertahan adalah tugas yang lain. Pada pelaku beradaptasi, dengan
+pengacakan per pasien dan laju salah tuduh yang sudah kembali ke nominal:
+
+  Rumah sakit mengambil Rp 30,9 juta
+    ukuran posisi   p = 0,0125
+    selisih rupiah  p = 0,0723
+  Salah tuduh pada 226 faskes lain
+    ukuran posisi   5,3 persen
+    selisih rupiah  4,9 persen
+
+Posisi menangkap yang rupiah lewatkan, pada laju salah tuduh yang benar. Dua
+rumah sakit lain yang mengambil jauh lebih sedikit terlewat oleh keduanya.
+
+### Satu cacat ketelitian yang ditemukan di jalan
+
+Profil faskes membulatkan seluruh kolomnya ke rupiah bulat. Ketika yang
+dimasukkan bukan rupiah melainkan posisi, yang nilainya di antara minus satu
+dan satu, seluruh kolomnya menjadi nol. Peringkatnya masih bekerja karena skor
+baku dihitung sebelum pembulatan, tapi angka yang dilaporkan tidak berarti apa
+apa. Ketelitiannya sekarang mengikuti besaran yang masuk.
+
+### Papan skor sesudah semuanya
+
+| Target | Hasil |
+|---|---|
+| T1 dua kali lipat atas mesin aturan | gagal, 1,853 ± 0,155, satu benih mencapai 2,027 |
+| T2 jaminan konformal | tercapai |
+| T3 mengalahkan pohon berpenguat | gagal |
+| T4 pralatih menolong | tercapai |
+| T5 keadilan antar kelompok | **tercapai**, lulus di kelima benih |
+| T6 pelaku beradaptasi | **gagal**, dan menyebar lebih untung daripada serakah |
+| T7 faskes dan periode tak dikenal | **tercapai** |
+
+Empat tercapai, tiga gagal, dan ketiga kegagalannya punya sebab yang bisa
+ditunjuk beserta angkanya.

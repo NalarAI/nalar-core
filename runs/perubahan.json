@@ -1,7 +1,7 @@
 {
  "kendali_positif_palsu": {
   "n_faskes_diuji": 229,
-  "porsi_p_di_bawah_05": 0.0611,
+  "porsi_p_di_bawah_05": 0.048,
   "porsi_p_di_bawah_01": 0.0087,
   "batas_wajar_05": 0.1,
   "lulus": true
@@ -10,25 +10,25 @@
   "n_diuji": 227,
   "n_benar_berubah": 18,
   "n_tidak_berubah": 209,
-  "tertangkap_p0.05": 0.2222,
-  "salah_tuduh_p0.05": 0.0622,
-  "tertangkap_p0.01": 0.1111,
+  "tertangkap_p0.05": 0.1667,
+  "salah_tuduh_p0.05": 0.0526,
+  "tertangkap_p0.01": 0.0,
   "salah_tuduh_p0.01": 0.0191,
-  "jarak_hari_median": 252,
-  "jarak_hari_p90": 423,
+  "jarak_hari_median": 288,
+  "jarak_hari_p90": 469,
   "rentang_hari": 1095,
   "tertangkap_per_kebijakan_tujuan": {
    "oportunis": {
     "ada": 8,
-    "tertangkap": 0.125
+    "tertangkap": 0.25
    },
    "sistematis": {
     "ada": 6,
-    "tertangkap": 0.3333
+    "tertangkap": 0.1667
    },
    "ekstrem": {
     "ada": 4,
-    "tertangkap": 0.25
+    "tertangkap": 0.0
    }
   },
   "berubah_yang_dilewatkan_k4_tapi_ditemukan_k6": 2,
@@ -45,7 +45,7 @@
    "rata_sesudah_rp": 430363,
    "lonjakan_rp": 88538,
    "lonjakan_peringkat": 0.0622,
-   "p": 0.5075
+   "p": 0.592
   },
   {
    "faskes": "1:102",
@@ -57,7 +57,7 @@
    "rata_sesudah_rp": 243793,
    "lonjakan_rp": -38414,
    "lonjakan_peringkat": 0.1016,
-   "p": 0.1493
+   "p": 0.2239
   },
   {
    "faskes": "0:291",
@@ -69,7 +69,7 @@
    "rata_sesudah_rp": 59389,
    "lonjakan_rp": 57936,
    "lonjakan_peringkat": 0.1168,
-   "p": 0.1542
+   "p": 0.1144
   },
   {
    "faskes": "1:87",
@@ -81,7 +81,7 @@
    "rata_sesudah_rp": 143237,
    "lonjakan_rp": 37057,
    "lonjakan_peringkat": 0.054,
-   "p": 0.5821
+   "p": 0.6269
   },
   {
    "faskes": "1:31",
@@ -93,7 +93,7 @@
    "rata_sesudah_rp": 529878,
    "lonjakan_rp": 497764,
    "lonjakan_peringkat": 0.1436,
-   "p": 0.0398
+   "p": 0.0597
   }
  ]
 }

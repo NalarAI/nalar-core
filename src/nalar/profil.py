@@ -103,16 +103,32 @@ def profil_faskes(episodes, selisih, minimal_klaim=20, minimal_sebaya=3):
             w = tau2 / (tau2 + sigma2 / max(d["n"], 1))
             susut = w * d["rata"] + (1 - w) * mu
             se = np.sqrt(sigma2 / max(d["n"], 1) + tau2)
+            # Pembulatan ke bilangan bulat sempat merusak kepala ini ketika
+            # yang dimasukkan bukan rupiah melainkan posisi terhadap ambang,
+            # yang nilainya berada di antara minus satu dan satu. Seluruh
+            # kolomnya menjadi nol dan peringkatnya kehilangan ketelitian.
+            # Sekarang ketelitiannya mengikuti besaran yang masuk.
+            kel = float(max(susut - mu, 0.0)) * d["n"]
+            bulat = abs(mu) > 1000.0
             hasil[kunci] = {
                 "n": d["n"],
                 "sebaya": nama,
                 "n_sebaya": len(anggota),
-                "rata_mentah_rp": round(d["rata"]),
-                "rata_sebaya_rp": round(mu),
-                "rata_susut_rp": round(float(susut)),
+                "rata_mentah": round(d["rata"]) if bulat else round(d["rata"], 6),
+                "rata_sebaya": round(mu) if bulat else round(mu, 6),
+                "rata_susut": round(float(susut)) if bulat
+                else round(float(susut), 6),
                 "bobot_percaya": round(float(w), 4),
                 "z": round(float((susut - mu) / max(se, 1e-9)), 3),
-                "kelebihan_rp": round(float(max(susut - mu, 0.0)) * d["n"]),
+                "kelebihan": round(kel) if bulat else round(kel, 6),
+                # nama lama dipertahankan supaya berkas hasil lama tetap
+                # terbaca dan skrip yang sudah ada tidak patah
+                "rata_susut_rp": round(float(susut)) if bulat
+                else round(float(susut), 6),
+                "rata_sebaya_rp": round(mu) if bulat else round(mu, 6),
+                "rata_mentah_rp": round(d["rata"]) if bulat
+                else round(d["rata"], 6),
+                "kelebihan_rp": round(kel) if bulat else round(kel, 6),
             }
     return hasil
 
@@ -157,7 +173,7 @@ def presisi_faskes_pada_k(profil, kebenaran, daftar_k=(10, 25, 50)):
 # dihentikan, karena kebiasaannya belum mengeras.
 
 def titik_perubahan(nilai, hari, minimal_sisi=25, n_acak=200, seed=0,
-                    peringkat=True):
+                    peringkat=True, blok=None):
     """Cari satu titik di mana rata rata deret bergeser, plus peluang semunya.
 
     Statistiknya selisih rata rata terbesar antara sebelum dan sesudah, dicari
@@ -215,8 +231,33 @@ def titik_perubahan(nilai, hari, minimal_sisi=25, n_acak=200, seed=0,
 
     beda, potong = cari(v)
     rng = np.random.default_rng(seed)
-    lebih = sum(1 for _ in range(n_acak)
-                if cari(rng.permutation(v))[0] >= beda)
+
+    # Pengacakan per blok, bukan per klaim.
+    #
+    # Uji permutasi mengandaikan klaim saling terpertukarkan. Klaim dari satu
+    # pasien tidak. Terukurnya begini: posisi dua klaim milik pasien yang sama
+    # berkorelasi 0,135, sedangkan dua klaim yang diambil acak berkorelasi
+    # nol. Pasien yang sama datang berdekatan waktunya, jadi korelasi itu
+    # tersalin menjadi struktur waktu yang tidak pernah dihancurkan oleh
+    # pengacakan per klaim. Akibatnya nilai p terlalu kecil, dan 9,2 persen
+    # faskes ditandai berubah pada data yang tidak memuat perubahan apa pun.
+    #
+    # Yang diacak sekarang urutan bloknya, bukan isinya. Korelasi di dalam
+    # pasien tetap utuh pada tiruan acaknya, sehingga yang dibandingkan
+    # benar benar setara.
+    if blok is not None:
+        blok_urut = np.asarray(blok)[urut]
+        _, awal = np.unique(blok_urut, return_index=True)
+        potongan = np.split(np.arange(n), np.sort(awal)[1:])
+
+        def acak():
+            urutan = rng.permutation(len(potongan))
+            return v[np.concatenate([potongan[j] for j in urutan])]
+    else:
+        def acak():
+            return rng.permutation(v)
+
+    lebih = sum(1 for _ in range(n_acak) if cari(acak())[0] >= beda)
     return {
         "hari_ganti": int(h[potong]),
         "n_sebelum": potong,
@@ -231,7 +272,7 @@ def titik_perubahan(nilai, hari, minimal_sisi=25, n_acak=200, seed=0,
 
 
 def perubahan_faskes(episodes, selisih, minimal_klaim=60, n_acak=200,
-                     seed=0, peringkat=True):
+                     seed=0, peringkat=True, per_pasien=True):
     """Titik perubahan untuk tiap faskes yang klaimnya cukup banyak."""
     selisih = np.asarray(selisih, dtype=np.float64)
     per: dict[tuple, list[int]] = {}
@@ -241,8 +282,11 @@ def perubahan_faskes(episodes, selisih, minimal_klaim=60, n_acak=200,
     for kunci, pos in per.items():
         if len(pos) < minimal_klaim:
             continue
-        t = titik_perubahan(selisih[pos], [episodes[i]["hari"] for i in pos],
-                            n_acak=n_acak, seed=seed, peringkat=peringkat)
+        t = titik_perubahan(
+            selisih[pos], [episodes[i]["hari"] for i in pos],
+            n_acak=n_acak, seed=seed, peringkat=peringkat,
+            blok=([episodes[i]["peserta_id"] for i in pos]
+                  if per_pasien else None))
         if t is not None:
             hasil[kunci] = t
     return hasil

@@ -440,6 +440,47 @@ class Detektor:
 
     # -- penjelasan ---------------------------------------------------------
 
+    def profil_ganda(self, episodes, atas=25):
+        """Dua daftar faskes yang saling melengkapi, bukan saling mengganti.
+
+        Yang pertama diurut menurut kelebihan rupiah. Ia menangkap kecurangan
+        biasa dengan presisi satu pada dua puluh lima teratas, dan ia buta
+        total terhadap faskes yang menagih tepat di bawah garis.
+
+        Yang kedua diurut menurut posisi terhadap garis. Kebalikannya persis.
+        Presisinya pada tugas biasa hanya 0,24, jadi ia tidak boleh
+        menggantikan yang pertama. Tapi pada serangan yang tidak terlihat
+        sama sekali oleh daftar pertama, ia menggerakkan faskes penyerang dari
+        peringkat 222 ke 90 dari 238.
+
+        Dua daftar ini menjawab dua pertanyaan berbeda, dan menggabungkannya
+        jadi satu skor akan merusak keduanya. Yang pertama bertanya siapa
+        menagih lebih daripada yang didukung bukti. Yang kedua bertanya siapa
+        menagih terus menerus persis sebanyak yang masih diizinkan.
+        """
+        from .profil import peringkat_faskes, profil_faskes
+
+        rp = profil_faskes(episodes, self.skor(episodes)["selisih"],
+                           minimal_klaim=20)
+        ps = profil_faskes(episodes, self.posisi(episodes), minimal_klaim=20)
+        return {
+            "antrean_rupiah": [
+                {"faskes": f"{k[0]}:{k[1]}", "n": v["n"],
+                 "kelebihan_rp": v["kelebihan_rp"], "z": v["z"]}
+                for k, v in peringkat_faskes(rp, atas=atas)],
+            "daftar_pantau_posisi": [
+                {"faskes": f"{k[0]}:{k[1]}", "n": v["n"],
+                 "posisi_susut": v["rata_susut"],
+                 "posisi_sebaya": v["rata_sebaya"],
+                 "z": v["z"]}
+                for k, v in peringkat_faskes(ps, atas=atas)],
+            "catatan": (
+                "Daftar kedua bukan tuduhan. Ia menandai faskes yang pola "
+                "penagihannya menempel pada batas, yang bisa berarti "
+                "pengodean yang rapi dan bisa berarti sesuatu yang lain. "
+                "Yang dituntut darinya penjelasan, bukan pengembalian."),
+        }
+
     def jelaskan(self, episodes, i: int) -> dict:
         """Alasan penandaan, dalam bentuk yang bisa dibantah faskes.
 
