@@ -66,7 +66,9 @@ def laporan(episodes, n_peserta: int, tahun: int) -> dict:
             "sasaran": SASARAN_KUNJUNGAN_PER_ORANG_TAHUN,
             "selisih_relatif": round(
                 abs(kpot - SASARAN_KUNJUNGAN_PER_ORANG_TAHUN)
-                / SASARAN_KUNJUNGAN_PER_ORANG_TAHUN, 3),
+                / SASARAN_KUNJUNGAN_PER_ORANG_TAHUN,
+                3,
+            ),
         }
     }
     for k, sas in SASARAN_BAURAN.items():
@@ -77,12 +79,19 @@ def laporan(episodes, n_peserta: int, tahun: int) -> dict:
         }
     hasil["lulus"] = all(
         v["selisih_relatif"] <= TOLERANSI_RELATIF
-        for v in hasil.values() if isinstance(v, dict))
+        for v in hasil.values()
+        if isinstance(v, dict)
+    )
     return hasil
 
 
-def setel(n_peserta: int = 4000, tahun: int = 3, seed: int = 11,
-          putaran: int = 14, verbose: bool = True) -> dict:
+def setel(
+    n_peserta: int = 4000,
+    tahun: int = 3,
+    seed: int = 11,
+    putaran: int = 14,
+    verbose: bool = True,
+) -> dict:
     """Cari nilai kedua tombol dengan iterasi sederhana.
 
     Bukan pengoptimal canggih. Dua tombol, sasaran monoton, jadi pembaruan
@@ -94,22 +103,31 @@ def setel(n_peserta: int = 4000, tahun: int = 3, seed: int = 11,
     tilt = {"tilt_fktp": 1.0, "skala_inap": 1.0}
 
     for i in range(putaran):
-        g = Pembangkit(n_peserta=n_peserta, tahun=tahun, seed=seed,
-                       prevalensi_faskes_nakal=0.0,
-                       pengali_utilisasi=pengali, tilt_tempat=dict(tilt))
+        g = Pembangkit(
+            n_peserta=n_peserta,
+            tahun=tahun,
+            seed=seed,
+            prevalensi_faskes_nakal=0.0,
+            pengali_utilisasi=pengali,
+            tilt_tempat=dict(tilt),
+        )
         eps = g.jalankan()
         b = bauran(eps)
         kpot = kunjungan_per_orang_tahun(eps, n_peserta, tahun)
 
         if verbose:
-            print(f"  putaran {i:2d}  kunjungan/orang/tahun {kpot:.3f}  "
-                  f"FKTP {b['FKTP']:.3f}  RJTL {b['RJTL']:.3f}  "
-                  f"RITL {b['RITL']:.3f}")
+            print(
+                f"  putaran {i:2d}  kunjungan/orang/tahun {kpot:.3f}  "
+                f"FKTP {b['FKTP']:.3f}  RJTL {b['RJTL']:.3f}  "
+                f"RITL {b['RITL']:.3f}"
+            )
 
-        cukup_volume = abs(kpot - SASARAN_KUNJUNGAN_PER_ORANG_TAHUN) \
-            / SASARAN_KUNJUNGAN_PER_ORANG_TAHUN <= 0.06
-        cukup_bauran = all(
-            abs(b[k] - s) / s <= 0.10 for k, s in SASARAN_BAURAN.items())
+        cukup_volume = (
+            abs(kpot - SASARAN_KUNJUNGAN_PER_ORANG_TAHUN)
+            / SASARAN_KUNJUNGAN_PER_ORANG_TAHUN
+            <= 0.06
+        )
+        cukup_bauran = all(abs(b[k] - s) / s <= 0.10 for k, s in SASARAN_BAURAN.items())
         if cukup_volume and cukup_bauran:
             break
 
@@ -120,9 +138,9 @@ def setel(n_peserta: int = 4000, tahun: int = 3, seed: int = 11,
 
         # perbarui tombol bauran. Dua tombol, dua sasaran.
         if b["FKTP"] > 1e-6:
-            tilt["tilt_fktp"] *= (
-                (SASARAN_BAURAN["FKTP"] / b["FKTP"]) ** 0.75
-                * ((1 - SASARAN_BAURAN["FKTP"]) / max(1 - b["FKTP"], 1e-6)) ** -0.75)
+            tilt["tilt_fktp"] *= (SASARAN_BAURAN["FKTP"] / b["FKTP"]) ** 0.75 * (
+                (1 - SASARAN_BAURAN["FKTP"]) / max(1 - b["FKTP"], 1e-6)
+            ) ** -0.75
         if b["RITL"] > 1e-6:
             tilt["skala_inap"] *= (SASARAN_BAURAN["RITL"] / b["RITL"]) ** 0.65
         else:
@@ -134,6 +152,8 @@ def setel(n_peserta: int = 4000, tahun: int = 3, seed: int = 11,
         tilt["tilt_fktp"] = float(np.clip(tilt["tilt_fktp"], 0.25, 4.0))
         tilt["skala_inap"] = float(np.clip(tilt["skala_inap"], 0.01, 8.0))
 
-    return {"pengali_utilisasi": round(pengali, 4),
-            "tilt_tempat": {k: round(v, 4) for k, v in tilt.items()},
-            "hasil": laporan(eps, n_peserta, tahun)}
+    return {
+        "pengali_utilisasi": round(pengali, 4),
+        "tilt_tempat": {k: round(v, 4) for k, v in tilt.items()},
+        "hasil": laporan(eps, n_peserta, tahun),
+    }

@@ -34,8 +34,8 @@ EVIDENCE_FIELDS = ["DXP", "DXS", "PRC", "OBT", "LAB", "BHP"]
 # --- token khusus -----------------------------------------------------------
 
 PAD = "[PAD]"
-EPS = "[EPS]"      # awal episode
-MASK = "[TUTUP]"   # posisi yang sengaja ditutup saat pralatih
+EPS = "[EPS]"  # awal episode
+MASK = "[TUTUP]"  # posisi yang sengaja ditutup saat pralatih
 MISS = "[HILANG]"  # bidang yang memang tidak ada datanya
 UNK = "[UNK]"
 SPECIALS = [PAD, EPS, MASK, MISS, UNK]
@@ -66,10 +66,10 @@ MAX_SEQ = 64
 class Segmen:
     """Segmen kepesertaan JKN."""
 
-    PBI = 0        # penerima bantuan iuran
-    PPU = 1        # pekerja penerima upah
-    PBPU = 2       # pekerja bukan penerima upah, peserta mandiri
-    BP = 3         # bukan pekerja
+    PBI = 0  # penerima bantuan iuran
+    PPU = 1  # pekerja penerima upah
+    PBPU = 2  # pekerja bukan penerima upah, peserta mandiri
+    BP = 3  # bukan pekerja
 
     NAMES = ("PBI", "PPU", "PBPU", "BP")
 

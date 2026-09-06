@@ -37,13 +37,44 @@ PORSI_NAKAL = np.array([0.636, 0.273, 0.091])  # oportunis, sistematis, ekstrem
 # memenuhi syarat. Angka angka ini asumsi, dan analisis kepekaan dijalankan
 # pada tiga tingkat prevalensi.
 INTENSITAS = {
-    OPORTUNIS: dict(M04=0.30, M12=0.10, M13=0.08, M07=0.12, M17=0.06,
-                    M20=0.08, M09=0.06, M11=0.02, M08=0.05, M03=0.05),
-    SISTEMATIS: dict(M04=0.62, M12=0.24, M13=0.22, M07=0.30, M17=0.20,
-                     M20=0.22, M09=0.18, M11=0.06, M08=0.16, M03=0.16),
-    EKSTREM: dict(M04=0.80, M12=0.34, M13=0.32, M07=0.48, M17=0.45,
-                  M20=0.34, M09=0.28, M11=0.14, M08=0.26, M03=0.26,
-                  M06=0.35, M05=0.30),
+    OPORTUNIS: dict(
+        M04=0.30,
+        M12=0.10,
+        M13=0.08,
+        M07=0.12,
+        M17=0.06,
+        M20=0.08,
+        M09=0.06,
+        M11=0.02,
+        M08=0.05,
+        M03=0.05,
+    ),
+    SISTEMATIS: dict(
+        M04=0.62,
+        M12=0.24,
+        M13=0.22,
+        M07=0.30,
+        M17=0.20,
+        M20=0.22,
+        M09=0.18,
+        M11=0.06,
+        M08=0.16,
+        M03=0.16,
+    ),
+    EKSTREM: dict(
+        M04=0.80,
+        M12=0.34,
+        M13=0.32,
+        M07=0.48,
+        M17=0.45,
+        M20=0.34,
+        M09=0.28,
+        M11=0.14,
+        M08=0.26,
+        M03=0.26,
+        M06=0.35,
+        M05=0.30,
+    ),
 }
 
 # Diagnosis sekunder berat yang paling sering dipakai menaikkan keparahan.
@@ -75,18 +106,20 @@ class Kebijakan:
         if jenis:
             g, aw, ak = self.ganti_rs[idx], self.awal_rs[idx], self.rs[idx]
         else:
-            g, aw, ak = (self.ganti_fktp[idx], self.awal_fktp[idx],
-                         self.fktp[idx])
+            g, aw, ak = (self.ganti_fktp[idx], self.awal_fktp[idx], self.fktp[idx])
         if g >= 0 and hari < g:
             return int(aw)
         return int(ak)
 
 
-def tetapkan_kebijakan(jaringan, rng: np.random.Generator,
-                       prevalensi: float = 0.22,
-                       minimal_per_jenis: int = 3,
-                       porsi_berubah: float = 0.0,
-                       total_hari: int = 1095) -> Kebijakan:
+def tetapkan_kebijakan(
+    jaringan,
+    rng: np.random.Generator,
+    prevalensi: float = 0.22,
+    minimal_per_jenis: int = 3,
+    porsi_berubah: float = 0.0,
+    total_hari: int = 1095,
+) -> Kebijakan:
     """Tetapkan kebijakan per faskes, berstrata.
 
     Undian bebas menghasilkan masalah pada jaringan kecil. Dengan dua puluh
@@ -103,7 +136,8 @@ def tetapkan_kebijakan(jaringan, rng: np.random.Generator,
     for arr, n in ((keb.rs, jaringan.n_fkrtl), (keb.fktp, jaringan.n_fktp)):
         target = np.maximum(
             np.round(n * prevalensi * PORSI_NAKAL).astype(int),
-            min(minimal_per_jenis, max(n // 8, 1)))
+            min(minimal_per_jenis, max(n // 8, 1)),
+        )
         total = int(target.sum())
         if total > n:
             target = np.floor(target * n / total).astype(int)
@@ -111,25 +145,27 @@ def tetapkan_kebijakan(jaringan, rng: np.random.Generator,
         pilih = rng.permutation(n)[:total]
         ofs = 0
         for jenis, jml in zip((OPORTUNIS, SISTEMATIS, EKSTREM), target):
-            arr[pilih[ofs:ofs + jml]] = jenis
+            arr[pilih[ofs : ofs + jml]] = jenis
             ofs += jml
     # Sebagian faskes dibuat berubah perilaku di tengah rentang waktu, dari
     # jujur menjadi nakal. Tanpa ini kepala K6 tidak bisa diuji, karena tidak
     # ada satu pun titik perubahan yang benar benar terjadi untuk ditemukan.
     if porsi_berubah > 0:
-        for arr, ganti, awal, n in ((keb.rs, keb.ganti_rs, keb.awal_rs,
-                                     jaringan.n_fkrtl),
-                                    (keb.fktp, keb.ganti_fktp, keb.awal_fktp,
-                                     jaringan.n_fktp)):
+        for arr, ganti, awal, n in (
+            (keb.rs, keb.ganti_rs, keb.awal_rs, jaringan.n_fkrtl),
+            (keb.fktp, keb.ganti_fktp, keb.awal_fktp, jaringan.n_fktp),
+        ):
             nakal = np.flatnonzero(arr > 0)
             if not len(nakal):
                 continue
             pilih = rng.permutation(nakal)[
-                : max(1, int(round(len(nakal) * porsi_berubah)))]
+                : max(1, int(round(len(nakal) * porsi_berubah)))
+            ]
             for i in pilih:
                 awal[i] = JUJUR
-                ganti[i] = int(rng.integers(int(0.25 * total_hari),
-                                            int(0.75 * total_hari)))
+                ganti[i] = int(
+                    rng.integers(int(0.25 * total_hari), int(0.75 * total_hari))
+                )
 
     # sebagian FKTP nakal punya rumah sakit favorit
     for i in np.flatnonzero(keb.fktp > 0):
@@ -145,6 +181,7 @@ def _peluang(keb_kode: int, modus: str) -> float:
 
 
 # --- injeksi per episode ----------------------------------------------------
+
 
 def terapkan(rec: dict, keb: Kebijakan, jaringan, rng: np.random.Generator) -> None:
     """Ubah satu klaim menurut kebijakan faskesnya.
@@ -177,8 +214,9 @@ def terapkan(rec: dict, keb: Kebijakan, jaringan, rng: np.random.Generator) -> N
         kandidat = [c for c in KODE_PENAIK if c not in dxs]
         if kandidat:
             n = 1 if rng.random() < 0.7 else 2
-            tambah = list(rng.choice(kandidat, size=min(n, len(kandidat)),
-                                     replace=False))
+            tambah = list(
+                rng.choice(kandidat, size=min(n, len(kandidat)), replace=False)
+            )
             dxs.extend(tambah)
             modus.append("M04")
             # varian yang ikut memalsukan bukti
@@ -196,12 +234,11 @@ def terapkan(rec: dict, keb: Kebijakan, jaringan, rng: np.random.Generator) -> N
                 modus.append("M04b")
 
     # --- M12 perpanjangan lama rawat --------------------------------------
-    if rec["rawat_inap"] and rng.random() < _peluang(kode, "M12"):
-        # perpanjang sampai melewati ambang sepuluh hari, yang pada aturan
-        # keparahan kami memindahkan kelompok bila ada satu diagnosis berat
-        if los < 10:
-            los = int(rng.integers(10, 14))
-            modus.append("M12")
+    # perpanjang sampai melewati ambang sepuluh hari, yang pada aturan
+    # keparahan kami memindahkan kelompok bila ada satu diagnosis berat
+    if rec["rawat_inap"] and los < 10 and rng.random() < _peluang(kode, "M12"):
+        los = int(rng.integers(10, 14))
+        modus.append("M12")
 
     # --- M13 manipulasi kelas perawatan ------------------------------------
     if rec["rawat_inap"] and kelas_rawat > 1 and rng.random() < _peluang(kode, "M13"):
@@ -260,8 +297,9 @@ def terapkan(rec: dict, keb: Kebijakan, jaringan, rng: np.random.Generator) -> N
 
     # tagihan bahan habis pakai, di luar paket
     tagih_bhp_j = sum(HARGA_ACUAN.get(k, 0) * n for k, n in rec["bhp_j"])
-    tagih_bhp = int(sum(HARGA_ACUAN.get(k, 0) * n for k, n in bhp)
-                    * rec["pengali_harga"])
+    tagih_bhp = int(
+        sum(HARGA_ACUAN.get(k, 0) * n for k, n in bhp) * rec["pengali_harga"]
+    )
     selisih_bhp = tagih_bhp - tagih_bhp_j
 
     # Jaring pengaman. Kalau seluruh perubahan ternyata tidak menghasilkan
@@ -272,21 +310,30 @@ def terapkan(rec: dict, keb: Kebijakan, jaringan, rng: np.random.Generator) -> N
         modus = []
 
     rec.update(
-        dxs=dxs, prc=prc, obt=obt,
+        dxs=dxs,
+        prc=prc,
+        obt=obt,
         lab=[(k, float(v)) for k, v in lab],
         bhp=[(k, int(n)) for k, n in bhp],
-        los=los, kelas_rawat=kelas_rawat,
-        cbg=kel.kode, keparahan=kel.keparahan, tarif=trf,
-        tagih_bhp=tagih_bhp, tagih_bhp_j=tagih_bhp_j,
-        kebijakan=kode, modus=modus,
+        los=los,
+        kelas_rawat=kelas_rawat,
+        cbg=kel.kode,
+        keparahan=kel.keparahan,
+        tarif=trf,
+        tagih_bhp=tagih_bhp,
+        tagih_bhp_j=tagih_bhp_j,
+        kebijakan=kode,
+        modus=modus,
         selisih_rp=max(selisih_total, 0),
     )
 
 
 # --- injeksi lintas episode -------------------------------------------------
 
-def pasca(episodes: list[dict], keb: Kebijakan, jaringan,
-          rng: np.random.Generator) -> list[dict]:
+
+def pasca(
+    episodes: list[dict], keb: Kebijakan, jaringan, rng: np.random.Generator
+) -> list[dict]:
     """Modus yang hanya bisa dilakukan dengan melihat lebih dari satu klaim.
 
     M11 penagihan berulang, M08 dan M16 pemecahan episode, M05 penjiplakan,
@@ -300,8 +347,7 @@ def pasca(episodes: list[dict], keb: Kebijakan, jaringan,
     next_id = max(r["eps_id"] for r in episodes) + 1 if episodes else 0
 
     for r in episodes:
-        kode = int(keb.rs[r["faskes"]] if r["f_jenis"]
-                   else keb.fktp[r["faskes"]])
+        kode = int(keb.rs[r["faskes"]] if r["f_jenis"] else keb.fktp[r["faskes"]])
         if kode == JUJUR:
             continue
 
@@ -325,15 +371,16 @@ def pasca(episodes: list[dict], keb: Kebijakan, jaringan,
             los_b = max(1, r["los"] - los_a)
             prc = list(r["prc"])
             prc_a = prc[: max(1, len(prc) // 2)] if prc else []
-            prc_b = prc[len(prc_a):]
+            prc_b = prc[len(prc_a) :]
 
             a = dict(r)
             a["los"] = los_a
             a["prc"] = prc_a
             kel_a = kelompokkan(a["dxp"], a["dxs"], prc_a, los_a, True)
             a["cbg"], a["keparahan"] = kel_a.kode, kel_a.keparahan
-            a["tarif"] = tarif(kel_a, a["dxp"], prc_a, a["kelas_rawat"],
-                               a["f_kelas"], a["f_reg"])
+            a["tarif"] = tarif(
+                kel_a, a["dxp"], prc_a, a["kelas_rawat"], a["f_kelas"], a["f_reg"]
+            )
 
             b = dict(r)
             b["eps_id"] = next_id
@@ -343,8 +390,9 @@ def pasca(episodes: list[dict], keb: Kebijakan, jaringan,
             b["prc"] = prc_b
             kel_b = kelompokkan(b["dxp"], b["dxs"], prc_b, los_b, True)
             b["cbg"], b["keparahan"] = kel_b.kode, kel_b.keparahan
-            b["tarif"] = tarif(kel_b, b["dxp"], prc_b, b["kelas_rawat"],
-                               b["f_kelas"], b["f_reg"])
+            b["tarif"] = tarif(
+                kel_b, b["dxp"], prc_b, b["kelas_rawat"], b["f_kelas"], b["f_reg"]
+            )
             b["tagih_bhp"] = 0
 
             selisih = a["tarif"] + b["tarif"] - r["tarif"]
@@ -380,11 +428,11 @@ def pasca(episodes: list[dict], keb: Kebijakan, jaringan,
             t["obt"] = list(sumber["obt"])
             t["lab"] = list(sumber["lab"])
             t["los"] = sumber["los"]
-            kel = kelompokkan(t["dxp"], t["dxs"], t["prc"], t["los"],
-                              t["rawat_inap"])
+            kel = kelompokkan(t["dxp"], t["dxs"], t["prc"], t["los"], t["rawat_inap"])
             t["cbg"], t["keparahan"] = kel.kode, kel.keparahan
-            t["tarif"] = tarif(kel, t["dxp"], t["prc"], t["kelas_rawat"],
-                               t["f_kelas"], t["f_reg"])
+            t["tarif"] = tarif(
+                kel, t["dxp"], t["prc"], t["kelas_rawat"], t["f_kelas"], t["f_reg"]
+            )
             t["modus"] = list(t["modus"]) + ["M05"]
             t["selisih_rp"] = t["selisih_rp"] + (t["tarif"] - asal_tarif)
 

@@ -1,9 +1,23 @@
+# lingkungan
 .venv/
 __pycache__/
 *.pyc
-data/raw/*.csv
+.python-version.local
+
+# data pihak ketiga, diunduh lewat scripts/unduh_data.py
+data/raw/
+
+# keluaran biner yang bisa dibangkitkan ulang
+runs/*.pkl
 runs/*.pt
 runs/*.log
-install_torch.log
+*.log
+
+# rahasia
 rahasia/
-artefak/
+*.env
+
+# perkakas
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/

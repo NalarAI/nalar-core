@@ -1,0 +1,73 @@
+[project]
+name = "nalar"
+version = "0.1.0"
+description = "Deteksi ketidaksesuaian klaim JKN tanpa label kecurangan"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Apache-2.0" }
+authors = [{ name = "zidanristek" }]
+keywords = ["jkn", "bpjs", "ina-cbg", "payment-integrity", "conformal-prediction"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Healthcare Industry",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+  "numpy>=2.0",
+  "scikit-learn>=1.5",
+]
+
+[project.optional-dependencies]
+# Hanya diperlukan untuk menjalankan ulang percobaan transformer, yang sudah
+# dinyatakan kalah pada percobaan kedua belas. Model yang dikirim tidak
+# memakainya.
+transformer = ["torch>=2.4"]
+# Untuk menyiapkan data acuan dari sumber aslinya.
+data = ["pymupdf>=1.24", "playwright>=1.47"]
+dev = ["ruff>=0.6", "pytest>=8.0"]
+
+[project.urls]
+Repository = "https://github.com/NalarAI/nalar-core"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/nalar"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+src = ["src", "tests", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "C4", "SIM"]
+ignore = [
+  # Nama variabel dan fungsi memakai bahasa Indonesia dengan sengaja, karena
+  # pembacanya verifikator dan analis kebijakan, bukan hanya insinyur.
+  "N",
+  # dict(a=1) dipakai dengan sengaja untuk menyusun rekaman, karena bentuk itu
+  # lebih terbaca daripada kurung kurawal ketika kuncinya banyak dan pendek.
+  "C408",
+  # zip tanpa strict. Panjang kedua sisi dijamin sama oleh pembangkitnya, dan
+  # memaksa strict di seluruh berkas akan menambah kebisingan tanpa menambah
+  # keamanan.
+  "B905",
+  # Peubah pengulangan yang tidak dipakai. Sebagian sengaja diberi nama supaya
+  # maksudnya terbaca, walaupun nilainya tidak dipakai.
+  "B007",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/*" = ["E402"]
+# train.py memanggil torch.set_num_threads sebelum modul lain diimpor, dan
+# urutannya memang harus begitu supaya batas utas terpasang sebelum apa pun
+# menyentuh torch. Mesin pengembangan hanya punya memori enam belas gigabyte.
+"src/nalar/train.py" = ["E402"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

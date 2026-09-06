@@ -66,12 +66,42 @@ TIPE_RJ_BUKAN_PROSEDUR = 5
 # kelompok, bukan lagi untuk mengalikan tarif, karena kelompok prosedur punya
 # tarifnya sendiri di peraturan.
 PROSEDUR_BESAR = {
-    "36.06", "01.24", "81.54", "79.35", "78.55", "79.32", "74.1", "68.4",
-    "68.29", "51.23", "51.22", "47.01", "47.09", "13.41", "13.59", "12.64",
-    "60.29", "45.73", "85.41", "56.0", "96.71", "41.31", "92.24", "99.25",
+    "36.06",
+    "01.24",
+    "81.54",
+    "79.35",
+    "78.55",
+    "79.32",
+    "74.1",
+    "68.4",
+    "68.29",
+    "51.23",
+    "51.22",
+    "47.01",
+    "47.09",
+    "13.41",
+    "13.59",
+    "12.64",
+    "60.29",
+    "45.73",
+    "85.41",
+    "56.0",
+    "96.71",
+    "41.31",
+    "92.24",
+    "99.25",
 }
-PROSEDUR_SIGNIFIKAN_RJ = {"39.95", "99.25", "92.24", "99.04", "99.06",
-                          "45.13", "45.23", "13.41", "95.02"}
+PROSEDUR_SIGNIFIKAN_RJ = {
+    "39.95",
+    "99.25",
+    "92.24",
+    "99.04",
+    "99.06",
+    "45.13",
+    "45.23",
+    "13.41",
+    "95.02",
+}
 
 _hitung_jalur = {"resmi": 0, "cadangan": 0}
 
@@ -80,7 +110,8 @@ def statistik_jalur() -> dict:
     """Berapa kali tarif diambil dari peraturan, berapa kali dari cadangan."""
     total = sum(_hitung_jalur.values()) or 1
     return dict(_hitung_jalur) | {
-        "porsi_resmi": round(_hitung_jalur["resmi"] / total, 4)}
+        "porsi_resmi": round(_hitung_jalur["resmi"] / total, 4)
+    }
 
 
 @dataclass(frozen=True)
@@ -104,10 +135,10 @@ def _berat(icd: str) -> bool:
 def hitung_keparahan(dxs: list[str], los: int, rawat_inap: bool) -> int:
     """Tingkat keparahan dari diagnosis sekunder.
 
-      III  dua atau lebih diagnosis sekunder berat,
-           atau satu berat dengan lama rawat panjang
-      II   satu diagnosis sekunder berat, atau tiga atau lebih ringan
-      I    selain itu
+    III  dua atau lebih diagnosis sekunder berat,
+         atau satu berat dengan lama rawat panjang
+    II   satu diagnosis sekunder berat, atau tiga atau lebih ringan
+    I    selain itu
     """
     if not rawat_inap:
         return 0
@@ -120,8 +151,9 @@ def hitung_keparahan(dxs: list[str], los: int, rawat_inap: bool) -> int:
     return 1
 
 
-def kelompokkan(dxp: str, dxs: list[str], prc: list[str], los: int,
-                rawat_inap: bool) -> Kelompok:
+def kelompokkan(
+    dxp: str, dxs: list[str], prc: list[str], los: int, rawat_inap: bool
+) -> Kelompok:
     """Petakan satu episode ke satu kelompok tarif resmi."""
     from .peta_cbg import kode_cbg
 
@@ -131,13 +163,20 @@ def kelompokkan(dxp: str, dxs: list[str], prc: list[str], los: int,
         # kondisi di luar katalog, dipetakan ke kelompok faktor lain
         kode = f"Z-4-99-{'I' if rawat_inap else '0'}"
     bagian = kode.split("-")
-    return Kelompok(kode, bagian[0], int(bagian[1]), int(bagian[2]),
-                    keparahan, rawat_inap)
+    return Kelompok(
+        kode, bagian[0], int(bagian[1]), int(bagian[2]), keparahan, rawat_inap
+    )
 
 
-def tarif(kel: Kelompok, dxp: str, prc: list[str], kelas_rawat: int,
-          kelas_rs: str, regional: int,
-          kepemilikan: str = "PEMERINTAH") -> int:
+def tarif(
+    kel: Kelompok,
+    dxp: str,
+    prc: list[str],
+    kelas_rawat: int,
+    kelas_rs: str,
+    regional: int,
+    kepemilikan: str = "PEMERINTAH",
+) -> int:
     """Tarif paket dari tabel resmi, dalam rupiah.
 
     regional pada peraturan bernomor 1 sampai 5. Pembangkit memakai 0 sampai 4,
@@ -146,8 +185,7 @@ def tarif(kel: Kelompok, dxp: str, prc: list[str], kelas_rawat: int,
     from .tarif_resmi import tarif_resmi, tersedia
 
     if tersedia():
-        v = tarif_resmi(kel.kode, kelas_rawat, kelas_rs,
-                        int(regional) + 1, kepemilikan)
+        v = tarif_resmi(kel.kode, kelas_rawat, kelas_rs, int(regional) + 1, kepemilikan)
         if v:
             _hitung_jalur["resmi"] += 1
             return int(v)

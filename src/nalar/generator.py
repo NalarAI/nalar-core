@@ -21,27 +21,28 @@ from __future__ import annotations
 
 import numpy as np
 
-from . import katalog as K
 from . import fraud as F
+from . import katalog as K
 from .tarif import kelompokkan, tarif
 from .wilayah import BOBOT_PROV, IS_DTPK, N_PROV, REGIONAL_PROV, Jaringan
 
 # porsi segmen kepesertaan. Disusun mendekati komposisi JKN, dengan PBI
 # sebagai segmen terbesar.
-SEBARAN_SEGMEN = np.array([0.52, 0.27, 0.14, 0.07])   # PBI, PPU, PBPU, BP
+SEBARAN_SEGMEN = np.array([0.52, 0.27, 0.14, 0.07])  # PBI, PPU, PBPU, BP
 
 # hak kelas rawat menurut segmen
 HAK_KELAS_SEGMEN = {
-    0: np.array([0.00, 0.02, 0.98]),   # PBI hampir seluruhnya kelas 3
-    1: np.array([0.22, 0.42, 0.36]),   # PPU
-    2: np.array([0.18, 0.32, 0.50]),   # PBPU
-    3: np.array([0.20, 0.36, 0.44]),   # BP
+    0: np.array([0.00, 0.02, 0.98]),  # PBI hampir seluruhnya kelas 3
+    1: np.array([0.22, 0.42, 0.36]),  # PPU
+    2: np.array([0.18, 0.32, 0.50]),  # PBPU
+    3: np.array([0.20, 0.36, 0.44]),  # BP
 }
 
 # sebaran umur penduduk Indonesia yang masih muda, dipakai sebagai bobot
 # untuk sepuluh pita umur
-SEBARAN_UMUR = np.array([0.085, 0.165, 0.170, 0.165, 0.140,
-                         0.115, 0.085, 0.048, 0.021, 0.006])
+SEBARAN_UMUR = np.array(
+    [0.085, 0.165, 0.170, 0.165, 0.140, 0.115, 0.085, 0.048, 0.021, 0.006]
+)
 
 HARI_PER_TAHUN = 365
 
@@ -55,26 +56,37 @@ TILT_TEMPAT = {"tilt_fktp": 4.0, "skala_inap": 0.0746}
 
 
 class Pembangkit:
-    def __init__(self, n_peserta: int = 40_000, tahun: int = 3,
-                 seed: int = 7, prevalensi_faskes_nakal: float = 0.22,
-                 pengali_utilisasi: float | None = None,
-                 tilt_tempat: dict | None = None,
-                 n_fktp: int | None = None, n_fkrtl: int | None = None,
-                 porsi_faskes_berubah: float = 0.0):
+    def __init__(
+        self,
+        n_peserta: int = 40_000,
+        tahun: int = 3,
+        seed: int = 7,
+        prevalensi_faskes_nakal: float = 0.22,
+        pengali_utilisasi: float | None = None,
+        tilt_tempat: dict | None = None,
+        n_fktp: int | None = None,
+        n_fkrtl: int | None = None,
+        porsi_faskes_berubah: float = 0.0,
+    ):
         self.rng = np.random.default_rng(seed)
         self.n_peserta = n_peserta
         self.tahun = tahun
         # dua tombol penyetel, nilainya dari modul kalibrasi
-        self.pengali_utilisasi = (PENGALI_UTILISASI if pengali_utilisasi is None
-                                  else float(pengali_utilisasi))
+        self.pengali_utilisasi = (
+            PENGALI_UTILISASI if pengali_utilisasi is None else float(pengali_utilisasi)
+        )
         t = TILT_TEMPAT if tilt_tempat is None else tilt_tempat
         self.tilt_fktp = float(t.get("tilt_fktp", 1.0))
         self.skala_inap = float(t.get("skala_inap", 1.0))
         self.n_hari = tahun * HARI_PER_TAHUN
         self.jaringan = Jaringan(n_peserta, self.rng, n_fktp, n_fkrtl)
         self.kebijakan = F.tetapkan_kebijakan(
-            self.jaringan, self.rng, prevalensi_faskes_nakal,
-            porsi_berubah=porsi_faskes_berubah, total_hari=self.n_hari)
+            self.jaringan,
+            self.rng,
+            prevalensi_faskes_nakal,
+            porsi_berubah=porsi_faskes_berubah,
+            total_hari=self.n_hari,
+        )
         self._siapkan_populasi()
         self._siapkan_tabel_kondisi()
 
@@ -84,19 +96,19 @@ class Pembangkit:
         rng, n = self.rng, self.n_peserta
         self.prov = rng.choice(N_PROV, size=n, p=BOBOT_PROV)
         self.umur_pita = rng.choice(K.N_AGE, size=n, p=SEBARAN_UMUR)
-        self.sex = rng.integers(0, 2, size=n)          # 0 laki laki, 1 perempuan
+        self.sex = rng.integers(0, 2, size=n)  # 0 laki laki, 1 perempuan
         self.segmen = rng.choice(4, size=n, p=SEBARAN_SEGMEN)
         self.hak_kelas = np.empty(n, dtype=np.int64)
         for s in range(4):
             m = self.segmen == s
             if m.any():
                 self.hak_kelas[m] = rng.choice(
-                    [1, 2, 3], size=int(m.sum()), p=HAK_KELAS_SEGMEN[s])
+                    [1, 2, 3], size=int(m.sum()), p=HAK_KELAS_SEGMEN[s]
+                )
         self.dtpk = IS_DTPK[self.prov]
         self.regional = REGIONAL_PROV[self.prov]
         # FKTP tempat peserta terdaftar
-        self.fktp = np.array([self.jaringan.pilih_fktp(int(p), rng)
-                              for p in self.prov])
+        self.fktp = np.array([self.jaringan.pilih_fktp(int(p), rng) for p in self.prov])
 
     # -- tabel kondisi ------------------------------------------------------
 
@@ -135,8 +147,9 @@ class Pembangkit:
 
     # -- tahap 5: isi klinis satu episode -----------------------------------
 
-    def _isi_klinis(self, kond: dict, umur: int, punya_lab: bool,
-                    rawat_inap: bool, kelas_rs: str):
+    def _isi_klinis(
+        self, kond: dict, umur: int, punya_lab: bool, rawat_inap: bool, kelas_rs: str
+    ):
         rng = self.rng
 
         # prosedur
@@ -189,7 +202,7 @@ class Pembangkit:
                 if kk and rng.random() < 0.55:
                     obt.extend(o for o in kk["bukti_obt"] if o not in obt)
         # buang pemeriksaan ganda, ambil yang terakhir
-        lab = list({k: v for k, v in lab}.items())
+        lab = list(dict(lab).items())
 
         # bahan habis pakai, mengikuti prosedur
         bhp = self._bhp_dari_prosedur(prc, rawat_inap, los)
@@ -289,7 +302,8 @@ class Pembangkit:
                         # bukan turunan insidens. Tombol utilisasi tidak boleh
                         # menyentuhnya, kalau tidak ia terhitung dua kali.
                         dasar = K.KUNJUNGAN_KRONIS_PER_TAHUN.get(
-                            kond["icd"], K.KUNJUNGAN_KRONIS_BAWAAN)
+                            kond["icd"], K.KUNJUNGAN_KRONIS_BAWAAN
+                        )
                         n_kunjungan = max(1, rng.poisson(dasar))
                         n_kunjungan = min(n_kunjungan, 130)
                     else:
@@ -298,8 +312,17 @@ class Pembangkit:
                     for _ in range(int(n_kunjungan)):
                         hari = th * HARI_PER_TAHUN + int(rng.integers(HARI_PER_TAHUN))
                         rec = self._satu_episode(
-                            eps_id, pid, kond, umur, sex, prov, hari,
-                            hari_terakhir, len(kronis_aktif), n_eps_tahun_ini)
+                            eps_id,
+                            pid,
+                            kond,
+                            umur,
+                            sex,
+                            prov,
+                            hari,
+                            hari_terakhir,
+                            len(kronis_aktif),
+                            n_eps_tahun_ini,
+                        )
                         if rec is None:
                             continue
                         keluar.append(rec)
@@ -313,8 +336,9 @@ class Pembangkit:
         keluar = F.pasca(keluar, self.kebijakan, J, rng)
         return keluar
 
-    def _satu_episode(self, eps_id, pid, kond, umur, sex, prov, hari,
-                      hari_terakhir, n_kronis, n_eps):
+    def _satu_episode(
+        self, eps_id, pid, kond, umur, sex, prov, hari, hari_terakhir, n_kronis, n_eps
+    ):
         rng = self.rng
         J = self.jaringan
 
@@ -377,7 +401,8 @@ class Pembangkit:
                 rujuk, perujuk = 1, int(self.fktp[pid])
 
         dxs, prc, obt, lab, bhp, los = self._isi_klinis(
-            kond, umur, punya_lab, rawat_inap, kelas_rs)
+            kond, umur, punya_lab, rawat_inap, kelas_rs
+        )
 
         # kelas rawat: umumnya sesuai hak, kadang naik karena kelas penuh
         hak = int(self.hak_kelas[pid])
@@ -390,24 +415,44 @@ class Pembangkit:
         tarif_j = tarif(kel_j, kond["icd"], prc_j, kelas_rawat, kelas_rs, regional)
 
         rec = dict(
-            eps_id=eps_id, peserta_id=pid, hari=hari, d_prev=-1,
-            umur=umur, sex=sex, segmen=int(self.segmen[pid]),
-            hak_kelas=hak, prov=prov,
-            n_kronis=min(n_kronis, 5), n_eps=min(n_eps, 5),
-            faskes=faskes, f_jenis=jenis, f_kelas=kelas_rs,
+            eps_id=eps_id,
+            peserta_id=pid,
+            hari=hari,
+            d_prev=-1,
+            umur=umur,
+            sex=sex,
+            segmen=int(self.segmen[pid]),
+            hak_kelas=hak,
+            prov=prov,
+            n_kronis=min(n_kronis, 5),
+            n_eps=min(n_eps, 5),
+            faskes=faskes,
+            f_jenis=jenis,
+            f_kelas=kelas_rs,
             f_milik=int(J.rs_milik[faskes]) if jenis else 0,
-            f_tt=f_tt, f_reg=regional,
+            f_tt=f_tt,
+            f_reg=regional,
             f_dtpk=int(J.rs_dtpk[faskes]) if jenis else int(J.fktp_dtpk[faskes]),
-            dpjp=dpjp, punya_lab=punya_lab,
-            bulan=(hari % HARI_PER_TAHUN) // 30, dow=hari % 7,
+            dpjp=dpjp,
+            punya_lab=punya_lab,
+            bulan=(hari % HARI_PER_TAHUN) // 30,
+            dow=hari % 7,
             libur=1 if hari % 7 in (5, 6) else 0,
-            rujuk=rujuk, perujuk=perujuk,
+            rujuk=rujuk,
+            perujuk=perujuk,
             rawat_inap=rawat_inap,
             # versi jujur
-            dxp=kond["icd"], dxs_j=dxs_j, prc_j=prc_j, obt_j=obt,
-            lab_j=lab, bhp_j=bhp, los_j=los,
-            kelas_rawat_j=kelas_rawat, cbg_j=kel_j.kode,
-            keparahan_j=kel_j.keparahan, tarif_j=tarif_j,
+            dxp=kond["icd"],
+            dxs_j=dxs_j,
+            prc_j=prc_j,
+            obt_j=obt,
+            lab_j=lab,
+            bhp_j=bhp,
+            los_j=los,
+            kelas_rawat_j=kelas_rawat,
+            cbg_j=kel_j.kode,
+            keparahan_j=kel_j.keparahan,
+            tarif_j=tarif_j,
         )
 
         # tahap 7: kebijakan faskes dan injeksi

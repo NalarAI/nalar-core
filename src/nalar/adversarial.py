@@ -25,7 +25,6 @@ import copy
 
 import numpy as np
 
-from . import katalog as K
 from .fraud import KODE_PENAIK
 from .tarif import hitung_keparahan, kelompokkan, tarif
 
@@ -36,8 +35,9 @@ def _terapkan_upcode(r: dict, tambah: list[str]) -> dict:
     d["dxs"] = list(r["dxs"]) + [c for c in tambah if c not in r["dxs"]]
     kel = kelompokkan(d["dxp"], d["dxs"], d["prc"], d["los"], d["rawat_inap"])
     d["cbg"], d["keparahan"] = kel.kode, kel.keparahan
-    d["tarif"] = tarif(kel, d["dxp"], d["prc"], d["kelas_rawat"],
-                       d["f_kelas"], d["f_reg"])
+    d["tarif"] = tarif(
+        kel, d["dxp"], d["prc"], d["kelas_rawat"], d["f_kelas"], d["f_reg"]
+    )
     return d
 
 
@@ -59,8 +59,9 @@ def kandidat_gerakan(r: dict, maks: int = 6) -> list[list[str]]:
     return gerak
 
 
-def jalankan(episodes, idx, penskor, ambang, rng, jenis: str = "hati_hati",
-             maks_klaim: int = 400):
+def jalankan(
+    episodes, idx, penskor, ambang, rng, jenis: str = "hati_hati", maks_klaim: int = 400
+):
     """Jalankan satu jenis pelaku dan ukur berapa yang bisa ia ambil.
 
     penskor  fungsi yang menerima daftar klaim dan mengembalikan skornya
@@ -85,8 +86,7 @@ def jalankan(episodes, idx, penskor, ambang, rng, jenis: str = "hati_hati",
         if not gerak:
             continue
         varian = [_terapkan_upcode(r, g) for g in gerak]
-        untung = np.array([v["tarif"] - r["tarif"] for v in varian],
-                          dtype=np.float64)
+        untung = np.array([v["tarif"] - r["tarif"] for v in varian], dtype=np.float64)
         if (untung <= 0).all():
             continue
         dicoba += 1
@@ -124,8 +124,10 @@ def jalankan(episodes, idx, penskor, ambang, rng, jenis: str = "hati_hati",
         "maks_per_klaim_rp": round(max(per_klaim)) if per_klaim else 0,
         "porsi_tertangkap": round(tertangkap / n, 4) if n else None,
         "diambil_tanpa_tertangkap_rp": round(
-            sum(p for p, s in zip(per_klaim, [0] * n)) if False else
-            diambil * (1 - (tertangkap / n if n else 0))),
+            sum(p for p, s in zip(per_klaim, [0] * n))
+            if False
+            else diambil * (1 - (tertangkap / n if n else 0))
+        ),
     }
 
 
@@ -145,7 +147,9 @@ def bandingkan(episodes, idx, penskor, ambang, seed=0):
     h = hasil.get("hati_hati", {})
     if s.get("maks_per_klaim_rp") and h.get("maks_per_klaim_rp") is not None:
         hasil["_penurunan_keuntungan_maksimum"] = round(
-            1.0 - h["maks_per_klaim_rp"] / max(s["maks_per_klaim_rp"], 1), 3)
+            1.0 - h["maks_per_klaim_rp"] / max(s["maks_per_klaim_rp"], 1), 3
+        )
         hasil["_target_T6_turun_setengah"] = bool(
-            hasil["_penurunan_keuntungan_maksimum"] >= 0.5)
+            hasil["_penurunan_keuntungan_maksimum"] >= 0.5
+        )
     return hasil

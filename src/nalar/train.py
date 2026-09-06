@@ -47,25 +47,40 @@ def buat_model(kamus, cfg: dict, dev) -> Nalar:
     return model
 
 
-def pralatih(kamus, arr, idx_latih, idx_valid, cfg=None, dev=None,
-             log_setiap: int = 50, jalur_simpan: str | None = None):
+def pralatih(
+    kamus,
+    arr,
+    idx_latih,
+    idx_valid,
+    cfg=None,
+    dev=None,
+    log_setiap: int = 50,
+    jalur_simpan: str | None = None,
+):
     cfg = dict(cfg or {})
     dev = dev or perangkat()
     rng = np.random.default_rng(cfg.get("seed", 0))
     model = buat_model(kamus, cfg, dev)
 
-    penanda_bid = {kamus.id(f"[BID:{f}]") for f in
-                   __import__("nalar.schema", fromlist=["FIELDS"]).FIELDS}
-    penutup = PenutupPeran(kamus.id(MASK), kamus.id(PAD), rng,
-                           hanya_acak=cfg.get("hanya_penutupan_acak", False))
+    penanda_bid = {
+        kamus.id(f"[BID:{f}]")
+        for f in __import__("nalar.schema", fromlist=["FIELDS"]).FIELDS
+    }
+    penutup = PenutupPeran(
+        kamus.id(MASK),
+        kamus.id(PAD),
+        rng,
+        hanya_acak=cfg.get("hanya_penutupan_acak", False),
+    )
 
     batch = cfg.get("batch", 96)
     langkah = cfg.get("langkah", 1200)
     lr = cfg.get("lr", 3e-4)
     w_hier = cfg.get("bobot_pinalti_hierarki", 0.01)
 
-    opt = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4,
-                            betas=(0.9, 0.98))
+    opt = torch.optim.AdamW(
+        model.parameters(), lr=lr, weight_decay=1e-4, betas=(0.9, 0.98)
+    )
     pemanasan = max(1, int(0.06 * langkah))
 
     def lr_pada(t):
@@ -74,8 +89,7 @@ def pralatih(kamus, arr, idx_latih, idx_valid, cfg=None, dev=None,
         p = (t - pemanasan) / max(1, langkah - pemanasan)
         return 1e-6 + 0.5 * (lr - 1e-6) * (1 + math.cos(math.pi * p))
 
-    tok_a, fld_a, pjg_a, dh_a = (arr["tok"], arr["fld"], arr["pjg"],
-                                 arr["dhari"])
+    tok_a, fld_a, pjg_a, dh_a = (arr["tok"], arr["fld"], arr["pjg"], arr["dhari"])
     riwayat = []
     t0 = time.time()
     model.train()
@@ -83,10 +97,10 @@ def pralatih(kamus, arr, idx_latih, idx_valid, cfg=None, dev=None,
     for t in range(1, langkah + 1):
         for g in opt.param_groups:
             g["lr"] = lr_pada(t)
-        pilih = rng.choice(idx_latih, size=min(batch, len(idx_latih)),
-                           replace=False)
-        tok, sas, _ = penutup.terapkan(tok_a[pilih], fld_a[pilih],
-                                       pjg_a[pilih], penanda_bid)
+        pilih = rng.choice(idx_latih, size=min(batch, len(idx_latih)), replace=False)
+        tok, sas, _ = penutup.terapkan(
+            tok_a[pilih], fld_a[pilih], pjg_a[pilih], penanda_bid
+        )
         tok_t = torch.from_numpy(tok.astype(np.int64)).to(dev)
         fld_t = torch.from_numpy(fld_a[pilih].astype(np.int64)).to(dev)
         dh_t = torch.from_numpy(dh_a[pilih].astype(np.int64)).to(dev)
@@ -105,12 +119,31 @@ def pralatih(kamus, arr, idx_latih, idx_valid, cfg=None, dev=None,
         opt.step()
 
         if t % log_setiap == 0 or t == 1:
-            v = evaluasi_rugi(model, kamus, arr, idx_valid, penutup,
-                              penanda_bid, dev, rng, n_batch=6, batch=batch)
-            riwayat.append(dict(langkah=t, rugi_latih=float(rugi.item()),
-                                rugi_valid=v, detik=round(time.time() - t0, 1)))
-            print(f"  langkah {t:5d}  rugi latih {rugi.item():.4f}  "
-                  f"rugi valid {v:.4f}  {time.time() - t0:.0f}s", flush=True)
+            v = evaluasi_rugi(
+                model,
+                kamus,
+                arr,
+                idx_valid,
+                penutup,
+                penanda_bid,
+                dev,
+                rng,
+                n_batch=6,
+                batch=batch,
+            )
+            riwayat.append(
+                dict(
+                    langkah=t,
+                    rugi_latih=float(rugi.item()),
+                    rugi_valid=v,
+                    detik=round(time.time() - t0, 1),
+                )
+            )
+            print(
+                f"  langkah {t:5d}  rugi latih {rugi.item():.4f}  "
+                f"rugi valid {v:.4f}  {time.time() - t0:.0f}s",
+                flush=True,
+            )
             model.train()
 
     if jalur_simpan:
@@ -122,14 +155,16 @@ def pralatih(kamus, arr, idx_latih, idx_valid, cfg=None, dev=None,
 
 
 @torch.no_grad()
-def evaluasi_rugi(model, kamus, arr, idx, penutup, penanda_bid, dev, rng,
-                  n_batch=6, batch=96):
+def evaluasi_rugi(
+    model, kamus, arr, idx, penutup, penanda_bid, dev, rng, n_batch=6, batch=96
+):
     model.eval()
     total, n = 0.0, 0
     for _ in range(n_batch):
         pilih = rng.choice(idx, size=min(batch, len(idx)), replace=False)
-        tok, sas, _ = penutup.terapkan(arr["tok"][pilih], arr["fld"][pilih],
-                                       arr["pjg"][pilih], penanda_bid)
+        tok, sas, _ = penutup.terapkan(
+            arr["tok"][pilih], arr["fld"][pilih], arr["pjg"][pilih], penanda_bid
+        )
         tok_t = torch.from_numpy(tok.astype(np.int64)).to(dev)
         fld_t = torch.from_numpy(arr["fld"][pilih].astype(np.int64)).to(dev)
         dh_t = torch.from_numpy(arr["dhari"][pilih].astype(np.int64)).to(dev)

@@ -60,11 +60,13 @@ def kurva(skor_dict, selisih, curang, daftar_k):
         rp = {int(k): rupiah_pada_k(s, selisih, k) for k in daftar_k}
         hasil[nama] = {
             "rupiah_pada_k": {k: round(v) for k, v in rp.items()},
-            "presisi_pada_k": {int(k): round(presisi_pada_k(s, curang, k), 4)
-                               for k in daftar_k},
+            "presisi_pada_k": {
+                int(k): round(presisi_pada_k(s, curang, k), 4) for k in daftar_k
+            },
             # porsi dari yang mungkin ditemukan pada anggaran itu
-            "porsi_batas_atas": {k: round(rp[k] / atas[k], 4) if atas[k] > 0
-                                 else None for k in rp},
+            "porsi_batas_atas": {
+                k: round(rp[k] / atas[k], 4) if atas[k] > 0 else None for k in rp
+            },
         }
     return hasil
 
@@ -84,8 +86,9 @@ def acak_dasar(selisih, k, n_ulang=200, seed=0):
     rng = np.random.default_rng(seed)
     sel = np.clip(np.asarray(selisih, dtype=np.float64), 0, None)
     k = min(int(k), len(sel))
-    nilai = [sel[rng.choice(len(sel), size=k, replace=False)].sum()
-             for _ in range(n_ulang)]
+    nilai = [
+        sel[rng.choice(len(sel), size=k, replace=False)].sum() for _ in range(n_ulang)
+    ]
     return float(np.mean(nilai))
 
 
@@ -103,13 +106,17 @@ def kalibrasi_selisih(perkiraan, benar, n_pita=8):
     tepi = np.quantile(p, np.linspace(0, 1, n_pita + 1))
     out = []
     for i in range(n_pita):
-        m = (p >= tepi[i]) & (p <= tepi[i + 1] if i == n_pita - 1
-                              else p < tepi[i + 1])
+        m = (p >= tepi[i]) & (p <= tepi[i + 1] if i == n_pita - 1 else p < tepi[i + 1])
         if m.sum() < 5:
             continue
-        out.append(dict(pita=i, n=int(m.sum()),
-                        perkiraan_rerata=round(float(p[m].mean())),
-                        benar_rerata=round(float(b[m].mean()))))
+        out.append(
+            dict(
+                pita=i,
+                n=int(m.sum()),
+                perkiraan_rerata=round(float(p[m].mean())),
+                benar_rerata=round(float(b[m].mean())),
+            )
+        )
     return out
 
 
@@ -163,8 +170,9 @@ def urai_keadilan(skor_dict, kelompok, bersih, porsi=0.02):
         keluar[nama] = {
             "rasio_maks_min": h.get("_rasio_maks_min"),
             "lulus_batas_dua_kali": h.get("_lulus_batas_dua_kali"),
-            "laju_per_kelompok": {k: v["laju"] for k, v in h.items()
-                                  if not k.startswith("_")},
+            "laju_per_kelompok": {
+                k: v["laju"] for k, v in h.items() if not k.startswith("_")
+            },
         }
     return keluar
 
@@ -197,8 +205,11 @@ def keadilan_berarah(tanda, kelompok, bersih):
             continue
         laju = float(tanda[m].mean())
         rasio = laju / laju_umum if laju_umum > 0 else None
-        out[str(k)] = {"n": int(m.sum()), "laju": round(laju, 5),
-                       "rasio_thd_keseluruhan": round(rasio, 3) if rasio else None}
+        out[str(k)] = {
+            "n": int(m.sum()),
+            "laju": round(laju, 5),
+            "rasio_thd_keseluruhan": round(rasio, 3) if rasio else None,
+        }
         if rasio and rasio > 1.0:
             kelebihan.append((rasio, str(k)))
     if kelebihan:

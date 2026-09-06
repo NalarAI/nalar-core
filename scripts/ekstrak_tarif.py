@@ -106,16 +106,23 @@ def ekstrak(pdf_path: str = PDF):
             nilai = nilai[:3]
             deskripsi = re.sub(r"\s+", " ", " ".join(desk_bagian)).strip()[:160]
 
-            baris.append(dict(
-                kode=kode, cmg=mk.group(1), tipe=int(mk.group(2)),
-                nomor=int(mk.group(3)), keparahan=mk.group(4),
-                deskripsi=deskripsi,
-                regional=regional, kelas_rs=kelas_rs,
-                kepemilikan=milik or "PEMERINTAH", rawat=rawat or "INAP",
-                tarif_kelas3=nilai[0],
-                tarif_kelas2=nilai[1] if len(nilai) > 1 else nilai[0],
-                tarif_kelas1=nilai[2] if len(nilai) > 2 else nilai[0],
-            ))
+            baris.append(
+                dict(
+                    kode=kode,
+                    cmg=mk.group(1),
+                    tipe=int(mk.group(2)),
+                    nomor=int(mk.group(3)),
+                    keparahan=mk.group(4),
+                    deskripsi=deskripsi,
+                    regional=regional,
+                    kelas_rs=kelas_rs,
+                    kepemilikan=milik or "PEMERINTAH",
+                    rawat=rawat or "INAP",
+                    tarif_kelas3=nilai[0],
+                    tarif_kelas2=nilai[1] if len(nilai) > 1 else nilai[0],
+                    tarif_kelas1=nilai[2] if len(nilai) > 2 else nilai[0],
+                )
+            )
             j = max(k, j + 1)
     return baris
 
@@ -123,8 +130,10 @@ def ekstrak(pdf_path: str = PDF):
 def main():
     if not os.path.exists(PDF):
         print(f"Berkas tidak ada: {PDF}")
-        print("Unduh dulu dari https://luk.staff.ugm.ac.id/atur/"
-              "Permenkes3-2023StandarTarif.pdf")
+        print(
+            "Unduh dulu dari https://luk.staff.ugm.ac.id/atur/"
+            "Permenkes3-2023StandarTarif.pdf"
+        )
         return 1
 
     baris = ekstrak()
@@ -148,16 +157,21 @@ def main():
         "tarif_terendah": min(b["tarif_kelas3"] for b in baris),
         "tarif_tertinggi": max(b["tarif_kelas1"] for b in baris),
     }
-    with open(os.path.join(KELUAR, "tarif_inacbg_ringkas.json"), "w",
-              encoding="utf-8") as f:
+    with open(
+        os.path.join(KELUAR, "tarif_inacbg_ringkas.json"), "w", encoding="utf-8"
+    ) as f:
         json.dump(ringkas, f, indent=1, ensure_ascii=False)
 
     print(f"{len(baris)} baris tarif, {len(kode_unik)} kode unik")
     print(f"CMG: {''.join(ringkas['cmg'])}")
-    print(f"regional {ringkas['regional']}, kelas RS {ringkas['kelas_rs']}, "
-          f"kepemilikan {ringkas['kepemilikan']}")
-    print(f"rentang tarif Rp {ringkas['tarif_terendah']:,} sampai "
-          f"Rp {ringkas['tarif_tertinggi']:,}")
+    print(
+        f"regional {ringkas['regional']}, kelas RS {ringkas['kelas_rs']}, "
+        f"kepemilikan {ringkas['kepemilikan']}"
+    )
+    print(
+        f"rentang tarif Rp {ringkas['tarif_terendah']:,} sampai "
+        f"Rp {ringkas['tarif_tertinggi']:,}"
+    )
     print(f"ditulis ke {csv_path}")
     return 0
 

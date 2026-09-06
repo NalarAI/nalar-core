@@ -28,8 +28,7 @@ import json
 import os
 import sys
 
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8",
-                              errors="replace")
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
 import numpy as np  # noqa: E402
 
@@ -45,8 +44,7 @@ from nalar.pembanding import mesin_aturan  # noqa: E402
 def utama(n_peserta=20000, tahun=3, seed=7, keluaran="runs/lawan.json"):
     catatan = {}
     print("[1] membangkitkan data dan melatih detektor yang dikirim")
-    g = Pembangkit(n_peserta=n_peserta, tahun=tahun, seed=seed,
-                   n_fktp=900, n_fkrtl=150)
+    g = Pembangkit(n_peserta=n_peserta, tahun=tahun, seed=seed, n_fktp=900, n_fkrtl=150)
     eps = g.jalankan()
     meta = bangun_meta(eps)
     m_tr, m_te = pisah_menurut_entitas(meta, frac_uji=0.25, seed=seed)
@@ -74,29 +72,30 @@ def utama(n_peserta=20000, tahun=3, seed=7, keluaran="runs/lawan.json"):
         return mesin_aturan(daftar)[0]
 
     print("[2] detektor yang dikirim melawan tiga pelaku")
-    hasil_det = adversarial.bandingkan(eps, ite, penskor_detektor, 0.0,
-                                       seed=seed)
+    hasil_det = adversarial.bandingkan(eps, ite, penskor_detektor, 0.0, seed=seed)
     for j in ("serakah", "hati_hati", "menyebar"):
         h = hasil_det[j]
-        print(f"    {j:10s} diambil Rp {h['total_diambil_rp'] / 1e6:8.1f} jt "
-              f"dari {h['klaim_yang_diserang']:3d} klaim, "
-              f"maks per klaim Rp {h['maks_per_klaim_rp'] / 1e6:6.2f} jt, "
-              f"tertangkap {h['porsi_tertangkap']}")
+        print(
+            f"    {j:10s} diambil Rp {h['total_diambil_rp'] / 1e6:8.1f} jt "
+            f"dari {h['klaim_yang_diserang']:3d} klaim, "
+            f"maks per klaim Rp {h['maks_per_klaim_rp'] / 1e6:6.2f} jt, "
+            f"tertangkap {h['porsi_tertangkap']}"
+        )
     catatan["detektor"] = hasil_det
 
     print("[3] mesin aturan melawan pelaku yang sama, sebagai pembanding")
     # Tanpa baris ini, penurunan keuntungan tidak bisa dibaca. Aturan tetap
     # pun akan menurunkan keuntungan pelaku serakah, jadi pertanyaannya bukan
     # apakah turun, melainkan apakah turun lebih banyak daripada aturan.
-    amb_aturan = float(np.percentile(
-        mesin_aturan([eps[i] for i in itr[:nk]])[0], 98))
-    hasil_atr = adversarial.bandingkan(eps, ite, penskor_aturan, amb_aturan,
-                                       seed=seed)
+    amb_aturan = float(np.percentile(mesin_aturan([eps[i] for i in itr[:nk]])[0], 98))
+    hasil_atr = adversarial.bandingkan(eps, ite, penskor_aturan, amb_aturan, seed=seed)
     for j in ("serakah", "hati_hati", "menyebar"):
         h = hasil_atr[j]
-        print(f"    {j:10s} diambil Rp {h['total_diambil_rp'] / 1e6:8.1f} jt, "
-              f"maks per klaim Rp {h['maks_per_klaim_rp'] / 1e6:6.2f} jt, "
-              f"tertangkap {h['porsi_tertangkap']}")
+        print(
+            f"    {j:10s} diambil Rp {h['total_diambil_rp'] / 1e6:8.1f} jt, "
+            f"maks per klaim Rp {h['maks_per_klaim_rp'] / 1e6:6.2f} jt, "
+            f"tertangkap {h['porsi_tertangkap']}"
+        )
     catatan["mesin_aturan"] = hasil_atr
 
     print("[4] menilai target T6")
@@ -108,8 +107,8 @@ def utama(n_peserta=20000, tahun=3, seed=7, keluaran="runs/lawan.json"):
         "batas": 0.5,
         "lulus": bool(turun_det is not None and turun_det >= 0.5),
         "lebih_baik_dari_aturan": bool(
-            turun_det is not None and turun_atr is not None
-            and turun_det > turun_atr),
+            turun_det is not None and turun_atr is not None and turun_det > turun_atr
+        ),
     }
     print(f"    detektor turun {turun_det}, mesin aturan turun {turun_atr}")
     print(f"    {catatan['penilaian_T6']}")
@@ -121,6 +120,7 @@ def utama(n_peserta=20000, tahun=3, seed=7, keluaran="runs/lawan.json"):
     # dijalankan pada klaim yang sudah diserang, dan diperiksa apakah faskes
     # penyerang naik peringkat.
     from nalar.profil import peringkat_faskes, profil_faskes
+
     e_te = [eps[i] for i in ite]
     s_bersih = det.skor(e_te)["selisih"]
     prof_awal = profil_faskes(e_te, s_bersih, minimal_klaim=20)
@@ -131,10 +131,12 @@ def utama(n_peserta=20000, tahun=3, seed=7, keluaran="runs/lawan.json"):
     per_faskes = {}
     for i, r in enumerate(e_te):
         if r["rawat_inap"] and not r["modus"]:
-            per_faskes.setdefault((int(r["f_jenis"]), int(r["faskes"])),
-                                  []).append(i)
-    korban = [k for k, v in per_faskes.items()
-              if len(v) >= 20 and peta_awal.get(k, 0) > len(urut_awal) // 2]
+            per_faskes.setdefault((int(r["f_jenis"]), int(r["faskes"])), []).append(i)
+    korban = [
+        k
+        for k, v in per_faskes.items()
+        if len(v) >= 20 and peta_awal.get(k, 0) > len(urut_awal) // 2
+    ]
     if korban:
         target = korban[0]
         e_serang = [dict(r) for r in e_te]
@@ -143,8 +145,7 @@ def utama(n_peserta=20000, tahun=3, seed=7, keluaran="runs/lawan.json"):
             gerak = adversarial.kandidat_gerakan(e_te[i])
             if not gerak:
                 continue
-            varian = [adversarial._terapkan_upcode(e_te[i], gg)
-                      for gg in gerak]
+            varian = [adversarial._terapkan_upcode(e_te[i], gg) for gg in gerak]
             sv = penskor_detektor(varian)
             aman = np.flatnonzero(sv <= 0)
             if aman.size == 0:

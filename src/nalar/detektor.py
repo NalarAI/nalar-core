@@ -22,12 +22,10 @@ keluarannya.
 
 from __future__ import annotations
 
-import json
 import os
 
 import numpy as np
 
-from .konformal import Kalibrator
 from .pembanding import fitur_bukti
 from .vocab import HARGA_ACUAN
 
@@ -35,10 +33,14 @@ from .vocab import HARGA_ACUAN
 class Detektor:
     """Penebak normatif berbasis pohon, plus seluruh perkakas di sekitarnya."""
 
-    def __init__(self, alpha: float = 0.02, seed: int = 0,
-                 biaya_audit_rp: int = 750_000,
-                 z_saring: float | None = 1.0,
-                 sadar_faskes: bool = False):
+    def __init__(
+        self,
+        alpha: float = 0.02,
+        seed: int = 0,
+        biaya_audit_rp: int = 750_000,
+        z_saring: float | None = 1.0,
+        sadar_faskes: bool = False,
+    ):
         self.alpha = alpha
         self.seed = seed
         # Biaya rata rata satu pemeriksaan berkas. Dipakai memotong antrean
@@ -101,7 +103,7 @@ class Detektor:
 
     # -- pelatihan ----------------------------------------------------------
 
-    def latih(self, episodes) -> "Detektor":
+    def latih(self, episodes) -> Detektor:
         """Pelajari tarif dan nilai tagihan yang wajar dari bukti.
 
         Tidak memakai satu pun label kecurangan. Dilatih pada seluruh klaim,
@@ -113,13 +115,16 @@ class Detektor:
 
         X = fitur_bukti(episodes)
         tarif = np.array([r["tarif"] for r in episodes], dtype=np.float64)
-        bhp = np.array([r.get("tagih_bhp", 0) for r in episodes],
-                       dtype=np.float64)
+        bhp = np.array([r.get("tagih_bhp", 0) for r in episodes], dtype=np.float64)
 
         def buat():
             return HistGradientBoostingRegressor(
-                max_iter=300, learning_rate=0.08, max_leaf_nodes=63,
-                l2_regularization=1.0, random_state=self.seed)
+                max_iter=300,
+                learning_rate=0.08,
+                max_leaf_nodes=63,
+                l2_regularization=1.0,
+                random_state=self.seed,
+            )
 
         # dilatih pada skala logaritma karena biaya klaim berekor sangat panjang
         self.m_tarif = buat().fit(X, np.log1p(tarif))
@@ -141,8 +146,7 @@ class Detektor:
             raise RuntimeError("panggil latih dulu")
         X = fitur_bukti(episodes)
         tarif = np.array([r["tarif"] for r in episodes], dtype=np.float64)
-        bhp = np.array([r.get("tagih_bhp", 0) for r in episodes],
-                       dtype=np.float64)
+        bhp = np.array([r.get("tagih_bhp", 0) for r in episodes], dtype=np.float64)
         harap_tarif = np.expm1(self.m_tarif.predict(X))
         harap_bhp = np.expm1(self.m_bhp.predict(X))
         s_tarif = tarif - harap_tarif
@@ -226,11 +230,14 @@ class Detektor:
         tanpa laboratorium tidak ditandai lebih sering daripada rumah sakit
         kelas A yang punya segalanya.
         """
-        return np.array([
-            f"{r['f_kelas']}|{int(r['f_dtpk'])}|{1 if r['lab'] else 0}"
-            for r in episodes])
+        return np.array(
+            [
+                f"{r['f_kelas']}|{int(r['f_dtpk'])}|{1 if r['lab'] else 0}"
+                for r in episodes
+            ]
+        )
 
-    def kalibrasi(self, episodes_bersih) -> "Detektor":
+    def kalibrasi(self, episodes_bersih) -> Detektor:
         """Tetapkan ambang penandaan dengan jaminan bebas distribusi.
 
         Kalibrasi dijalankan per kelas fasilitas kesehatan. Tanpa itu, sistem
@@ -276,17 +283,19 @@ class Detektor:
         # pada yang paling menguntungkan.
         if self.z_saring is not None:
             from .profil import profil_faskes
-            prof = profil_faskes(episodes_bersih, s, minimal_klaim=20,
-                                 minimal_sebaya=3)
+
+            prof = profil_faskes(episodes_bersih, s, minimal_klaim=20, minimal_sebaya=3)
             buang = {k for k, v in prof.items() if v["z"] > self.z_saring}
-            simpan = np.array([
-                (int(r["f_jenis"]), int(r["faskes"])) not in buang
-                for r in episodes_bersih])
+            simpan = np.array(
+                [
+                    (int(r["f_jenis"]), int(r["faskes"])) not in buang
+                    for r in episodes_bersih
+                ]
+            )
             self.n_faskes_dibuang = len(buang)
             self.porsi_klaim_dibuang = round(float(1 - simpan.mean()), 4)
             if simpan.sum() >= self.minimal_kalibrasi:
-                episodes_bersih = [r for r, m in zip(episodes_bersih, simpan)
-                                   if m]
+                episodes_bersih = [r for r, m in zip(episodes_bersih, simpan) if m]
                 s = s[simpan]
 
         # Kalibrasi bertingkat. Kelompok terhalus dipakai bila datanya cukup.
@@ -306,8 +315,7 @@ class Detektor:
             for k in self.kunci_bertingkat(r):
                 per_kunci.setdefault(k, []).append(nilai)
                 asal_faskes.setdefault(k, []).append(fid)
-                faskes_kunci.setdefault(k, set()).add(
-                    (r["faskes"], r["f_jenis"]))
+                faskes_kunci.setdefault(k, set()).add((r["faskes"], r["f_jenis"]))
 
         # Syarat kedua: jumlah faskes, bukan hanya jumlah klaim.
         #
@@ -339,16 +347,21 @@ class Detektor:
         self.kunci_kurang_faskes = set()
         self.ambang_tingkat = {}
         for k, v in per_kunci.items():
-            if (len(v) >= self.minimal_kalibrasi
-                    and len(faskes_kunci[k]) < self.minimal_faskes):
+            if (
+                len(v) >= self.minimal_kalibrasi
+                and len(faskes_kunci[k]) < self.minimal_faskes
+            ):
                 self.kunci_kurang_faskes.add(k)
         for k, v in per_kunci.items():
-            if (len(v) >= self.minimal_kalibrasi
-                    and len(faskes_kunci[k]) >= self.minimal_faskes):
+            if (
+                len(v) >= self.minimal_kalibrasi
+                and len(faskes_kunci[k]) >= self.minimal_faskes
+            ):
                 self.ambang_tingkat[k] = (
                     ambang_sadar_faskes(v, asal_faskes[k], self.alpha)
                     if self.sadar_faskes
-                    else ambang_konformal(np.asarray(v), self.alpha))
+                    else ambang_konformal(np.asarray(v), self.alpha)
+                )
         self.ambang_umum = ambang_konformal(s, self.alpha)
         self._terkalibrasi = True
         return self
@@ -394,9 +407,13 @@ class Detektor:
 
     # -- peringkat audit ----------------------------------------------------
 
-    def antrean_audit(self, episodes, kapasitas: int = 1000,
-                      batas_per_faskes: int | None = None,
-                      porsi_acak: float = 0.05) -> list[int]:
+    def antrean_audit(
+        self,
+        episodes,
+        kapasitas: int = 1000,
+        batas_per_faskes: int | None = None,
+        porsi_acak: float = 0.05,
+    ) -> list[int]:
         """Antrean pemeriksaan, diurutkan menurut nilai bersih yang diharapkan.
 
         Tiga hal yang membedakannya dari sekadar mengurutkan skor:
@@ -433,9 +450,10 @@ class Detektor:
 
         sisa = np.setdiff1d(np.arange(len(episodes)), np.array(terpilih or [0]))
         if n_acak > 0 and len(sisa) > 0:
-            terpilih += [int(x) for x in
-                         rng.choice(sisa, size=min(n_acak, len(sisa)),
-                                    replace=False)]
+            terpilih += [
+                int(x)
+                for x in rng.choice(sisa, size=min(n_acak, len(sisa)), replace=False)
+            ]
         return terpilih
 
     # -- penjelasan ---------------------------------------------------------
@@ -460,25 +478,34 @@ class Detektor:
         """
         from .profil import peringkat_faskes, profil_faskes
 
-        rp = profil_faskes(episodes, self.skor(episodes)["selisih"],
-                           minimal_klaim=20)
+        rp = profil_faskes(episodes, self.skor(episodes)["selisih"], minimal_klaim=20)
         ps = profil_faskes(episodes, self.posisi(episodes), minimal_klaim=20)
         return {
             "antrean_rupiah": [
-                {"faskes": f"{k[0]}:{k[1]}", "n": v["n"],
-                 "kelebihan_rp": v["kelebihan_rp"], "z": v["z"]}
-                for k, v in peringkat_faskes(rp, atas=atas)],
+                {
+                    "faskes": f"{k[0]}:{k[1]}",
+                    "n": v["n"],
+                    "kelebihan_rp": v["kelebihan_rp"],
+                    "z": v["z"],
+                }
+                for k, v in peringkat_faskes(rp, atas=atas)
+            ],
             "daftar_pantau_posisi": [
-                {"faskes": f"{k[0]}:{k[1]}", "n": v["n"],
-                 "posisi_susut": v["rata_susut"],
-                 "posisi_sebaya": v["rata_sebaya"],
-                 "z": v["z"]}
-                for k, v in peringkat_faskes(ps, atas=atas)],
+                {
+                    "faskes": f"{k[0]}:{k[1]}",
+                    "n": v["n"],
+                    "posisi_susut": v["rata_susut"],
+                    "posisi_sebaya": v["rata_sebaya"],
+                    "z": v["z"],
+                }
+                for k, v in peringkat_faskes(ps, atas=atas)
+            ],
             "catatan": (
                 "Daftar kedua bukan tuduhan. Ia menandai faskes yang pola "
                 "penagihannya menempel pada batas, yang bisa berarti "
                 "pengodean yang rapi dan bisa berarti sesuatu yang lain. "
-                "Yang dituntut darinya penjelasan, bukan pengembalian."),
+                "Yang dituntut darinya penjelasan, bukan pengembalian."
+            ),
         }
 
     def jelaskan(self, episodes, i: int) -> dict:
@@ -513,8 +540,7 @@ class Detektor:
             baru = self.skor([tiruan])["selisih"][0]
             ubah = float(s["selisih"][0] - baru)
             if abs(ubah) > 1000:
-                pengandaian.append({"bukti": kode,
-                                    "perubahan_selisih_rp": round(ubah)})
+                pengandaian.append({"bukti": kode, "perubahan_selisih_rp": round(ubah)})
         pengandaian.sort(key=lambda x: -abs(x["perubahan_selisih_rp"]))
 
         return {
@@ -540,31 +566,40 @@ class Detektor:
                 "Angka di atas bukan tuduhan. Ia menyatakan bahwa tarif yang "
                 "ditagihkan lebih besar daripada yang dapat dijelaskan bukti "
                 "yang menyertai klaim ini. Fasilitas kesehatan berhak "
-                "melengkapi bukti sebelum ada konsekuensi apa pun."),
+                "melengkapi bukti sebelum ada konsekuensi apa pun."
+            ),
         }
 
     # -- simpan dan muat ----------------------------------------------------
 
     def simpan(self, jalur: str) -> None:
         import pickle
+
         os.makedirs(os.path.dirname(jalur) or ".", exist_ok=True)
         with open(jalur, "wb") as f:
-            pickle.dump({"m_tarif": self.m_tarif, "m_bhp": self.m_bhp,
-                         "ambang_tingkat": self.ambang_tingkat,
-                         "ambang_umum": self.ambang_umum,
-                         "minimal_kalibrasi": self.minimal_kalibrasi,
-                         "minimal_faskes": self.minimal_faskes,
-                         "kecualikan_dtpk": self.kecualikan_dtpk,
-                         "alpha": self.alpha, "seed": self.seed,
-                         "biaya_audit_rp": self.biaya_audit_rp}, f)
+            pickle.dump(
+                {
+                    "m_tarif": self.m_tarif,
+                    "m_bhp": self.m_bhp,
+                    "ambang_tingkat": self.ambang_tingkat,
+                    "ambang_umum": self.ambang_umum,
+                    "minimal_kalibrasi": self.minimal_kalibrasi,
+                    "minimal_faskes": self.minimal_faskes,
+                    "kecualikan_dtpk": self.kecualikan_dtpk,
+                    "alpha": self.alpha,
+                    "seed": self.seed,
+                    "biaya_audit_rp": self.biaya_audit_rp,
+                },
+                f,
+            )
 
     @classmethod
-    def muat(cls, jalur: str) -> "Detektor":
+    def muat(cls, jalur: str) -> Detektor:
         import pickle
+
         with open(jalur, "rb") as f:
             d = pickle.load(f)
-        o = cls(alpha=d["alpha"], seed=d["seed"],
-                biaya_audit_rp=d["biaya_audit_rp"])
+        o = cls(alpha=d["alpha"], seed=d["seed"], biaya_audit_rp=d["biaya_audit_rp"])
         o.m_tarif, o.m_bhp = d["m_tarif"], d["m_bhp"]
         o.ambang_tingkat = d["ambang_tingkat"]
         o.ambang_umum = d["ambang_umum"]

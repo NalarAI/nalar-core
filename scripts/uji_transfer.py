@@ -28,8 +28,7 @@ import json
 import os
 import sys
 
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8",
-                              errors="replace")
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
 import numpy as np  # noqa: E402
 
@@ -41,9 +40,14 @@ from nalar.generator import Pembangkit  # noqa: E402
 
 def _pohon(seed):
     from sklearn.ensemble import HistGradientBoostingRegressor
+
     return HistGradientBoostingRegressor(
-        max_iter=300, learning_rate=0.08, max_leaf_nodes=63,
-        l2_regularization=1.0, random_state=seed)
+        max_iter=300,
+        learning_rate=0.08,
+        max_leaf_nodes=63,
+        l2_regularization=1.0,
+        random_state=seed,
+    )
 
 
 def _spearman(a, b):
@@ -81,8 +85,7 @@ def utama(n_peserta=20000, tahun=3, seed=7, keluaran="runs/transfer.json"):
     print(f"    {len(unik)} faskes, {m_uji.sum()} klaim masuk himpunan uji")
 
     print("[2] membangkitkan data karangan")
-    g = Pembangkit(n_peserta=n_peserta, tahun=tahun, seed=seed,
-                   n_fktp=900, n_fkrtl=150)
+    g = Pembangkit(n_peserta=n_peserta, tahun=tahun, seed=seed, n_fktp=900, n_fkrtl=150)
     eps = g.jalankan()
     Xk, yk_rp, inap = nyata.matriks_dari_episode(eps)
     yk = nyata.bakukan(yk_rp)
@@ -94,8 +97,7 @@ def utama(n_peserta=20000, tahun=3, seed=7, keluaran="runs/transfer.json"):
         "faskes_amerika": len(unik),
         "episode_karangan": len(eps),
         "rawat_inap_karangan": len(inap),
-        "nilai_biaya_unik_amerika": int(len(np.unique(
-            [r["biaya"] for r in baris]))),
+        "nilai_biaya_unik_amerika": int(len(np.unique([r["biaya"] for r in baris]))),
     }
 
     print("[3] membandingkan sebaran kolom bersama")
@@ -107,9 +109,11 @@ def utama(n_peserta=20000, tahun=3, seed=7, keluaran="runs/transfer.json"):
             "karangan_sd": round(float(Xk[:, j].std()), 3),
             "amerika_sd": round(float(Xn[:, j].std()), 3),
         }
-        print(f"    {k:6s} karangan {Xk[:, j].mean():7.2f} "
-              f"± {Xk[:, j].std():5.2f}   "
-              f"amerika {Xn[:, j].mean():7.2f} ± {Xn[:, j].std():5.2f}")
+        print(
+            f"    {k:6s} karangan {Xk[:, j].mean():7.2f} "
+            f"± {Xk[:, j].std():5.2f}   "
+            f"amerika {Xn[:, j].mean():7.2f} ± {Xn[:, j].std():5.2f}"
+        )
     catatan["sebaran_kolom"] = banding
 
     print("[4] melatih tiga model")
@@ -131,8 +135,11 @@ def utama(n_peserta=20000, tahun=3, seed=7, keluaran="runs/transfer.json"):
             "mae": round(float(np.abs(y_te - p).mean()), 4),
         }
 
-    hasil = {"pindah": ukur(p_pindah), "pribumi": ukur(p_pribumi),
-             "tebakan": ukur(p_tebak)}
+    hasil = {
+        "pindah": ukur(p_pindah),
+        "pribumi": ukur(p_pribumi),
+        "tebakan": ukur(p_tebak),
+    }
 
     # Transfer yang ditera ulang. Model yang dilatih di dunia lain bisa benar
     # bentuknya tapi salah skalanya. Satu garis lurus dicocokkan pada seperempat
@@ -149,12 +156,13 @@ def utama(n_peserta=20000, tahun=3, seed=7, keluaran="runs/transfer.json"):
     print("[5] menilai terhadap syarat rancangan")
     for nama in ["pindah", "pindah_ditera", "pribumi", "tebakan"]:
         h = hasil[nama]
-        print(f"    {nama:14s} r2 {h['r2']:+.4f}   "
-              f"spearman {h['spearman']:+.4f}   mae {h['mae']:.4f}")
+        print(
+            f"    {nama:14s} r2 {h['r2']:+.4f}   "
+            f"spearman {h['spearman']:+.4f}   mae {h['mae']:.4f}"
+        )
 
     r2_p, r2_n = hasil["pindah_ditera"]["r2"], hasil["pribumi"]["r2"]
-    sp_p, sp_n = hasil["pindah_ditera"]["spearman"], \
-        hasil["pribumi"]["spearman"]
+    sp_p, sp_n = hasil["pindah_ditera"]["spearman"], hasil["pribumi"]["spearman"]
     turun_r2 = 1.0 - (r2_p / r2_n) if r2_n > 0 else float("nan")
     turun_sp = 1.0 - (sp_p / sp_n) if sp_n > 0 else float("nan")
 
@@ -166,10 +174,14 @@ def utama(n_peserta=20000, tahun=3, seed=7, keluaran="runs/transfer.json"):
         "lulus_r2": bool(turun_r2 < 1 / 3),
         "lulus_spearman": bool(turun_sp < 1 / 3),
     }
-    print(f"    penurunan r2       {turun_r2:+.1%}  "
-          f"(batas 33,3%)  {'lulus' if turun_r2 < 1/3 else 'GAGAL'}")
-    print(f"    penurunan spearman {turun_sp:+.1%}  "
-          f"(batas 33,3%)  {'lulus' if turun_sp < 1/3 else 'GAGAL'}")
+    print(
+        f"    penurunan r2       {turun_r2:+.1%}  "
+        f"(batas 33,3%)  {'lulus' if turun_r2 < 1 / 3 else 'GAGAL'}"
+    )
+    print(
+        f"    penurunan spearman {turun_sp:+.1%}  "
+        f"(batas 33,3%)  {'lulus' if turun_sp < 1 / 3 else 'GAGAL'}"
+    )
 
     print("[6] pentingnya tiap kolom, untuk tahu apa yang berpindah")
     # Diukur dengan mengacak satu kolom lalu melihat berapa yang runtuh.
@@ -198,16 +210,17 @@ def utama(n_peserta=20000, tahun=3, seed=7, keluaran="runs/transfer.json"):
     pl2 = m_p2.predict(X_tr[:, sisa])
     A2 = np.stack([pl2, np.ones_like(pl2)], axis=1)
     k2, *_ = np.linalg.lstsq(A2, y_tr, rcond=None)
-    tanpa = {"pindah_ditera": ukur(k2[0] * p_p2 + k2[1]),
-             "pribumi": ukur(p_n2)}
+    tanpa = {"pindah_ditera": ukur(k2[0] * p_p2 + k2[1]), "pribumi": ukur(p_n2)}
     tanpa["penurunan_spearman"] = round(
-        1 - tanpa["pindah_ditera"]["spearman"] / tanpa["pribumi"]["spearman"],
-        4)
+        1 - tanpa["pindah_ditera"]["spearman"] / tanpa["pribumi"]["spearman"], 4
+    )
     tanpa["lulus_spearman"] = bool(tanpa["penurunan_spearman"] < 1 / 3)
     catatan["tanpa_n_dxs"] = tanpa
-    print(f"    pindah  spearman {tanpa['pindah_ditera']['spearman']:+.4f}"
-          f"   pribumi {tanpa['pribumi']['spearman']:+.4f}"
-          f"   turun {tanpa['penurunan_spearman']:+.1%}")
+    print(
+        f"    pindah  spearman {tanpa['pindah_ditera']['spearman']:+.4f}"
+        f"   pribumi {tanpa['pribumi']['spearman']:+.4f}"
+        f"   turun {tanpa['penurunan_spearman']:+.1%}"
+    )
 
     print("[8] arah sebaliknya, latih di Amerika uji di data karangan")
     # Kalau jatuhnya setara di kedua arah, yang kita lihat adalah dua dunia
@@ -227,18 +240,24 @@ def utama(n_peserta=20000, tahun=3, seed=7, keluaran="runs/transfer.json"):
     m_pri_k = _pohon(seed).fit(Xk[~mk], yk[~mk])
 
     def ukur2(p):
-        return {"r2": round(_r2(yk[mk], p), 4),
-                "spearman": round(_spearman(yk[mk], p), 4)}
+        return {
+            "r2": round(_r2(yk[mk], p), 4),
+            "spearman": round(_spearman(yk[mk], p), 4),
+        }
 
-    balik = {"pindah_ditera": ukur2(kb[0] * pb + kb[1]),
-             "pribumi": ukur2(m_pri_k.predict(Xk[mk]))}
+    balik = {
+        "pindah_ditera": ukur2(kb[0] * pb + kb[1]),
+        "pribumi": ukur2(m_pri_k.predict(Xk[mk])),
+    }
     balik["penurunan_spearman"] = round(
-        1 - balik["pindah_ditera"]["spearman"] / balik["pribumi"]["spearman"],
-        4)
+        1 - balik["pindah_ditera"]["spearman"] / balik["pribumi"]["spearman"], 4
+    )
     catatan["arah_sebaliknya"] = balik
-    print(f"    pindah  spearman {balik['pindah_ditera']['spearman']:+.4f}"
-          f"   pribumi {balik['pribumi']['spearman']:+.4f}"
-          f"   turun {balik['penurunan_spearman']:+.1%}")
+    print(
+        f"    pindah  spearman {balik['pindah_ditera']['spearman']:+.4f}"
+        f"   pribumi {balik['pribumi']['spearman']:+.4f}"
+        f"   turun {balik['penurunan_spearman']:+.1%}"
+    )
 
     os.makedirs(os.path.dirname(keluaran), exist_ok=True)
     with open(keluaran, "w", encoding="utf-8") as f:

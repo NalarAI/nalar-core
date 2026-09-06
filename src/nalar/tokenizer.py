@@ -19,7 +19,7 @@ from __future__ import annotations
 import numpy as np
 
 from . import katalog as K
-from .schema import EPS, FIELD_ID, MASK, MISS, PAD, MAX_SEQ
+from .schema import EPS, FIELD_ID, MAX_SEQ, MISS, PAD
 
 # batas jumlah token per bidang berulang, dipotong menurut prioritas
 BATAS = {"DXS": 9, "PRC": 6, "OBT": 10, "LAB": 10, "BHP": 8}
@@ -126,9 +126,13 @@ class Penoken:
 
         # PSN
         tambah(bid("PSN"), "PSN")
-        for nama, nilai in (("UMUR", r["umur"]), ("SEX", r["sex"]),
-                            ("SEG", r["segmen"]), ("HAKKELAS", r["hak_kelas"] - 1),
-                            ("PROV", r["prov"])):
+        for nama, nilai in (
+            ("UMUR", r["umur"]),
+            ("SEX", r["sex"]),
+            ("SEG", r["segmen"]),
+            ("HAKKELAS", r["hak_kelas"] - 1),
+            ("PROV", r["prov"]),
+        ):
             tambah(f"{nama}:{nilai}", "PSN")
 
         # RWY
@@ -139,18 +143,25 @@ class Penoken:
         # FKS
         tambah(bid("FKS"), "FKS")
         kelas_idx = {"A": 0, "B": 1, "C": 2, "D": 3, "FKTP": 4}[r["f_kelas"]]
-        for nama, nilai in (("FJENIS", r["f_jenis"]), ("FKELAS", kelas_idx),
-                            ("FMILIK", r["f_milik"]),
-                            ("FTT", self.pita_tt(r["f_tt"])),
-                            ("FREG", r["f_reg"]), ("FDTPK", r["f_dtpk"])):
+        for nama, nilai in (
+            ("FJENIS", r["f_jenis"]),
+            ("FKELAS", kelas_idx),
+            ("FMILIK", r["f_milik"]),
+            ("FTT", self.pita_tt(r["f_tt"])),
+            ("FREG", r["f_reg"]),
+            ("FDTPK", r["f_dtpk"]),
+        ):
             tambah(f"{nama}:{nilai}", "FKS")
 
         # WKT
         tambah(bid("WKT"), "WKT")
-        for nama, nilai in (("BULAN", min(r["bulan"], 11)), ("DOW", r["dow"]),
-                            ("LIBUR", r["libur"]),
-                            ("LOS", self.pita_los(r["los"])),
-                            ("DPREV", self.pita_dprev(r["d_prev"]))):
+        for nama, nilai in (
+            ("BULAN", min(r["bulan"], 11)),
+            ("DOW", r["dow"]),
+            ("LIBUR", r["libur"]),
+            ("LOS", self.pita_los(r["los"])),
+            ("DPREV", self.pita_dprev(r["d_prev"])),
+        ):
             tambah(f"{nama}:{nilai}", "WKT")
 
         # RJK
@@ -221,6 +232,6 @@ class Penoken:
     def posisi_bidang(self, fld: np.ndarray, n: int, bidang: str) -> np.ndarray:
         """Indeks token milik satu bidang, tanpa penanda batasnya."""
         f = FIELD_ID[bidang]
-        idx = np.flatnonzero((fld[:n] == f))
+        idx = np.flatnonzero(fld[:n] == f)
         # buang token penanda batas, yaitu token pertama tiap bidang
         return idx[1:] if len(idx) > 1 else idx

@@ -22,6 +22,7 @@ def bangun_array(episodes, penoken):
     """Ubah daftar episode menjadi array siap latih."""
     n = len(episodes)
     from .schema import MAX_SEQ
+
     tok = np.zeros((n, MAX_SEQ), dtype=np.int32)
     fld = np.zeros((n, MAX_SEQ), dtype=np.int8)
     pjg = np.zeros(n, dtype=np.int16)
@@ -43,22 +44,24 @@ def bangun_meta(episodes):
         tarif=np.array([r["tarif"] for r in episodes], dtype=np.int64),
         tarif_j=np.array([r["tarif_j"] for r in episodes], dtype=np.int64),
         selisih=np.array([r["selisih_rp"] for r in episodes], dtype=np.int64),
-        curang=np.array([1 if r["modus"] else 0 for r in episodes],
-                        dtype=np.int8),
+        curang=np.array([1 if r["modus"] else 0 for r in episodes], dtype=np.int8),
         keparahan=np.array([r["keparahan"] for r in episodes], dtype=np.int8),
-        keparahan_j=np.array([r["keparahan_j"] for r in episodes],
-                             dtype=np.int8),
+        keparahan_j=np.array([r["keparahan_j"] for r in episodes], dtype=np.int8),
         rawat_inap=np.array([r["rawat_inap"] for r in episodes], dtype=np.int8),
-        kebijakan=np.array([r.get("kebijakan", 0) for r in episodes],
-                           dtype=np.int8),
+        kebijakan=np.array([r.get("kebijakan", 0) for r in episodes], dtype=np.int8),
     )
 
 
 class PenutupPeran:
     """Pilih pola penutupan lalu terapkan pada satu tumpukan."""
 
-    def __init__(self, id_mask: int, id_pad: int, rng: np.random.Generator,
-                 hanya_acak: bool = False):
+    def __init__(
+        self,
+        id_mask: int,
+        id_pad: int,
+        rng: np.random.Generator,
+        hanya_acak: bool = False,
+    ):
         self.id_mask = id_mask
         self.id_pad = id_pad
         self.rng = rng
@@ -67,8 +70,9 @@ class PenutupPeran:
         self.peluang = np.array([MASK_PATTERNS[k][0] for k in self.nama])
         self.peluang = self.peluang / self.peluang.sum()
 
-    def terapkan(self, tok: np.ndarray, fld: np.ndarray, pjg: np.ndarray,
-                 penanda_bid: set[int]):
+    def terapkan(
+        self, tok: np.ndarray, fld: np.ndarray, pjg: np.ndarray, penanda_bid: set[int]
+    ):
         """Kembalikan (tok_tertutup, sasaran, pola).
 
         sasaran berisi id token asli pada posisi yang ditutup, dan -100 di
@@ -91,8 +95,8 @@ class PenutupPeran:
 
             if bidang is None:
                 kandidat = np.flatnonzero(
-                    (np.arange(T) < n)
-                    & ~np.isin(tok[b], list(penanda_bid)))
+                    (np.arange(T) < n) & ~np.isin(tok[b], list(penanda_bid))
+                )
                 if kandidat.size == 0:
                     continue
                 k = max(1, int(round(RANDOM_MASK_RATE * kandidat.size)))
@@ -100,8 +104,10 @@ class PenutupPeran:
             else:
                 ids = [FIELD_ID[f] for f in bidang]
                 idx = np.flatnonzero(
-                    (np.arange(T) < n) & np.isin(fld[b], ids)
-                    & ~np.isin(tok[b], list(penanda_bid)))
+                    (np.arange(T) < n)
+                    & np.isin(fld[b], ids)
+                    & ~np.isin(tok[b], list(penanda_bid))
+                )
                 if idx.size == 0:
                     continue
 

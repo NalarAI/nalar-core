@@ -36,9 +36,9 @@ import torch
 import torch.nn as nn
 
 # tanda pada episode berikutnya
-TANDA_LANJUT = 0     # diagnosis primer sama, kemungkinan satu episode dipecah
-TANDA_PINDAH = 1     # diagnosis primer berbeda
-TANDA_HABIS = 2      # tidak ada episode berikutnya di jendela pengamatan
+TANDA_LANJUT = 0  # diagnosis primer sama, kemungkinan satu episode dipecah
+TANDA_PINDAH = 1  # diagnosis primer berbeda
+TANDA_HABIS = 2  # tidak ada episode berikutnya di jendela pengamatan
 N_TANDA = 3
 
 
@@ -49,8 +49,11 @@ class KepalaWaktu(nn.Module):
         super().__init__()
         self.k = n_campuran
         self.badan = nn.Sequential(
-            nn.Linear(d, tersembunyi), nn.GELU(),
-            nn.Linear(tersembunyi, tersembunyi), nn.GELU())
+            nn.Linear(d, tersembunyi),
+            nn.GELU(),
+            nn.Linear(tersembunyi, tersembunyi),
+            nn.GELU(),
+        )
         # bobot campuran, rerata, dan simpangan pada skala logaritma hari
         self.ke_bobot = nn.Linear(tersembunyi, n_campuran)
         self.ke_mu = nn.Linear(tersembunyi, n_campuran)
@@ -59,7 +62,8 @@ class KepalaWaktu(nn.Module):
         # awali agar campuran menyebar dari jarak pendek sampai panjang
         with torch.no_grad():
             self.ke_mu.bias.copy_(
-                torch.log(torch.tensor([2.0, 14.0, 60.0, 240.0][:n_campuran])))
+                torch.log(torch.tensor([2.0, 14.0, 60.0, 240.0][:n_campuran]))
+            )
             self.ke_log_sigma.bias.fill_(math.log(0.9))
 
     def forward(self, h: torch.Tensor):
@@ -77,8 +81,9 @@ class KepalaWaktu(nn.Module):
         x = torch.log(t)
         sigma = torch.exp(log_sigma)
         # rapat log-normal pada t, bukan pada log t, jadi ada suku minus log t
-        komponen = (-0.5 * ((x - mu) / sigma) ** 2
-                    - log_sigma - 0.5 * math.log(2 * math.pi) - x)
+        komponen = (
+            -0.5 * ((x - mu) / sigma) ** 2 - log_sigma - 0.5 * math.log(2 * math.pi) - x
+        )
         return torch.logsumexp(log_pi + komponen, dim=-1)
 
     def rugi(self, h, dhari, tanda, ada_berikutnya) -> torch.Tensor:
@@ -127,8 +132,9 @@ class KepalaWaktu(nn.Module):
     def kejutan(self, h, dhari, tanda) -> np.ndarray:
         """Seberapa mengejutkan pasangan jarak dan tanda yang benar terjadi."""
         _, _, _, log_tanda = self(h)
-        s = -(self.log_rapat(h, dhari)
-              + log_tanda.gather(1, tanda.view(-1, 1)).squeeze(1))
+        s = -(
+            self.log_rapat(h, dhari) + log_tanda.gather(1, tanda.view(-1, 1)).squeeze(1)
+        )
         return s.cpu().numpy()
 
 
@@ -148,16 +154,22 @@ def susun_pasangan(episodes, idx):
         for a, b in zip(daftar, daftar[1:]):
             asal.append(a)
             dhari.append(max(episodes[b]["hari"] - episodes[a]["hari"], 0))
-            tanda.append(TANDA_LANJUT
-                         if episodes[b]["dxp"] == episodes[a]["dxp"]
-                         else TANDA_PINDAH)
+            tanda.append(
+                TANDA_LANJUT
+                if episodes[b]["dxp"] == episodes[a]["dxp"]
+                else TANDA_PINDAH
+            )
             ada.append(1)
         asal.append(daftar[-1])
         dhari.append(0)
         tanda.append(TANDA_HABIS)
         ada.append(0)
-    return (np.array(asal, dtype=np.int64), np.array(dhari, dtype=np.int64),
-            np.array(tanda, dtype=np.int64), np.array(ada, dtype=np.int8))
+    return (
+        np.array(asal, dtype=np.int64),
+        np.array(dhari, dtype=np.int64),
+        np.array(tanda, dtype=np.int64),
+        np.array(ada, dtype=np.int8),
+    )
 
 
 @torch.no_grad()
@@ -166,7 +178,7 @@ def representasi(model, arr, idx, dev, batch=256) -> torch.Tensor:
     model.eval()
     keluar = []
     for s in range(0, len(idx), batch):
-        sel = idx[s:s + batch]
+        sel = idx[s : s + batch]
         tok = torch.from_numpy(arr["tok"][sel].astype(np.int64)).to(dev)
         fld = torch.from_numpy(arr["fld"][sel].astype(np.int64)).to(dev)
         dh = torch.from_numpy(arr["dhari"][sel].astype(np.int64)).to(dev)
@@ -176,8 +188,19 @@ def representasi(model, arr, idx, dev, batch=256) -> torch.Tensor:
     return torch.cat(keluar) if keluar else torch.zeros(0, model.d)
 
 
-def latih(kepala, H, dhari, tanda, ada, dev, langkah=400, batch=512, lr=2e-3,
-          seed=0, log_setiap=100):
+def latih(
+    kepala,
+    H,
+    dhari,
+    tanda,
+    ada,
+    dev,
+    langkah=400,
+    batch=512,
+    lr=2e-3,
+    seed=0,
+    log_setiap=100,
+):
     """Latih kepala waktu. Tidak memakai satu pun label kecurangan."""
     rng = np.random.default_rng(seed)
     opt = torch.optim.AdamW(kepala.parameters(), lr=lr, weight_decay=1e-4)
@@ -235,8 +258,9 @@ def rupiah_dipertaruhkan(episodes, a: int, b: int) -> int:
         prc = list(dict.fromkeys(list(ra["prc"]) + list(rb["prc"])))[:6]
         los = int(ra["los"]) + int(rb["los"])
         kel = kelompokkan(ra["dxp"], dxs, prc, los, True)
-        gabung = tarif(kel, ra["dxp"], prc, ra["kelas_rawat"], ra["f_kelas"],
-                       ra["f_reg"])
+        gabung = tarif(
+            kel, ra["dxp"], prc, ra["kelas_rawat"], ra["f_kelas"], ra["f_reg"]
+        )
         return max(int(ra["tarif"] + rb["tarif"] - gabung), 0)
 
     if not ra["rawat_inap"] and not rb["rawat_inap"]:

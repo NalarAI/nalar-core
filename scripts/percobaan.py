@@ -22,18 +22,30 @@ import torch
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from nalar import kalibrasi, metrik  # noqa: E402
-from nalar.dataset import (bangun_array, bangun_meta,  # noqa: E402
-                           pisah_menurut_entitas)
+from nalar.dataset import bangun_array, bangun_meta, pisah_menurut_entitas  # noqa: E402
 from nalar.generator import Pembangkit  # noqa: E402
-from nalar.heads import (TabelBarang, TabelTarif,  # noqa: E402
-                         divergensi_sebaya, kemiripan_berlebih, kmeans,
-                         normalkan_terhadap_sejenis, sebaran_harapan,
-                         selisih_tagihan, selisih_tarif, skor_kejutan,
-                         wakil_faskes)
+from nalar.heads import (  # noqa: E402
+    TabelBarang,
+    TabelTarif,
+    divergensi_sebaya,
+    kemiripan_berlebih,
+    kmeans,
+    normalkan_terhadap_sejenis,
+    sebaran_harapan,
+    selisih_tagihan,
+    selisih_tarif,
+    skor_kejutan,
+    wakil_faskes,
+)
 from nalar.konformal import Kalibrator, periksa_jaminan  # noqa: E402
-from nalar.pembanding import (RegresiLogistik, fitur_bukti,  # noqa: E402
-                              fitur_tangan, mesin_aturan, pohon_normatif,
-                              pohon_terawasi)
+from nalar.pembanding import (  # noqa: E402
+    RegresiLogistik,
+    fitur_bukti,
+    fitur_tangan,
+    mesin_aturan,
+    pohon_normatif,
+    pohon_terawasi,
+)
 from nalar.tokenizer import Penoken  # noqa: E402
 from nalar.train import perangkat, pralatih  # noqa: E402
 from nalar.vocab import Kamus  # noqa: E402
@@ -54,8 +66,11 @@ def utama():
     ap.add_argument("--utas", type=int, default=8)
     ap.add_argument("--seed", type=int, default=7)
     ap.add_argument("--keluaran", default="runs/percobaan.json")
-    ap.add_argument("--tarif-cadangan", action="store_true",
-                    help="pakai tarif tebakan, bukan tabel resmi. Untuk ablasi.")
+    ap.add_argument(
+        "--tarif-cadangan",
+        action="store_true",
+        help="pakai tarif tebakan, bukan tabel resmi. Untuk ablasi.",
+    )
     a = ap.parse_args()
 
     torch.set_num_threads(a.utas)
@@ -63,20 +78,21 @@ def utama():
         # Ablasi: matikan tabel resmi dengan mengarahkan berkasnya ke jalur
         # yang tidak ada, sehingga seluruh alur jatuh ke tarif tebakan.
         from nalar import tarif_resmi as _tr
-        _tr.CSV_TARIF = os.path.join(AKAR_PALSU := "", "tidak_ada.csv")
+
+        _tr.CSV_TARIF = "tidak_ada.csv"
         _tr._muat.cache_clear()
         _tr._cadangan_per_kode.cache_clear()
         _tr.kode_tersedia.cache_clear()
-        print("[ablasi] tabel tarif resmi dimatikan, memakai tarif tebakan",
-              flush=True)
+        print("[ablasi] tabel tarif resmi dimatikan, memakai tarif tebakan", flush=True)
     t_mulai = time.time()
     catatan: dict = {"pengaturan": vars(a)}
 
     # --- 1. data ----------------------------------------------------------
     print("[1] membangkitkan data", flush=True)
     t = time.time()
-    g = Pembangkit(n_peserta=a.peserta, tahun=a.tahun, seed=a.seed,
-                   n_fktp=a.fktp, n_fkrtl=a.fkrtl)
+    g = Pembangkit(
+        n_peserta=a.peserta, tahun=a.tahun, seed=a.seed, n_fktp=a.fktp, n_fkrtl=a.fkrtl
+    )
     eps = g.jalankan()
     print(f"    {len(eps)} episode dalam {time.time() - t:.0f}s", flush=True)
     catatan["data"] = {
@@ -92,19 +108,24 @@ def utama():
     total_tagih = sum(r["tarif"] + r.get("tagih_bhp", 0) for r in eps)
     catatan["data"]["porsi_klaim_terpengaruh"] = round(float(curang.mean()), 4)
     catatan["data"]["porsi_nilai_terpengaruh"] = round(
-        float(selisih.sum() / max(total_tagih, 1)), 4)
+        float(selisih.sum() / max(total_tagih, 1)), 4
+    )
 
     # --- 2. penokenan -----------------------------------------------------
     print("[2] menokenkan", flush=True)
     V = Kamus()
-    pen = Penoken(V,
-                  Penoken.pelajari_tepi([r["tarif"] for r in eps]),
-                  Penoken.pelajari_tepi([r.get("tagih_bhp", 0) for r in eps]))
+    pen = Penoken(
+        V,
+        Penoken.pelajari_tepi([r["tarif"] for r in eps]),
+        Penoken.pelajari_tepi([r.get("tagih_bhp", 0) for r in eps]),
+    )
     arr = bangun_array(eps, pen)
     meta = bangun_meta(eps)
-    catatan["kamus"] = {"ukuran": len(V),
-                        "panjang_rerata": float(arr["pjg"].mean()),
-                        "panjang_maks": int(arr["pjg"].max())}
+    catatan["kamus"] = {
+        "ukuran": len(V),
+        "panjang_rerata": float(arr["pjg"].mean()),
+        "panjang_maks": int(arr["pjg"].max()),
+    }
 
     # --- 3. pemisahan menurut entitas -------------------------------------
     m_tr, m_te = pisah_menurut_entitas(meta, frac_uji=0.25, seed=a.seed)
@@ -114,21 +135,40 @@ def utama():
     rng.shuffle(idx_tr)
     n_kal = min(6000, len(idx_tr) // 5)
     idx_kal, idx_latih = idx_tr[:n_kal], idx_tr[n_kal:]
-    print(f"    latih {len(idx_latih)} | kalibrasi {len(idx_kal)} "
-          f"| uji {len(idx_te)}", flush=True)
-    catatan["pemisahan"] = {"cara": "menurut faskes, bukan acak per klaim",
-                            "n_latih": len(idx_latih), "n_kalibrasi": len(idx_kal),
-                            "n_uji": len(idx_te)}
+    print(
+        f"    latih {len(idx_latih)} | kalibrasi {len(idx_kal)} | uji {len(idx_te)}",
+        flush=True,
+    )
+    catatan["pemisahan"] = {
+        "cara": "menurut faskes, bukan acak per klaim",
+        "n_latih": len(idx_latih),
+        "n_kalibrasi": len(idx_kal),
+        "n_uji": len(idx_te),
+    }
 
     # --- 4. pralatih ------------------------------------------------------
-    print("[3] pralatih tulang punggung, tanpa satu pun label kecurangan",
-          flush=True)
+    print("[3] pralatih tulang punggung, tanpa satu pun label kecurangan", flush=True)
     dev = perangkat()
-    cfg = dict(d=a.d, n_lapis=a.lapis, n_kepala=a.kepala, d_ff=a.dff,
-               batch=a.batch, langkah=a.langkah, lr=4e-4, seed=a.seed)
-    model, riwayat = pralatih(V, arr, idx_latih, idx_kal, cfg, dev,
-                              log_setiap=max(25, a.langkah // 8),
-                              jalur_simpan="runs/nalar.pt")
+    cfg = dict(
+        d=a.d,
+        n_lapis=a.lapis,
+        n_kepala=a.kepala,
+        d_ff=a.dff,
+        batch=a.batch,
+        langkah=a.langkah,
+        lr=4e-4,
+        seed=a.seed,
+    )
+    model, riwayat = pralatih(
+        V,
+        arr,
+        idx_latih,
+        idx_kal,
+        cfg,
+        dev,
+        log_setiap=max(25, a.langkah // 8),
+        jalur_simpan="runs/nalar.pt",
+    )
     catatan["pralatih"] = {
         "perangkat": str(dev),
         "parameter_juta": round(model.jumlah_parameter() / 1e6, 3),
@@ -141,13 +181,15 @@ def utama():
     print("[4] menskor dengan kepala K1 dan K2", flush=True)
     t = time.time()
     k1_mentah = skor_kejutan(model, V, arr, idx_te, ["TRF"], dev)
-    kunci_sejenis = np.array([f"{eps[i]['dxp']}|{eps[i]['rawat_inap']}"
-                              for i in idx_te])
+    kunci_sejenis = np.array(
+        [f"{eps[i]['dxp']}|{eps[i]['rawat_inap']}" for i in idx_te]
+    )
     k1 = normalkan_terhadap_sejenis(k1_mentah, kunci_sejenis)
 
     tabel = TabelTarif(V, eps)
     k2_selisih, k2_harapan, k2_yakin, p_salah, sel_salah = selisih_tarif(
-        model, V, arr, idx_te, eps, tabel, dev)
+        model, V, arr, idx_te, eps, tabel, dev
+    )
     print(f"    selesai dalam {time.time() - t:.0f}s", flush=True)
 
     # K7 konsistensi tagihan bahan habis pakai. Ditambahkan setelah pembedahan
@@ -156,8 +198,7 @@ def utama():
     # puluh tiga persen dan tidak terlihat kepala mana pun.
     print("[4b] kepala K7 konsistensi tagihan", flush=True)
     barang = TabelBarang(V)
-    k7_selisih, k7_harapan = selisih_tagihan(model, V, arr, idx_te, eps,
-                                             barang, dev)
+    k7_selisih, k7_harapan = selisih_tagihan(model, V, arr, idx_te, eps, barang, dev)
 
     # Skor gabungan: peluang kelompok yang ditagihkan salah, dikali selisih
     # rupiah bila memang salah. Percobaan pertama memakai perkalian persentil
@@ -175,13 +216,15 @@ def utama():
     y_tr = curang[idx_latih]
     reg = RegresiLogistik().fit(X_tr, y_tr)
     skor_reg = reg.skor(X_te) * np.maximum(
-        [r["tarif"] + r.get("tagih_bhp", 0) for r in eps_te], 1)
+        [r["tarif"] + r.get("tagih_bhp", 0) for r in eps_te], 1
+    )
 
     # Pohon berpenguat, target T3. Dua bentuk. Yang normatif tidak memakai
     # satu pun label kecurangan, jadi itulah pembanding yang sebanding.
     eps_latih = [eps[i] for i in idx_latih]
-    nilai_te = np.array([r["tarif"] + r.get("tagih_bhp", 0) for r in eps_te],
-                        dtype=np.float64)
+    nilai_te = np.array(
+        [r["tarif"] + r.get("tagih_bhp", 0) for r in eps_te], dtype=np.float64
+    )
     skor_pohon_awas = skor_pohon_norm = None
     try:
         Xb_tr, Xb_te = fitur_bukti(eps_latih), fitur_bukti(eps_te)
@@ -189,13 +232,12 @@ def utama():
         skor_pohon_norm, _, _ = pohon_normatif(
             Xb_tr,
             np.array([r["tarif"] for r in eps_latih], dtype=np.float64),
-            np.array([r.get("tagih_bhp", 0) for r in eps_latih],
-                     dtype=np.float64),
+            np.array([r.get("tagih_bhp", 0) for r in eps_latih], dtype=np.float64),
             Xb_te,
             np.array([r["tarif"] for r in eps_te], dtype=np.float64),
-            np.array([r.get("tagih_bhp", 0) for r in eps_te],
-                     dtype=np.float64),
-            a.seed)
+            np.array([r.get("tagih_bhp", 0) for r in eps_te], dtype=np.float64),
+            a.seed,
+        )
         print("    pohon berpenguat selesai", flush=True)
     except Exception as e:
         print(f"    pohon berpenguat dilewat: {e}", flush=True)
@@ -215,8 +257,8 @@ def utama():
         "regresi_logistik": skor_reg,
         "nalar_k7_saja": np.clip(k7_selisih, 0, None),
         "nilai_klaim": np.array(
-            [r["tarif"] + r.get("tagih_bhp", 0) for r in eps_te],
-            dtype=np.float64),
+            [r["tarif"] + r.get("tagih_bhp", 0) for r in eps_te], dtype=np.float64
+        ),
         "acak": rng.random(len(idx_te)),
     }
     if skor_pohon_awas is not None:
@@ -224,10 +266,10 @@ def utama():
     if skor_pohon_norm is not None:
         penskor["pohon_normatif"] = skor_pohon_norm
     hasil = metrik.kurva(penskor, sel_te, cur_te, daftar_k)
-    for nama in ("nalar", "nalar_k2_saja", "regresi_logistik",
-                 "nilai_klaim"):
+    for nama in ("nalar", "nalar_k2_saja", "regresi_logistik", "nilai_klaim"):
         hasil[nama]["peningkatan_atas_aturan"] = metrik.peningkatan_atas(
-            hasil, nama, "mesin_aturan", daftar_k)
+            hasil, nama, "mesin_aturan", daftar_k
+        )
     hasil["_total_selisih_tersedia"] = round(float(sel_te.sum()))
     hasil["_n_uji"] = len(idx_te)
     catatan["metrik"] = hasil
@@ -235,11 +277,9 @@ def utama():
     # --- 8. kalibrasi konformal -------------------------------------------
     print("[6] kalibrasi konformal", flush=True)
     k1_kal_mentah = skor_kejutan(model, V, arr, idx_kal, ["TRF"], dev)
-    kunci_kal = np.array([f"{eps[i]['dxp']}|{eps[i]['rawat_inap']}"
-                          for i in idx_kal])
-    k1_kal = normalkan_terhadap_sejenis(k1_kal_mentah, kunci_kal)
-    _, _, _, ps_kal, ss_kal = selisih_tarif(model, V, arr, idx_kal, eps,
-                                            tabel, dev)
+    kunci_kal = np.array([f"{eps[i]['dxp']}|{eps[i]['rawat_inap']}" for i in idx_kal])
+    normalkan_terhadap_sejenis(k1_kal_mentah, kunci_kal)
+    _, _, _, ps_kal, ss_kal = selisih_tarif(model, V, arr, idx_kal, eps, tabel, dev)
     skor_kal = ps_kal * np.clip(ss_kal, 0, None)
 
     kel_kal = np.array([eps[i]["f_kelas"] for i in idx_kal])
@@ -248,22 +288,22 @@ def utama():
     for alpha in (0.01, 0.02, 0.05):
         kal = Kalibrator(alpha=alpha).pasang(skor_kal, kel_kal)
         hasil_konformal[str(alpha)] = periksa_jaminan(
-            skor_nalar, cur_te == 0, kal, kel_te)
+            skor_nalar, cur_te == 0, kal, kel_te
+        )
     catatan["konformal"] = hasil_konformal
 
     # --- 9. keadilan ------------------------------------------------------
     kal = Kalibrator(alpha=0.02).pasang(skor_kal, kel_kal)
     tanda = kal.tandai(skor_nalar, kel_te)
     catatan["keadilan"] = {
-        "menurut_kelas_faskes": metrik.keadilan_kelompok(
-            tanda, kel_te, cur_te == 0),
+        "menurut_kelas_faskes": metrik.keadilan_kelompok(tanda, kel_te, cur_te == 0),
         "menurut_daerah_tertinggal": metrik.keadilan_kelompok(
-            tanda, np.array([r["f_dtpk"] for r in eps_te]), cur_te == 0),
+            tanda, np.array([r["f_dtpk"] for r in eps_te]), cur_te == 0
+        ),
     }
 
     # --- 10. kalibrasi selisih dan K5 -------------------------------------
-    catatan["kalibrasi_selisih_k2"] = metrik.kalibrasi_selisih(
-        k2_selisih, sel_te)
+    catatan["kalibrasi_selisih_k2"] = metrik.kalibrasi_selisih(k2_selisih, sel_te)
 
     print("[7] kepala K5 kemiripan berlebih", flush=True)
     skor_k5, dasar = kemiripan_berlebih(eps, idx_te, seed=a.seed)
@@ -272,13 +312,19 @@ def utama():
     catatan["k5_kemiripan"] = {
         "dasar_median": round(dasar, 4),
         "sepuluh_teratas": [
-            dict(faskes=int(f), kelebihan=round(v["kelebihan"], 4),
-                 n_klaim=v["n"], kebijakan_sebenarnya=keb.get(int(f)))
-            for f, v in urut],
+            dict(
+                faskes=int(f),
+                kelebihan=round(v["kelebihan"], 4),
+                n_klaim=v["n"],
+                kebijakan_sebenarnya=keb.get(int(f)),
+            )
+            for f, v in urut
+        ],
     }
     nakal = [1 if keb.get(int(f), 0) > 0 else 0 for f, _ in urut]
     catatan["k5_kemiripan"]["presisi_sepuluh_teratas"] = (
-        round(float(np.mean(nakal)), 3) if nakal else None)
+        round(float(np.mean(nakal)), 3) if nakal else None
+    )
 
     # --- 11. kepala K4 kelompok sebaya -----------------------------------
     print("[8] kepala K4 kelompok sebaya", flush=True)
@@ -287,32 +333,46 @@ def utama():
         k = max(2, min(5, len(faskes_list) // 4))
         label, _ = kmeans(Xf, k, seed=a.seed)
         harapan = sebaran_harapan(model, V, arr, idx_te, tabel, dev)
-        div = divergensi_sebaya(eps, idx_te, tabel, harapan, faskes_list,
-                                label, selisih_klaim=np.clip(k2_selisih, 0, None))
+        div = divergensi_sebaya(
+            eps,
+            idx_te,
+            tabel,
+            harapan,
+            faskes_list,
+            label,
+            selisih_klaim=np.clip(k2_selisih, 0, None),
+        )
         urut4 = sorted(div.items(), key=lambda kv: -kv[1]["skor_relatif"])[:10]
         keb_rs = {int(f): int(g.kebijakan.rs[f]) for f in div}
         catatan["k4_sebaya"] = {
             "n_faskes_dinilai": len(div),
             "n_kelompok_sebaya": int(k),
             "sepuluh_teratas": [
-                dict(faskes=int(f), skor_relatif=v["skor_relatif"],
-                     js_relatif=v["js_relatif"], n_klaim=v["n"],
-                     kelebihan_per_klaim_rp=v["kelebihan_per_klaim_rp"],
-                     kelompok=v["kelompok"],
-                     perkiraan_kelebihan_rp=v["perkiraan_kelebihan_rp"],
-                     kebijakan_sebenarnya=keb_rs.get(int(f)))
-                for f, v in urut4],
+                dict(
+                    faskes=int(f),
+                    skor_relatif=v["skor_relatif"],
+                    js_relatif=v["js_relatif"],
+                    n_klaim=v["n"],
+                    kelebihan_per_klaim_rp=v["kelebihan_per_klaim_rp"],
+                    kelompok=v["kelompok"],
+                    perkiraan_kelebihan_rp=v["perkiraan_kelebihan_rp"],
+                    kebijakan_sebenarnya=keb_rs.get(int(f)),
+                )
+                for f, v in urut4
+            ],
         }
         nakal4 = [1 if keb_rs.get(int(f), 0) > 0 else 0 for f, _ in urut4]
         catatan["k4_sebaya"]["presisi_sepuluh_teratas"] = (
-            round(float(np.mean(nakal4)), 3) if nakal4 else None)
+            round(float(np.mean(nakal4)), 3) if nakal4 else None
+        )
         # berapa porsi faskes nakal yang ada di daftar peringkat teratas
         semua_nakal = sum(1 for f in div if keb_rs.get(int(f), 0) > 0)
         catatan["k4_sebaya"]["n_faskes_nakal_sebenarnya"] = semua_nakal
     else:
         catatan["k4_sebaya"] = {
             "status": "dilewat, faskes pada himpunan uji terlalu sedikit",
-            "n_faskes": len(faskes_list)}
+            "n_faskes": len(faskes_list),
+        }
 
     # --- 11b. kepala K3 integritas episode -------------------------------
     print("[8b] kepala K3 integritas episode", flush=True)
@@ -321,13 +381,15 @@ def utama():
     a_tr, d_tr, m_tr, ada_tr = tpp.susun_pasangan(eps, idx_latih)
     H_tr = tpp.representasi(model, arr, a_tr, dev)
     kepala_waktu = tpp.KepalaWaktu(H_tr.shape[1]).to(dev)
-    riwayat_k3 = tpp.latih(kepala_waktu, H_tr, d_tr, m_tr, ada_tr, dev,
-                           langkah=500, seed=a.seed)
+    riwayat_k3 = tpp.latih(
+        kepala_waktu, H_tr, d_tr, m_tr, ada_tr, dev, langkah=500, seed=a.seed
+    )
 
     a_te, d_te, m_te, ada_te = tpp.susun_pasangan(eps, idx_te)
     H_te = tpp.representasi(model, arr, a_te, dev)
     p_lama = kepala_waktu.peluang_lebih_lama(
-        H_te.to(dev), torch.from_numpy(d_te).to(dev))
+        H_te.to(dev), torch.from_numpy(d_te).to(dev)
+    )
     p_tanda = kepala_waktu.peluang_tanda(H_te.to(dev))
 
     # Skor K3 dalam rupiah, satuan yang sama dengan K2 supaya bisa
@@ -378,21 +440,20 @@ def utama():
         ix = np.arange(len(daftar))
         k1x = skor_kejutan(model, V, a, ix, ["TRF"], dev)
         kun = np.array([f"{r['dxp']}|{r['rawat_inap']}" for r in daftar])
-        k1n = normalkan_terhadap_sejenis(k1x, kun)
-        _, _, _, psx, ssx = selisih_tarif(model, V, a, ix, daftar,
-                                          tabel_lokal, dev)
+        normalkan_terhadap_sejenis(k1x, kun)
+        _, _, _, psx, ssx = selisih_tarif(model, V, a, ix, daftar, tabel_lokal, dev)
         return psx * np.clip(ssx, 0, None)
 
     kal2 = Kalibrator(alpha=0.02).pasang(skor_kal, kel_kal)
     catatan["adversarial"] = bandingkan_pelaku(
-        eps, idx_te, penskor_klaim, kal2.ambang_global, seed=a.seed)
+        eps, idx_te, penskor_klaim, kal2.ambang_global, seed=a.seed
+    )
 
     # metrik ulang dengan K3 ikut serta
     penskor2 = dict(penskor)
     penskor2["nalar_k3_saja"] = skor_k3
     penskor2["nalar_k2_plus_k3"] = skor_nalar + skor_k3
-    penskor2["nalar_semua"] = (skor_nalar + skor_k3
-                               + np.clip(k7_selisih, 0, None))
+    penskor2["nalar_semua"] = skor_nalar + skor_k3 + np.clip(k7_selisih, 0, None)
     # Uji positioning. Pohon normatif mengalahkan kami pada pekerjaan per
     # klaim, yaitu keluarga A. Tapi pohon bekerja satu baris satu baris, jadi
     # ia tidak bisa mengerjakan keluarga B yang soal barisan waktu. Gabungan
@@ -400,26 +461,51 @@ def utama():
     # bisa dikerjakan pohon, bukan di tulang punggungnya.
     if skor_pohon_norm is not None:
         penskor2["pohon_plus_k3"] = skor_pohon_norm + skor_k3
-        penskor2["pohon_plus_k3_k7"] = (skor_pohon_norm + skor_k3
-                                        + np.clip(k7_selisih, 0, None))
+        penskor2["pohon_plus_k3_k7"] = (
+            skor_pohon_norm + skor_k3 + np.clip(k7_selisih, 0, None)
+        )
     hasil2 = metrik.kurva(penskor2, sel_te, cur_te, daftar_k)
-    for nama in [n for n in ("nalar_k3_saja", "nalar_k2_plus_k3",
-                             "nalar_semua", "pohon_plus_k3",
-                             "pohon_plus_k3_k7") if n in hasil2]:
+    for nama in [
+        n
+        for n in (
+            "nalar_k3_saja",
+            "nalar_k2_plus_k3",
+            "nalar_semua",
+            "pohon_plus_k3",
+            "pohon_plus_k3_k7",
+        )
+        if n in hasil2
+    ]:
         hasil2[nama]["peningkatan_atas_aturan"] = metrik.peningkatan_atas(
-            hasil2, nama, "mesin_aturan", daftar_k)
+            hasil2, nama, "mesin_aturan", daftar_k
+        )
         # Peningkatan atas garis dasar urutkan menurut nilai klaim. Inilah
         # pembanding yang paling jujur untuk sistem yang keluarannya rupiah,
         # karena mengurutkan klaim termahal lebih dulu itu gratis dan tidak
         # butuh model sama sekali.
         hasil2[nama]["peningkatan_atas_nilai_klaim"] = metrik.peningkatan_atas(
-            hasil2, nama, "nilai_klaim", daftar_k)
+            hasil2, nama, "nilai_klaim", daftar_k
+        )
     catatan["metrik_dengan_k3"] = {
-        k: v for k, v in hasil2.items()
-        if k in ("nalar", "nalar_k3_saja", "nalar_k2_plus_k3", "nalar_semua",
-                 "nalar_k7_saja", "mesin_aturan", "regresi_logistik",
-                 "nilai_klaim", "pohon_terawasi", "pohon_normatif",
-                 "pohon_plus_k3", "pohon_plus_k3_k7", "_batas_atas")}
+        k: v
+        for k, v in hasil2.items()
+        if k
+        in (
+            "nalar",
+            "nalar_k3_saja",
+            "nalar_k2_plus_k3",
+            "nalar_semua",
+            "nalar_k7_saja",
+            "mesin_aturan",
+            "regresi_logistik",
+            "nilai_klaim",
+            "pohon_terawasi",
+            "pohon_normatif",
+            "pohon_plus_k3",
+            "pohon_plus_k3_k7",
+            "_batas_atas",
+        )
+    }
 
     # --- 13. keadilan per kepala, dan pada skor yang sebenarnya dipakai ---
     # Pengukuran keadilan sebelumnya hanya memakai skor K2, bukan skor
@@ -428,17 +514,23 @@ def utama():
     # diatribusikan ke kepala mana.
     print("[10] keadilan per kepala", flush=True)
     skor_semua = skor_nalar + skor_k3 + np.clip(k7_selisih, 0, None)
-    for nama_kel, kel in (("kelas_faskes", kel_te),
-                          ("daerah_tertinggal",
-                           np.array([r["f_dtpk"] for r in eps_te]))):
-        catatan.setdefault("keadilan_per_kepala", {})[nama_kel] =             metrik.urai_keadilan(
-                {"K2": skor_nalar,
-                 "K3": skor_k3,
-                 "K7": np.clip(k7_selisih, 0, None),
-                 "semua": skor_semua,
-                 "nilai_klaim": penskor["nilai_klaim"],
-                 "mesin_aturan": skor_aturan},
-                kel, cur_te == 0, porsi=0.02)
+    for nama_kel, kel in (
+        ("kelas_faskes", kel_te),
+        ("daerah_tertinggal", np.array([r["f_dtpk"] for r in eps_te])),
+    ):
+        catatan.setdefault("keadilan_per_kepala", {})[nama_kel] = metrik.urai_keadilan(
+            {
+                "K2": skor_nalar,
+                "K3": skor_k3,
+                "K7": np.clip(k7_selisih, 0, None),
+                "semua": skor_semua,
+                "nilai_klaim": penskor["nilai_klaim"],
+                "mesin_aturan": skor_aturan,
+            },
+            kel,
+            cur_te == 0,
+            porsi=0.02,
+        )
 
     catatan["waktu_total_detik"] = round(time.time() - t_mulai, 1)
     os.makedirs(os.path.dirname(a.keluaran), exist_ok=True)
@@ -450,39 +542,59 @@ def utama():
     print("\n=== RINGKAS ===")
     k = daftar_k[-1]
     for nama in ("nalar", "mesin_aturan", "regresi_logistik", "acak"):
-        print(f"  {nama:20s} rupiah@{k}: "
-              f"Rp {hasil[nama]['rupiah_pada_k'][k]/1e6:10.1f} juta   "
-              f"presisi {hasil[nama]['presisi_pada_k'][k]:.3f}")
-    print(f"  peningkatan nalar atas aturan: "
-          f"{hasil['nalar']['peningkatan_atas_aturan']}")
+        print(
+            f"  {nama:20s} rupiah@{k}: "
+            f"Rp {hasil[nama]['rupiah_pada_k'][k] / 1e6:10.1f} juta   "
+            f"presisi {hasil[nama]['presisi_pada_k'][k]:.3f}"
+        )
+    print(
+        f"  peningkatan nalar atas aturan: {hasil['nalar']['peningkatan_atas_aturan']}"
+    )
     h2 = catatan["metrik_dengan_k3"]
-    print(f"  K3 saja rupiah@{k}: "
-          f"Rp {h2['nalar_k3_saja']['rupiah_pada_k'][k]/1e6:.1f} juta")
-    print(f"  nilai klaim saja rupiah@{k}: "
-          f"Rp {hasil['nilai_klaim']['rupiah_pada_k'][k]/1e6:.1f} juta")
-    print(f"  K2+K3   rupiah@{k}: "
-          f"Rp {h2['nalar_k2_plus_k3']['rupiah_pada_k'][k]/1e6:.1f} juta   "
-          f"peningkatan atas aturan {h2['nalar_k2_plus_k3']['peningkatan_atas_aturan']}")
-    print(f"  K7 saja rupiah@{k}: "
-          f"Rp {hasil['nalar_k7_saja']['rupiah_pada_k'][k]/1e6:.1f} juta")
-    print(f"  SEMUA   rupiah@{k}: "
-          f"Rp {h2['nalar_semua']['rupiah_pada_k'][k]/1e6:.1f} juta")
-    print(f"  SEMUA lift atas aturan     : "
-          f"{h2['nalar_semua']['peningkatan_atas_aturan']}")
-    print(f"  SEMUA lift atas nilai klaim: "
-          f"{h2['nalar_semua']['peningkatan_atas_nilai_klaim']}")
-    print(f"  SEMUA porsi batas atas     : "
-          f"{h2['nalar_semua']['porsi_batas_atas']}")
+    print(
+        f"  K3 saja rupiah@{k}: "
+        f"Rp {h2['nalar_k3_saja']['rupiah_pada_k'][k] / 1e6:.1f} juta"
+    )
+    print(
+        f"  nilai klaim saja rupiah@{k}: "
+        f"Rp {hasil['nilai_klaim']['rupiah_pada_k'][k] / 1e6:.1f} juta"
+    )
+    print(
+        f"  K2+K3   rupiah@{k}: "
+        f"Rp {h2['nalar_k2_plus_k3']['rupiah_pada_k'][k] / 1e6:.1f} juta   "
+        "peningkatan atas aturan "
+        f"{h2['nalar_k2_plus_k3']['peningkatan_atas_aturan']}"
+    )
+    print(
+        f"  K7 saja rupiah@{k}: "
+        f"Rp {hasil['nalar_k7_saja']['rupiah_pada_k'][k] / 1e6:.1f} juta"
+    )
+    print(
+        f"  SEMUA   rupiah@{k}: "
+        f"Rp {h2['nalar_semua']['rupiah_pada_k'][k] / 1e6:.1f} juta"
+    )
+    print(
+        f"  SEMUA lift atas aturan     : {h2['nalar_semua']['peningkatan_atas_aturan']}"
+    )
+    print(
+        f"  SEMUA lift atas nilai klaim: "
+        f"{h2['nalar_semua']['peningkatan_atas_nilai_klaim']}"
+    )
+    print(f"  SEMUA porsi batas atas     : {h2['nalar_semua']['porsi_batas_atas']}")
     for nm in ("pohon_plus_k3", "pohon_plus_k3_k7"):
         if nm in h2:
-            print(f"  {nm:18s} rp@{k}: "
-                  f"Rp {h2[nm]['rupiah_pada_k'][k]/1e6:8.1f} juta   "
-                  f"porsi batas atas {h2[nm]['porsi_batas_atas'][k]}")
+            print(
+                f"  {nm:18s} rp@{k}: "
+                f"Rp {h2[nm]['rupiah_pada_k'][k] / 1e6:8.1f} juta   "
+                f"porsi batas atas {h2[nm]['porsi_batas_atas'][k]}"
+            )
     for nm in ("pohon_normatif", "pohon_terawasi"):
         if nm in hasil:
-            print(f"  {nm:16s} rp@{k}: "
-                  f"Rp {hasil[nm]['rupiah_pada_k'][k]/1e6:8.1f} juta   "
-                  f"porsi batas atas {hasil[nm]['porsi_batas_atas'][k]}")
+            print(
+                f"  {nm:16s} rp@{k}: "
+                f"Rp {hasil[nm]['rupiah_pada_k'][k] / 1e6:8.1f} juta   "
+                f"porsi batas atas {hasil[nm]['porsi_batas_atas'][k]}"
+            )
 
 
 if __name__ == "__main__":

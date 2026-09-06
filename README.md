@@ -1,10 +1,28 @@
 # NALAR
 
-Model deteksi ketidaksesuaian klaim JKN, dibangun dari nol.
+[![uji](https://github.com/NalarAI/nalar-core/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/NalarAI/nalar-core/actions/workflows/ci.yml)
+[![lisensi](https://img.shields.io/badge/lisensi-Apache%202.0-blue.svg)](LICENSE)
+[![python](https://img.shields.io/badge/python-3.12-blue.svg)](.python-version)
+
+**Menghitung berapa rupiah dari sebuah tagihan klaim JKN yang tidak didukung
+oleh buktinya sendiri, tanpa satu pun contoh kecurangan berlabel.**
+
 Untuk Healthkathon BPJS Kesehatan 2026, kategori Efisiensi Risiko pada
 Fasilitas Kesehatan.
 
-Rancangan lengkapnya ada di `../docs/rancangan_model_ai_nalar_jkn.yaml`.
+| | |
+|---|---|
+| Porsi batas atas pada seribu klaim | 0,713 |
+| Rasio pengembalian audit | 2,32 banding 1 |
+| Laju penandaan klaim bersih | 1,10 persen pada alpha dua persen |
+| Presisi profil faskes pada 25 teratas | 1,000 |
+| Target tercapai | 4 dari 7, dan tiga kegagalannya ditulis |
+
+Angka rupiah sengaja tidak ditaruh di tabel ini. Ia bergeser empat puluh
+persen antar benih acak, jadi mengutipnya sendirian akan menyesatkan.
+Alasannya di [TEMUAN.md](TEMUAN.md).
+
+Rancangan lengkapnya ada di [docs/rancangan_model_ai_nalar_jkn.yaml](docs/rancangan_model_ai_nalar_jkn.yaml).
 Seluruh hasil percobaan beserta kegagalannya ada di `TEMUAN.md`.
 Berkas ini hanya menjelaskan kode yang sudah jalan.
 

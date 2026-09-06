@@ -41,14 +41,20 @@ class EmbeddingOntologi(nn.Module):
     agar jarak antar-vektor menghormati jarak di pohon.
     """
 
-    def __init__(self, n_vocab: int, d: int, leluhur: torch.Tensor,
-                 leluhur_mask: torch.Tensor, aktif: bool = True):
+    def __init__(
+        self,
+        n_vocab: int,
+        d: int,
+        leluhur: torch.Tensor,
+        leluhur_mask: torch.Tensor,
+        aktif: bool = True,
+    ):
         super().__init__()
         self.aktif = aktif
         self.d = d
         self.dasar = nn.Embedding(n_vocab, d)
         nn.init.normal_(self.dasar.weight, std=0.02)
-        self.register_buffer("leluhur", leluhur)          # (V, L)
+        self.register_buffer("leluhur", leluhur)  # (V, L)
         self.register_buffer("leluhur_mask", leluhur_mask)  # (V, L)
         if aktif:
             self.kueri = nn.Linear(d, d, bias=False)
@@ -58,10 +64,10 @@ class EmbeddingOntologi(nn.Module):
         """Tabel embedding efektif, ukuran (V, d)."""
         if not self.aktif:
             return self.dasar.weight
-        W = self.dasar.weight                       # (V, d)
-        anc = self.dasar.weight[self.leluhur]       # (V, L, d)
-        q = self.kueri(W).unsqueeze(1)              # (V, 1, d)
-        k = self.kunci(anc)                         # (V, L, d)
+        W = self.dasar.weight  # (V, d)
+        anc = self.dasar.weight[self.leluhur]  # (V, L, d)
+        q = self.kueri(W).unsqueeze(1)  # (V, 1, d)
+        k = self.kunci(anc)  # (V, L, d)
         skor = (q * k).sum(-1) / math.sqrt(self.d)  # (V, L)
         skor = skor.masked_fill(~self.leluhur_mask, float("-inf"))
         a = torch.softmax(skor, dim=-1).unsqueeze(-1)
@@ -80,7 +86,7 @@ class EmbeddingOntologi(nn.Module):
             return torch.zeros((), device=self.dasar.weight.device)
         V = self.dasar.weight.shape[0]
         i = torch.randint(0, V, (contoh,), device=self.dasar.weight.device)
-        induk = self.leluhur[i, 1]                  # leluhur terdekat
+        induk = self.leluhur[i, 1]  # leluhur terdekat
         W = self.tabel()
         jarak = (W[i] - W[induk]).pow(2).sum(-1)
         return jarak.mean()
@@ -110,15 +116,15 @@ class PerhatianBerbidang(nn.Module):
         self.out = nn.Linear(d, d, bias=False)
         self.pakai_bias_bidang = pakai_bias_bidang
         if pakai_bias_bidang:
-            self.bias_bidang = nn.Parameter(
-                torch.zeros(n_kepala, N_FIELDS, N_FIELDS))
+            self.bias_bidang = nn.Parameter(torch.zeros(n_kepala, N_FIELDS, N_FIELDS))
 
-    def forward(self, x: torch.Tensor, fld: torch.Tensor,
-                pad_mask: torch.Tensor) -> torch.Tensor:
+    def forward(
+        self, x: torch.Tensor, fld: torch.Tensor, pad_mask: torch.Tensor
+    ) -> torch.Tensor:
         B, T, D = x.shape
         qkv = self.qkv(x).view(B, T, 3, self.h, self.dk).permute(2, 0, 3, 1, 4)
-        q, k, v = qkv[0], qkv[1], qkv[2]                 # (B, h, T, dk)
-        skor = (q @ k.transpose(-2, -1)) / math.sqrt(self.dk)   # (B, h, T, T)
+        q, k, v = qkv[0], qkv[1], qkv[2]  # (B, h, T, dk)
+        skor = (q @ k.transpose(-2, -1)) / math.sqrt(self.dk)  # (B, h, T, T)
 
         if self.pakai_bias_bidang:
             # bias[b, h, i, j] = bias_bidang[h, fld[b,i], fld[b,j]]
@@ -127,7 +133,7 @@ class PerhatianBerbidang(nn.Module):
             # sempat memakan lebih dari separuh waktu satu langkah.
             fi = fld.long()
             pasangan = (fi[:, :, None] * N_FIELDS + fi[:, None, :]).reshape(-1)
-            rata = self.bias_bidang.reshape(self.h, -1)          # (h, F*F)
+            rata = self.bias_bidang.reshape(self.h, -1)  # (h, F*F)
             b = rata.index_select(1, pasangan).view(self.h, B, T, T)
             skor = skor + b.permute(1, 0, 2, 3)
 
@@ -140,14 +146,14 @@ class PerhatianBerbidang(nn.Module):
 class Blok(nn.Module):
     """Satu lapis encoder. Normalisasi diletakkan sebelum sub-lapis."""
 
-    def __init__(self, d: int, n_kepala: int, d_ff: int, dropout: float,
-                 pakai_bias_bidang: bool):
+    def __init__(
+        self, d: int, n_kepala: int, d_ff: int, dropout: float, pakai_bias_bidang: bool
+    ):
         super().__init__()
         self.n1 = nn.LayerNorm(d)
         self.att = PerhatianBerbidang(d, n_kepala, pakai_bias_bidang)
         self.n2 = nn.LayerNorm(d)
-        self.ff = nn.Sequential(
-            nn.Linear(d, d_ff), nn.GELU(), nn.Linear(d_ff, d))
+        self.ff = nn.Sequential(nn.Linear(d, d_ff), nn.GELU(), nn.Linear(d_ff, d))
         self.drop = nn.Dropout(dropout)
 
     def forward(self, x, fld, pad_mask):
@@ -171,8 +177,7 @@ class WaktuKontinu(nn.Module):
         super().__init__()
         self.n_frek = n_frek
         self.proj = nn.Linear(2 * n_frek, d)
-        self.register_buffer(
-            "frek", torch.exp(torch.linspace(0.0, 3.0, n_frek)))
+        self.register_buffer("frek", torch.exp(torch.linspace(0.0, 3.0, n_frek)))
 
     def forward(self, dhari: torch.Tensor) -> torch.Tensor:
         t = torch.log1p(dhari.clamp(min=0).float()).unsqueeze(-1)  # (B, 1)
@@ -183,22 +188,35 @@ class WaktuKontinu(nn.Module):
 class Nalar(nn.Module):
     """Tulang punggung ditambah kepala rekonstruksi."""
 
-    def __init__(self, n_vocab: int, leluhur, leluhur_mask,
-                 d: int = 256, n_lapis: int = 8, n_kepala: int = 8,
-                 d_ff: int = 1024, dropout: float = 0.1,
-                 pakai_ontologi: bool = True, pakai_bias_bidang: bool = True,
-                 pakai_waktu: bool = True):
+    def __init__(
+        self,
+        n_vocab: int,
+        leluhur,
+        leluhur_mask,
+        d: int = 256,
+        n_lapis: int = 8,
+        n_kepala: int = 8,
+        d_ff: int = 1024,
+        dropout: float = 0.1,
+        pakai_ontologi: bool = True,
+        pakai_bias_bidang: bool = True,
+        pakai_waktu: bool = True,
+    ):
         super().__init__()
         self.d = d
-        self.emb = EmbeddingOntologi(n_vocab, d, leluhur, leluhur_mask,
-                                     aktif=pakai_ontologi)
+        self.emb = EmbeddingOntologi(
+            n_vocab, d, leluhur, leluhur_mask, aktif=pakai_ontologi
+        )
         self.emb_bidang = nn.Embedding(N_FIELDS, d)
         self.pakai_waktu = pakai_waktu
         if pakai_waktu:
             self.waktu = WaktuKontinu(d)
-        self.blok = nn.ModuleList([
-            Blok(d, n_kepala, d_ff, dropout, pakai_bias_bidang)
-            for _ in range(n_lapis)])
+        self.blok = nn.ModuleList(
+            [
+                Blok(d, n_kepala, d_ff, dropout, pakai_bias_bidang)
+                for _ in range(n_lapis)
+            ]
+        )
         self.norm = nn.LayerNorm(d)
         # Kepala rekonstruksi memakai tabel embedding yang sama dengan
         # masukan, yaitu tabel yang sudah dirakit dari leluhur. Mengikatnya
@@ -207,7 +225,7 @@ class Nalar(nn.Module):
         self.drop = nn.Dropout(dropout)
 
     def encode(self, tok, fld, dhari=None):
-        pad_mask = tok != 0                       # 0 adalah [PAD]
+        pad_mask = tok != 0  # 0 adalah [PAD]
         x = self.emb(tok) + self.emb_bidang(fld.long())
         if self.pakai_waktu and dhari is not None:
             x = x + self.waktu(dhari).unsqueeze(1)

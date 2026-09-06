@@ -114,17 +114,25 @@ def muat_rawat_inap(batas=None):
         umur = (mulai - lahir).days / 365.25
         if not (0 <= umur <= 110):
             continue
-        n_dxs = sum(1 for i in range(2, 11)
-                    if (d.get(f"ICD9_DGNS_CD_{i}") or "").strip())
-        n_prc = sum(1 for i in range(1, 7)
-                    if (d.get(f"ICD9_PRCDR_CD_{i}") or "").strip())
-        keluar.append({
-            "umur": pita_umur(umur), "umur_tahun": umur, "sex": sex,
-            "los": los,
-            "n_dxs": n_dxs, "n_prc": n_prc,
-            "biaya": biaya, "faskes": d.get("PRVDR_NUM", ""),
-            "dokter": (d.get("AT_PHYSN_NPI") or "").strip(),
-        })
+        n_dxs = sum(
+            1 for i in range(2, 11) if (d.get(f"ICD9_DGNS_CD_{i}") or "").strip()
+        )
+        n_prc = sum(
+            1 for i in range(1, 7) if (d.get(f"ICD9_PRCDR_CD_{i}") or "").strip()
+        )
+        keluar.append(
+            {
+                "umur": pita_umur(umur),
+                "umur_tahun": umur,
+                "sex": sex,
+                "los": los,
+                "n_dxs": n_dxs,
+                "n_prc": n_prc,
+                "biaya": biaya,
+                "faskes": d.get("PRVDR_NUM", ""),
+                "dokter": (d.get("AT_PHYSN_NPI") or "").strip(),
+            }
+        )
         if batas and len(keluar) >= batas:
             break
     return keluar
@@ -133,8 +141,8 @@ def muat_rawat_inap(batas=None):
 def matriks_bersama(baris):
     """Matriks fitur dari daftar kamus, memakai KOLOM_BERSAMA."""
     return np.asarray(
-        [[float(r[k]) for k in KOLOM_BERSAMA] for r in baris],
-        dtype=np.float64)
+        [[float(r[k]) for k in KOLOM_BERSAMA] for r in baris], dtype=np.float64
+    )
 
 
 def matriks_dari_episode(episodes):
@@ -144,9 +152,18 @@ def matriks_dari_episode(episodes):
     """
     inap = [r for r in episodes if r["rawat_inap"]]
     X = np.asarray(
-        [[float(r["umur"]), float(r["sex"]), float(r["los"]),
-          float(len(r["dxs"])), float(len(r["prc"]))] for r in inap],
-        dtype=np.float64)
+        [
+            [
+                float(r["umur"]),
+                float(r["sex"]),
+                float(r["los"]),
+                float(len(r["dxs"])),
+                float(len(r["prc"])),
+            ]
+            for r in inap
+        ],
+        dtype=np.float64,
+    )
     y = np.asarray([float(r["tarif"]) for r in inap], dtype=np.float64)
     return X, y, inap
 

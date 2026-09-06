@@ -36,7 +36,7 @@ def kunci_sebaya(r) -> str:
     rumah sakit kelas B milik pemerintah di regional 2. Itu sebabnya kelompok
     ini dibentuk dari kolom administratif saja.
     """
-    return (f"{r['f_kelas']}|{r['f_reg']}|{r['f_milik']}|{r['f_dtpk']}")
+    return f"{r['f_kelas']}|{r['f_reg']}|{r['f_milik']}|{r['f_dtpk']}"
 
 
 def profil_faskes(episodes, selisih, minimal_klaim=20, minimal_sebaya=3):
@@ -116,18 +116,17 @@ def profil_faskes(episodes, selisih, minimal_klaim=20, minimal_sebaya=3):
                 "n_sebaya": len(anggota),
                 "rata_mentah": round(d["rata"]) if bulat else round(d["rata"], 6),
                 "rata_sebaya": round(mu) if bulat else round(mu, 6),
-                "rata_susut": round(float(susut)) if bulat
-                else round(float(susut), 6),
+                "rata_susut": round(float(susut)) if bulat else round(float(susut), 6),
                 "bobot_percaya": round(float(w), 4),
                 "z": round(float((susut - mu) / max(se, 1e-9)), 3),
                 "kelebihan": round(kel) if bulat else round(kel, 6),
                 # nama lama dipertahankan supaya berkas hasil lama tetap
                 # terbaca dan skrip yang sudah ada tidak patah
-                "rata_susut_rp": round(float(susut)) if bulat
+                "rata_susut_rp": round(float(susut))
+                if bulat
                 else round(float(susut), 6),
                 "rata_sebaya_rp": round(mu) if bulat else round(mu, 6),
-                "rata_mentah_rp": round(d["rata"]) if bulat
-                else round(d["rata"], 6),
+                "rata_mentah_rp": round(d["rata"]) if bulat else round(d["rata"], 6),
                 "kelebihan_rp": round(kel) if bulat else round(kel, 6),
             }
     return hasil
@@ -152,9 +151,11 @@ def presisi_faskes_pada_k(profil, kebenaran, daftar_k=(10, 25, 50)):
         if not sel:
             continue
         out[f"presisi@{k}"] = round(
-            float(np.mean([kebenaran.get(x, 0) for x in sel])), 4)
-        out[f"peningkatan@{k}"] = round(
-            out[f"presisi@{k}"] / dasar, 3) if dasar > 0 else None
+            float(np.mean([kebenaran.get(x, 0) for x in sel])), 4
+        )
+        out[f"peningkatan@{k}"] = (
+            round(out[f"presisi@{k}"] / dasar, 3) if dasar > 0 else None
+        )
     return out
 
 
@@ -172,8 +173,10 @@ def presisi_faskes_pada_k(profil, kebenaran, daftar_k=(10, 25, 50)):
 # oleh masa lalunya yang bersih. Justru faskes itulah yang paling murah
 # dihentikan, karena kebiasaannya belum mengeras.
 
-def titik_perubahan(nilai, hari, minimal_sisi=25, n_acak=200, seed=0,
-                    peringkat=True, blok=None):
+
+def titik_perubahan(
+    nilai, hari, minimal_sisi=25, n_acak=200, seed=0, peringkat=True, blok=None
+):
     """Cari satu titik di mana rata rata deret bergeser, plus peluang semunya.
 
     Statistiknya selisih rata rata terbesar antara sebelum dan sesudah, dicari
@@ -254,6 +257,7 @@ def titik_perubahan(nilai, hari, minimal_sisi=25, n_acak=200, seed=0,
             urutan = rng.permutation(len(potongan))
             return v[np.concatenate([potongan[j] for j in urutan])]
     else:
+
         def acak():
             return rng.permutation(v)
 
@@ -264,15 +268,21 @@ def titik_perubahan(nilai, hari, minimal_sisi=25, n_acak=200, seed=0,
         "n_sesudah": n - potong,
         "rata_sebelum_rp": round(float(mentah[:potong].mean())),
         "rata_sesudah_rp": round(float(mentah[potong:].mean())),
-        "lonjakan_rp": round(float(mentah[potong:].mean()
-                                   - mentah[:potong].mean())),
+        "lonjakan_rp": round(float(mentah[potong:].mean() - mentah[:potong].mean())),
         "lonjakan_peringkat": round(float(beda), 4),
         "p": round((lebih + 1) / (n_acak + 1), 4),
     }
 
 
-def perubahan_faskes(episodes, selisih, minimal_klaim=60, n_acak=200,
-                     seed=0, peringkat=True, per_pasien=True):
+def perubahan_faskes(
+    episodes,
+    selisih,
+    minimal_klaim=60,
+    n_acak=200,
+    seed=0,
+    peringkat=True,
+    per_pasien=True,
+):
     """Titik perubahan untuk tiap faskes yang klaimnya cukup banyak."""
     selisih = np.asarray(selisih, dtype=np.float64)
     per: dict[tuple, list[int]] = {}
@@ -283,10 +293,13 @@ def perubahan_faskes(episodes, selisih, minimal_klaim=60, n_acak=200,
         if len(pos) < minimal_klaim:
             continue
         t = titik_perubahan(
-            selisih[pos], [episodes[i]["hari"] for i in pos],
-            n_acak=n_acak, seed=seed, peringkat=peringkat,
-            blok=([episodes[i]["peserta_id"] for i in pos]
-                  if per_pasien else None))
+            selisih[pos],
+            [episodes[i]["hari"] for i in pos],
+            n_acak=n_acak,
+            seed=seed,
+            peringkat=peringkat,
+            blok=([episodes[i]["peserta_id"] for i in pos] if per_pasien else None),
+        )
         if t is not None:
             hasil[kunci] = t
     return hasil

@@ -18,12 +18,11 @@ import numpy as np
 import torch
 
 from .schema import FIELD_ID, MASK
-from .tarif import Kelompok, tarif
-
 
 # ---------------------------------------------------------------------------
 # K1 konsistensi bukti
 # ---------------------------------------------------------------------------
+
 
 @torch.no_grad()
 def skor_kejutan(model, kamus, arr, idx, bidang, dev, batch=256):
@@ -39,7 +38,7 @@ def skor_kejutan(model, kamus, arr, idx, bidang, dev, batch=256):
     keluar = np.zeros(len(idx), dtype=np.float32)
 
     for s in range(0, len(idx), batch):
-        sel = idx[s:s + batch]
+        sel = idx[s : s + batch]
         tok = arr["tok"][sel].astype(np.int64).copy()
         fld = arr["fld"][sel].astype(np.int64)
         pjg = arr["pjg"][sel]
@@ -48,23 +47,27 @@ def skor_kejutan(model, kamus, arr, idx, bidang, dev, batch=256):
         tutup = np.zeros_like(tok, dtype=bool)
         T = tok.shape[1]
         for b in range(len(sel)):
-            m = ((np.arange(T) < pjg[b]) & np.isin(fld[b], ids_bidang)
-                 & ~np.isin(tok[b], list(penanda)))
+            m = (
+                (np.arange(T) < pjg[b])
+                & np.isin(fld[b], ids_bidang)
+                & ~np.isin(tok[b], list(penanda))
+            )
             tutup[b] = m
         asli = tok.copy()
         tok[tutup] = id_mask
 
-        logit, _, _ = model(torch.from_numpy(tok).to(dev),
-                            torch.from_numpy(fld).to(dev),
-                            torch.from_numpy(dh).to(dev))
+        logit, _, _ = model(
+            torch.from_numpy(tok).to(dev),
+            torch.from_numpy(fld).to(dev),
+            torch.from_numpy(dh).to(dev),
+        )
         logp = torch.log_softmax(logit.float(), dim=-1).cpu().numpy()
         for b in range(len(sel)):
             pos = np.flatnonzero(tutup[b])
             if pos.size == 0:
                 keluar[s + b] = 0.0
                 continue
-            keluar[s + b] = float(
-                -np.mean(logp[b, pos, asli[b, pos]]))
+            keluar[s + b] = float(-np.mean(logp[b, pos, asli[b, pos]]))
     return keluar
 
 
@@ -97,6 +100,7 @@ def normalkan_terhadap_sejenis(skor, kunci, minimal=25):
 # K2 tarif kontrafaktual
 # ---------------------------------------------------------------------------
 
+
 class TabelTarif:
     """Peta dari token kelompok tarif ke nilai rupiah, per konteks klaim.
 
@@ -107,6 +111,7 @@ class TabelTarif:
 
     def __init__(self, kamus, episodes=None):
         from .tarif_resmi import matriks_tarif, vektor_tarif
+
         self._matriks_resmi = matriks_tarif
         self._vektor_resmi = vektor_tarif
 
@@ -119,19 +124,22 @@ class TabelTarif:
         self.peta_kode = {k: i for i, k in enumerate(self.kode)}
         # token kelas rawat, supaya kepala K2 menaksir kelas juga
         self.tok_kelas = np.array(
-            [kamus.id(f"KLSRAWAT:{i}") for i in range(3)], dtype=np.int64)
+            [kamus.id(f"KLSRAWAT:{i}") for i in range(3)], dtype=np.int64
+        )
         self.inap = np.array(
-            [k.rsplit("-", 1)[1] in ("I", "II", "III") for k in self.kode])
+            [k.rsplit("-", 1)[1] in ("I", "II", "III") for k in self.kode]
+        )
         self._singgahan: dict[tuple, np.ndarray] = {}
 
-    def nilai(self, dxp, prc, kelas_rawat, kelas_rs, regional,
-              kepemilikan="PEMERINTAH"):
+    def nilai(
+        self, dxp, prc, kelas_rawat, kelas_rs, regional, kepemilikan="PEMERINTAH"
+    ):
         """Vektor tarif untuk seluruh kelompok, pada konteks klaim ini."""
-        return self._vektor_resmi(self.kode, kelas_rawat, kelas_rs,
-                                  int(regional) + 1, kepemilikan)
+        return self._vektor_resmi(
+            self.kode, kelas_rawat, kelas_rs, int(regional) + 1, kepemilikan
+        )
 
-    def matriks(self, dxp, prc, kelas_rs, regional,
-                kepemilikan="PEMERINTAH"):
+    def matriks(self, dxp, prc, kelas_rs, regional, kepemilikan="PEMERINTAH"):
         """Tarif untuk setiap pasangan kelompok dan kelas rawat.
 
         Hasilnya disinggahkan per konteks, karena konteks yang berbeda cuma
@@ -140,13 +148,13 @@ class TabelTarif:
         kunci = (kelas_rs, int(regional), kepemilikan)
         if kunci not in self._singgahan:
             self._singgahan[kunci] = self._matriks_resmi(
-                self.kode, kelas_rs, int(regional) + 1, kepemilikan)
+                self.kode, kelas_rs, int(regional) + 1, kepemilikan
+            )
         return self._singgahan[kunci]
 
 
 @torch.no_grad()
-def selisih_tarif(model, kamus, arr, idx, episodes, tabel: TabelTarif, dev,
-                  batch=128):
+def selisih_tarif(model, kamus, arr, idx, episodes, tabel: TabelTarif, dev, batch=128):
     """Selisih antara tarif yang ditagih dan tarif yang didukung bukti.
 
     Ini bentuk keluaran yang benar untuk pembayar. Bisa ditagih, karena BPJS
@@ -173,7 +181,7 @@ def selisih_tarif(model, kamus, arr, idx, episodes, tabel: TabelTarif, dev,
     selisih_bila_salah = np.zeros(len(idx), dtype=np.float64)
 
     for s in range(0, len(idx), batch):
-        sel = idx[s:s + batch]
+        sel = idx[s : s + batch]
         tok = arr["tok"][sel].astype(np.int64).copy()
         fld = arr["fld"][sel].astype(np.int64)
         pjg = arr["pjg"][sel]
@@ -183,13 +191,12 @@ def selisih_tarif(model, kamus, arr, idx, episodes, tabel: TabelTarif, dev,
         pos_cbg = np.full(len(sel), -1, dtype=np.int64)
         pos_kls = np.full(len(sel), -1, dtype=np.int64)
         for b in range(len(sel)):
-            m = ((np.arange(T) < pjg[b]) & (fld[b] == f_trf)
-                 & (tok[b] != penanda_trf))
+            m = (np.arange(T) < pjg[b]) & (fld[b] == f_trf) & (tok[b] != penanda_trf)
             p = np.flatnonzero(m)
             if p.size:
-                pos_cbg[b] = p[0]      # token kelompok tarif ada di awal TRF
+                pos_cbg[b] = p[0]  # token kelompok tarif ada di awal TRF
             if p.size > 1:
-                pos_kls[b] = p[1]      # lalu kelas rawat
+                pos_kls[b] = p[1]  # lalu kelas rawat
             tok[b, m] = id_mask
 
             # Diagnosis sekunder ikut ditutup, dan ini yang menentukan.
@@ -204,24 +211,30 @@ def selisih_tarif(model, kamus, arr, idx, episodes, tabel: TabelTarif, dev,
             # Dengan diagnosis sekunder ikut ditutup, pertanyaannya berubah
             # menjadi yang benar: tarif seperti apa yang didukung bukti klinis,
             # tanpa memandang komorbiditas yang diakui pengaju klaim.
-            md = ((np.arange(T) < pjg[b]) & (fld[b] == f_dxs)
-                  & (tok[b] != penanda_dxs))
+            md = (np.arange(T) < pjg[b]) & (fld[b] == f_dxs) & (tok[b] != penanda_dxs)
             tok[b, md] = id_mask
 
-        logit, _, _ = model(torch.from_numpy(tok).to(dev),
-                            torch.from_numpy(fld).to(dev),
-                            torch.from_numpy(dh).to(dev))
+        logit, _, _ = model(
+            torch.from_numpy(tok).to(dev),
+            torch.from_numpy(fld).to(dev),
+            torch.from_numpy(dh).to(dev),
+        )
 
         for b in range(len(sel)):
             if pos_cbg[b] < 0:
                 continue
             r = episodes[sel[b]]
-            p = torch.softmax(
-                logit[b, pos_cbg[b]].float()[tok_cbg], dim=-1).cpu().numpy()
+            p = (
+                torch.softmax(logit[b, pos_cbg[b]].float()[tok_cbg], dim=-1)
+                .cpu()
+                .numpy()
+            )
             if pos_kls[b] >= 0:
-                q = torch.softmax(
-                    logit[b, pos_kls[b]].float()[tok_kls], dim=-1
-                ).cpu().numpy()
+                q = (
+                    torch.softmax(logit[b, pos_kls[b]].float()[tok_kls], dim=-1)
+                    .cpu()
+                    .numpy()
+                )
             else:
                 q = np.zeros(3)
                 q[r["kelas_rawat"] - 1] = 1.0
@@ -263,6 +276,7 @@ def selisih_tarif(model, kamus, arr, idx, episodes, tabel: TabelTarif, dev,
 # K5 kemiripan berlebih
 # ---------------------------------------------------------------------------
 
+
 def _tanda_tangan(r, bobot_entropi):
     """Ringkas isi klaim menjadi himpunan berbobot.
 
@@ -273,6 +287,7 @@ def _tanda_tangan(r, bobot_entropi):
     ditetapkan manusia tapi diambil dari entropi variabel itu dalam korpus.
     """
     from . import katalog as K
+
     unsur = []
     for c in r["dxs"]:
         unsur.append(("DX", c))
@@ -289,9 +304,16 @@ def _tanda_tangan(r, bobot_entropi):
 def bobot_dari_entropi(episodes):
     """Bobot per jenis unsur, dari entropi sebarannya di korpus."""
     from collections import Counter
+
     from . import katalog as K
-    hit = {"DX": Counter(), "PR": Counter(), "OB": Counter(),
-           "LB": Counter(), "LOS": Counter()}
+
+    hit = {
+        "DX": Counter(),
+        "PR": Counter(),
+        "OB": Counter(),
+        "LB": Counter(),
+        "LOS": Counter(),
+    }
     for r in episodes:
         for c in r["dxs"]:
             hit["DX"][c] += 1
@@ -346,20 +368,19 @@ def kemiripan_berlebih(episodes, idx, n_pasang_maks=400_000, seed=0):
         n_pasang = min(len(anggota) * 6, 3000)
         a = rng.choice(anggota, size=n_pasang)
         b = rng.choice(anggota, size=n_pasang)
-        nilai = [jaccard(tanda[int(x)], tanda[int(y)])
-                 for x, y in zip(a, b) if x != y]
+        nilai = [jaccard(tanda[int(x)], tanda[int(y)]) for x, y in zip(a, b) if x != y]
         if not nilai:
             continue
         nilai = np.array(nilai)
         skor_faskes[f] = dict(
             rerata=float(nilai.mean()),
             porsi_sangat_mirip=float((nilai > 0.85).mean()),
-            n=len(anggota))
+            n=len(anggota),
+        )
 
     if not skor_faskes:
         return {}, 0.0
-    dasar = float(np.median([v["porsi_sangat_mirip"]
-                             for v in skor_faskes.values()]))
+    dasar = float(np.median([v["porsi_sangat_mirip"] for v in skor_faskes.values()]))
     for f, v in skor_faskes.items():
         v["kelebihan"] = v["porsi_sangat_mirip"] - dasar
     return skor_faskes, dasar
@@ -368,6 +389,7 @@ def kemiripan_berlebih(episodes, idx, n_pasang_maks=400_000, seed=0):
 # ---------------------------------------------------------------------------
 # K4 kelompok sebaya
 # ---------------------------------------------------------------------------
+
 
 def kmeans(X, k, iterasi=40, seed=0):
     """K-means sederhana, ditulis sendiri.
@@ -410,7 +432,7 @@ def sebaran_harapan(model, kamus, arr, idx, tabel, dev, batch=128):
     out = np.zeros((len(idx), len(tabel.kode)), dtype=np.float32)
 
     for s in range(0, len(idx), batch):
-        sel = idx[s:s + batch]
+        sel = idx[s : s + batch]
         tok = arr["tok"][sel].astype(np.int64).copy()
         fld = arr["fld"][sel].astype(np.int64)
         pjg = arr["pjg"][sel]
@@ -418,20 +440,22 @@ def sebaran_harapan(model, kamus, arr, idx, tabel, dev, batch=128):
         T = tok.shape[1]
         pos = np.full(len(sel), -1, dtype=np.int64)
         for b in range(len(sel)):
-            m = ((np.arange(T) < pjg[b]) & (fld[b] == f_trf)
-                 & (tok[b] != penanda_trf))
+            m = (np.arange(T) < pjg[b]) & (fld[b] == f_trf) & (tok[b] != penanda_trf)
             p = np.flatnonzero(m)
             if p.size:
                 pos[b] = p[0]
             tok[b, m] = id_mask
-        logit, h, _ = model(torch.from_numpy(tok).to(dev),
-                            torch.from_numpy(fld).to(dev),
-                            torch.from_numpy(dh).to(dev))
+        logit, h, _ = model(
+            torch.from_numpy(tok).to(dev),
+            torch.from_numpy(fld).to(dev),
+            torch.from_numpy(dh).to(dev),
+        )
         for b in range(len(sel)):
             if pos[b] < 0:
                 continue
-            out[s + b] = torch.softmax(
-                logit[b, pos[b]].float()[tok_cbg], dim=-1).cpu().numpy()
+            out[s + b] = (
+                torch.softmax(logit[b, pos[b]].float()[tok_cbg], dim=-1).cpu().numpy()
+            )
     return out
 
 
@@ -443,7 +467,7 @@ def wakil_faskes(model, kamus, arr, idx, episodes, dev, batch=256):
     jumlah: dict[int, np.ndarray] = {}
     hitung: dict[int, int] = {}
     for s in range(0, len(idx), batch):
-        sel = idx[s:s + batch]
+        sel = idx[s : s + batch]
         tok = torch.from_numpy(arr["tok"][sel].astype(np.int64)).to(dev)
         fld = torch.from_numpy(arr["fld"][sel].astype(np.int64)).to(dev)
         dh = torch.from_numpy(arr["dhari"][sel].astype(np.int64)).to(dev)
@@ -458,13 +482,17 @@ def wakil_faskes(model, kamus, arr, idx, episodes, dev, batch=256):
             jumlah[f] = jumlah.get(f, np.zeros(d, dtype=np.float64)) + v[b]
             hitung[f] = hitung.get(f, 0) + 1
     faskes = sorted(jumlah)
-    X = np.stack([jumlah[f] / hitung[f] for f in faskes]) if faskes else \
-        np.zeros((0, d))
+    X = (
+        np.stack([jumlah[f] / hitung[f] for f in faskes])
+        if faskes
+        else np.zeros((0, d))
+    )
     return faskes, X, np.array([hitung[f] for f in faskes])
 
 
-def divergensi_sebaya(episodes, idx, tabel, harapan, faskes_list, kelompok,
-                      minimal=40, selisih_klaim=None):
+def divergensi_sebaya(
+    episodes, idx, tabel, harapan, faskes_list, kelompok, minimal=40, selisih_klaim=None
+):
     """Seberapa jauh sebaran tarif faskes menyimpang dari yang diharapkan.
 
     Pembandingnya bukan sebaran rata rata kelompok, tapi sebaran yang
@@ -495,9 +523,11 @@ def divergensi_sebaya(episodes, idx, tabel, harapan, faskes_list, kelompok,
 
         # divergensi Jensen Shannon, simetris dan berbatas
         m = 0.5 * (teramati + diharap)
+
         def kl(p, q):
             m_ = p > 0
             return float((p[m_] * np.log(p[m_] / np.maximum(q[m_], 1e-12))).sum())
+
         js = 0.5 * kl(teramati, m) + 0.5 * kl(diharap, m)
 
         # Kelebihan rupiah yang diperkirakan dari pergeseran sebaran. Nilai
@@ -514,10 +544,13 @@ def divergensi_sebaya(episodes, idx, tabel, harapan, faskes_list, kelompok,
             per_klaim = float(np.mean(np.clip(selisih_klaim[pos], 0, None)))
         else:
             per_klaim = lebih / max(len(pos), 1)
-        hasil[f] = dict(js=round(js, 5), n=len(pos),
-                        kelompok=kel_of.get(f, -1),
-                        kelebihan_per_klaim_rp=round(per_klaim),
-                        perkiraan_kelebihan_rp=round(lebih))
+        hasil[f] = dict(
+            js=round(js, 5),
+            n=len(pos),
+            kelompok=kel_of.get(f, -1),
+            kelebihan_per_klaim_rp=round(per_klaim),
+            perkiraan_kelebihan_rp=round(lebih),
+        )
 
     # bandingkan hanya di dalam kelompok sebaya
     for kel in {v["kelompok"] for v in hasil.values()}:
@@ -527,8 +560,10 @@ def divergensi_sebaya(episodes, idx, tabel, harapan, faskes_list, kelompok,
                 hasil[f]["js_relatif"] = 0.0
                 hasil[f]["skor_relatif"] = 0.0
             continue
-        for kunci, nama in (("js", "js_relatif"),
-                            ("kelebihan_per_klaim_rp", "skor_relatif")):
+        for kunci, nama in (
+            ("js", "js_relatif"),
+            ("kelebihan_per_klaim_rp", "skor_relatif"),
+        ):
             nilai = np.array([hasil[f][kunci] for f in anggota], dtype=float)
             med = float(np.median(nilai))
             mad = float(np.median(np.abs(nilai - med))) or 1e-9
@@ -572,15 +607,17 @@ class TabelBarang:
                 continue
             kode, pita = bagian[1], int(bagian[2])
             self.tok_id.append(i)
-            self.nilai.append(HARGA_ACUAN.get(kode, 0) *
-                              TENGAH_PITA_JUMLAH[min(pita, 6)])
+            self.nilai.append(
+                HARGA_ACUAN.get(kode, 0) * TENGAH_PITA_JUMLAH[min(pita, 6)]
+            )
         self.tok_id = np.array(self.tok_id, dtype=np.int64)
         self.nilai = np.array(self.nilai, dtype=np.float64)
 
 
 @torch.no_grad()
-def selisih_tagihan(model, kamus, arr, idx, episodes, barang: TabelBarang,
-                    dev, batch=128):
+def selisih_tagihan(
+    model, kamus, arr, idx, episodes, barang: TabelBarang, dev, batch=128
+):
     """Selisih antara tagihan barang dan nilai barang yang didukung bukti.
 
     Mengembalikan selisih rupiah dan nilai harapannya. Selisih positif berarti
@@ -597,7 +634,7 @@ def selisih_tagihan(model, kamus, arr, idx, episodes, barang: TabelBarang,
     harapan = np.zeros(len(idx), dtype=np.float64)
 
     for s in range(0, len(idx), batch):
-        sel = idx[s:s + batch]
+        sel = idx[s : s + batch]
         tok = arr["tok"][sel].astype(np.int64).copy()
         fld = arr["fld"][sel].astype(np.int64)
         pjg = arr["pjg"][sel]
@@ -606,14 +643,15 @@ def selisih_tagihan(model, kamus, arr, idx, episodes, barang: TabelBarang,
         T = tok.shape[1]
         posisi = []
         for b in range(len(sel)):
-            m = ((np.arange(T) < pjg[b]) & (fld[b] == f_bhp)
-                 & (tok[b] != penanda_bhp))
+            m = (np.arange(T) < pjg[b]) & (fld[b] == f_bhp) & (tok[b] != penanda_bhp)
             posisi.append(np.flatnonzero(m))
             tok[b, m] = id_mask
 
-        logit, _, _ = model(torch.from_numpy(tok).to(dev),
-                            torch.from_numpy(fld).to(dev),
-                            torch.from_numpy(dh).to(dev))
+        logit, _, _ = model(
+            torch.from_numpy(tok).to(dev),
+            torch.from_numpy(fld).to(dev),
+            torch.from_numpy(dh).to(dev),
+        )
 
         for b in range(len(sel)):
             r = episodes[sel[b]]

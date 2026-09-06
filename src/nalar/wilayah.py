@@ -19,22 +19,44 @@ import numpy as np
 # pendekatan kami: Jawa dan Bali regional 1, Sumatera regional 2, dan makin
 # jauh ke timur regional makin tinggi.
 PROVINSI = [
-    ("Aceh", 5.4, 1), ("Sumatera Utara", 15.6, 1), ("Sumatera Barat", 5.7, 1),
-    ("Riau", 6.6, 1), ("Jambi", 3.7, 1), ("Sumatera Selatan", 8.7, 1),
-    ("Bengkulu", 2.1, 1), ("Lampung", 9.2, 1), ("Kepulauan Bangka Belitung", 1.5, 1),
-    ("Kepulauan Riau", 2.1, 1), ("DKI Jakarta", 10.7, 0), ("Jawa Barat", 49.9, 0),
-    ("Jawa Tengah", 37.5, 0), ("DI Yogyakarta", 3.7, 0), ("Jawa Timur", 41.1, 0),
-    ("Banten", 12.3, 0), ("Bali", 4.3, 0), ("Nusa Tenggara Barat", 5.5, 2),
-    ("Nusa Tenggara Timur", 5.5, 2), ("Kalimantan Barat", 5.5, 2),
-    ("Kalimantan Tengah", 2.7, 2), ("Kalimantan Selatan", 4.2, 2),
-    ("Kalimantan Timur", 3.9, 2), ("Kalimantan Utara", 0.7, 3),
-    ("Sulawesi Utara", 2.6, 2), ("Sulawesi Tengah", 3.1, 2),
-    ("Sulawesi Selatan", 9.2, 2), ("Sulawesi Tenggara", 2.7, 2),
-    ("Gorontalo", 1.2, 2), ("Sulawesi Barat", 1.4, 2),
-    ("Maluku", 1.9, 3), ("Maluku Utara", 1.3, 3),
-    ("Papua Barat", 0.6, 4), ("Papua Barat Daya", 0.6, 4),
-    ("Papua", 1.0, 4), ("Papua Selatan", 0.5, 4),
-    ("Papua Tengah", 1.3, 4), ("Papua Pegunungan", 1.4, 4),
+    ("Aceh", 5.4, 1),
+    ("Sumatera Utara", 15.6, 1),
+    ("Sumatera Barat", 5.7, 1),
+    ("Riau", 6.6, 1),
+    ("Jambi", 3.7, 1),
+    ("Sumatera Selatan", 8.7, 1),
+    ("Bengkulu", 2.1, 1),
+    ("Lampung", 9.2, 1),
+    ("Kepulauan Bangka Belitung", 1.5, 1),
+    ("Kepulauan Riau", 2.1, 1),
+    ("DKI Jakarta", 10.7, 0),
+    ("Jawa Barat", 49.9, 0),
+    ("Jawa Tengah", 37.5, 0),
+    ("DI Yogyakarta", 3.7, 0),
+    ("Jawa Timur", 41.1, 0),
+    ("Banten", 12.3, 0),
+    ("Bali", 4.3, 0),
+    ("Nusa Tenggara Barat", 5.5, 2),
+    ("Nusa Tenggara Timur", 5.5, 2),
+    ("Kalimantan Barat", 5.5, 2),
+    ("Kalimantan Tengah", 2.7, 2),
+    ("Kalimantan Selatan", 4.2, 2),
+    ("Kalimantan Timur", 3.9, 2),
+    ("Kalimantan Utara", 0.7, 3),
+    ("Sulawesi Utara", 2.6, 2),
+    ("Sulawesi Tengah", 3.1, 2),
+    ("Sulawesi Selatan", 9.2, 2),
+    ("Sulawesi Tenggara", 2.7, 2),
+    ("Gorontalo", 1.2, 2),
+    ("Sulawesi Barat", 1.4, 2),
+    ("Maluku", 1.9, 3),
+    ("Maluku Utara", 1.3, 3),
+    ("Papua Barat", 0.6, 4),
+    ("Papua Barat Daya", 0.6, 4),
+    ("Papua", 1.0, 4),
+    ("Papua Selatan", 0.5, 4),
+    ("Papua Tengah", 1.3, 4),
+    ("Papua Pegunungan", 1.4, 4),
 ]
 N_PROV = len(PROVINSI)
 BOBOT_PROV = np.array([p[1] for p in PROVINSI], dtype=np.float64)
@@ -42,9 +64,19 @@ BOBOT_PROV = BOBOT_PROV / BOBOT_PROV.sum()
 REGIONAL_PROV = np.array([p[2] for p in PROVINSI], dtype=np.int64)
 
 # provinsi yang banyak memuat daerah tertinggal, terdepan, terluar
-DTPK = {"Nusa Tenggara Timur", "Maluku", "Maluku Utara", "Papua Barat",
-        "Papua Barat Daya", "Papua", "Papua Selatan", "Papua Tengah",
-        "Papua Pegunungan", "Kalimantan Utara", "Sulawesi Barat"}
+DTPK = {
+    "Nusa Tenggara Timur",
+    "Maluku",
+    "Maluku Utara",
+    "Papua Barat",
+    "Papua Barat Daya",
+    "Papua",
+    "Papua Selatan",
+    "Papua Tengah",
+    "Papua Pegunungan",
+    "Kalimantan Utara",
+    "Sulawesi Barat",
+}
 IS_DTPK = np.array([1 if p[0] in DTPK else 0 for p in PROVINSI], dtype=np.int64)
 
 # angka terbitan BPJS Kesehatan untuk 2025
@@ -64,9 +96,14 @@ SEBARAN_KEPEMILIKAN = np.array([0.04, 0.34, 0.05, 0.51, 0.06])
 class Jaringan:
     """Jaringan faskes sintetis, berskala terhadap jumlah peserta."""
 
-    def __init__(self, n_peserta: int, rng: np.random.Generator,
-                 n_fktp: int | None = None, n_fkrtl: int | None = None,
-                 skala_nasional: int = 282_700_000):
+    def __init__(
+        self,
+        n_peserta: int,
+        rng: np.random.Generator,
+        n_fktp: int | None = None,
+        n_fkrtl: int | None = None,
+        skala_nasional: int = 282_700_000,
+    ):
         """Jaringan faskes.
 
         Ada satu ketegangan yang tidak bisa dihindari pada simulasi kecil.
@@ -100,15 +137,17 @@ class Jaringan:
         self.rs_kelas = rng.choice(4, size=self.n_fkrtl, p=SEBARAN_KELAS_RS)
         self.rs_milik = rng.choice(5, size=self.n_fkrtl, p=SEBARAN_KEPEMILIKAN)
         tt_mean = np.array([TT_MEAN[KELAS_HURUF[k]] for k in self.rs_kelas])
-        self.rs_tt = np.maximum(
-            rng.lognormal(np.log(tt_mean), 0.32).astype(int), 20)
+        self.rs_tt = np.maximum(rng.lognormal(np.log(tt_mean), 0.32).astype(int), 20)
         # kapasitas tempat tidur per kelas rawat, dipakai modus M13.
         # Sebagian besar tempat tidur JKN ada di kelas 3.
-        self.rs_tt_kelas = np.stack([
-            (self.rs_tt * 0.14).astype(int) + 2,   # kelas 1
-            (self.rs_tt * 0.24).astype(int) + 3,   # kelas 2
-            (self.rs_tt * 0.62).astype(int) + 5,   # kelas 3
-        ], axis=1)
+        self.rs_tt_kelas = np.stack(
+            [
+                (self.rs_tt * 0.14).astype(int) + 2,  # kelas 1
+                (self.rs_tt * 0.24).astype(int) + 3,  # kelas 2
+                (self.rs_tt * 0.62).astype(int) + 5,  # kelas 3
+            ],
+            axis=1,
+        )
         self.rs_regional = REGIONAL_PROV[self.rs_prov]
         self.rs_dtpk = IS_DTPK[self.rs_prov]
         # jumlah dokter penanggung jawab per rumah sakit, kasar dari tempat tidur
@@ -125,10 +164,10 @@ class Jaringan:
         self.fktp_punya_lab = rng.random(self.n_fktp) < p_lab
 
         # indeks faskes per provinsi, supaya penugasan bisa cepat
-        self.fktp_per_prov = [np.flatnonzero(self.fktp_prov == p)
-                              for p in range(N_PROV)]
-        self.rs_per_prov = [np.flatnonzero(self.rs_prov == p)
-                            for p in range(N_PROV)]
+        self.fktp_per_prov = [
+            np.flatnonzero(self.fktp_prov == p) for p in range(N_PROV)
+        ]
+        self.rs_per_prov = [np.flatnonzero(self.rs_prov == p) for p in range(N_PROV)]
         # provinsi tanpa rumah sakit dirujuk ke provinsi terdekat yang punya.
         # Pendekatan sederhana: pakai kumpulan nasional sebagai cadangan.
         self.rs_semua = np.arange(self.n_fkrtl)
@@ -139,8 +178,9 @@ class Jaringan:
             return int(rng.integers(self.n_fktp))
         return int(rng.choice(kandidat))
 
-    def pilih_rs(self, prov: int, rng: np.random.Generator,
-                 butuh_kelas_tinggi: bool = False) -> int:
+    def pilih_rs(
+        self, prov: int, rng: np.random.Generator, butuh_kelas_tinggi: bool = False
+    ) -> int:
         kandidat = self.rs_per_prov[prov]
         if len(kandidat) == 0:
             kandidat = self.rs_semua

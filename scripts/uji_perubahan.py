@@ -23,8 +23,7 @@ import json
 import os
 import sys
 
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8",
-                              errors="replace")
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
 import numpy as np  # noqa: E402
 
@@ -37,9 +36,14 @@ from nalar.profil import perubahan_faskes  # noqa: E402
 
 
 def _siapkan(porsi_berubah, n_peserta, tahun, seed):
-    g = Pembangkit(n_peserta=n_peserta, tahun=tahun, seed=seed,
-                   n_fktp=900, n_fkrtl=150,
-                   porsi_faskes_berubah=porsi_berubah)
+    g = Pembangkit(
+        n_peserta=n_peserta,
+        tahun=tahun,
+        seed=seed,
+        n_fktp=900,
+        n_fkrtl=150,
+        porsi_faskes_berubah=porsi_berubah,
+    )
     eps = g.jalankan()
     meta = bangun_meta(eps)
     m_tr, m_te = pisah_menurut_entitas(meta, frac_uji=0.25, seed=seed)
@@ -68,13 +72,17 @@ def utama(n_peserta=20000, tahun=3, seed=7, keluaran="runs/perubahan.json"):
         "lulus": bool(np.mean(nilai_p < 0.05) <= 0.10),
     }
     catatan["kendali_positif_palsu"] = palsu
-    print(f"    {palsu['n_faskes_diuji']} faskes diuji, "
-          f"p<0,05 pada {palsu['porsi_p_di_bawah_05']:.1%}, "
-          f"p<0,01 pada {palsu['porsi_p_di_bawah_01']:.1%}  "
-          f"{'lulus' if palsu['lulus'] else 'GAGAL'}")
+    print(
+        f"    {palsu['n_faskes_diuji']} faskes diuji, "
+        f"p<0,05 pada {palsu['porsi_p_di_bawah_05']:.1%}, "
+        f"p<0,01 pada {palsu['porsi_p_di_bawah_01']:.1%}  "
+        f"{'lulus' if palsu['lulus'] else 'GAGAL'}"
+    )
     if not palsu["lulus"]:
-        print("    ujinya menemukan pola pada derau, angka daya temu di "
-              "bawah tidak berarti apa apa")
+        print(
+            "    ujinya menemukan pola pada derau, angka daya temu di "
+            "bawah tidak berarti apa apa"
+        )
 
     print("[2] data dengan setengah faskes nakal berubah di tengah jalan")
     g1, _, e1, s1 = _siapkan(0.5, n_peserta, tahun, seed)
@@ -85,37 +93,48 @@ def utama(n_peserta=20000, tahun=3, seed=7, keluaran="runs/perubahan.json"):
         k = (int(r["f_jenis"]), int(r["faskes"]))
         if k in benar:
             continue
-        g = (keb.ganti_rs[k[1]] if k[0] else keb.ganti_fktp[k[1]])
+        g = keb.ganti_rs[k[1]] if k[0] else keb.ganti_fktp[k[1]]
         benar[k] = int(g)
 
     berubah = [k for k in p1 if benar.get(k, -1) >= 0]
     tetap = [k for k in p1 if benar.get(k, -1) < 0]
-    print(f"    {len(p1)} faskes diuji, {len(berubah)} di antaranya memang "
-          f"berubah")
+    print(f"    {len(p1)} faskes diuji, {len(berubah)} di antaranya memang berubah")
 
-    hasil = {"n_diuji": len(p1), "n_benar_berubah": len(berubah),
-             "n_tidak_berubah": len(tetap)}
+    hasil = {
+        "n_diuji": len(p1),
+        "n_benar_berubah": len(berubah),
+        "n_tidak_berubah": len(tetap),
+    }
     for batas in (0.05, 0.01):
-        tt = float(np.mean([p1[k]["p"] < batas for k in berubah])) \
-            if berubah else float("nan")
-        sp = float(np.mean([p1[k]["p"] < batas for k in tetap])) \
-            if tetap else float("nan")
+        tt = (
+            float(np.mean([p1[k]["p"] < batas for k in berubah]))
+            if berubah
+            else float("nan")
+        )
+        sp = (
+            float(np.mean([p1[k]["p"] < batas for k in tetap]))
+            if tetap
+            else float("nan")
+        )
         hasil[f"tertangkap_p{batas}"] = round(tt, 4)
         hasil[f"salah_tuduh_p{batas}"] = round(sp, 4)
-        print(f"    p<{batas}: tertangkap {tt:.1%} dari yang berubah, "
-              f"salah tuduh {sp:.1%} dari yang tidak")
+        print(
+            f"    p<{batas}: tertangkap {tt:.1%} dari yang berubah, "
+            f"salah tuduh {sp:.1%} dari yang tidak"
+        )
 
     # Seberapa dekat tanggal tebakan dengan tanggal sebenarnya, dihitung
     # hanya pada faskes yang memang berubah dan memang tertangkap. Menghitung
     # jaraknya pada faskes yang tidak berubah tidak ada artinya.
-    jarak = [abs(p1[k]["hari_ganti"] - benar[k])
-             for k in berubah if p1[k]["p"] < 0.05]
+    jarak = [abs(p1[k]["hari_ganti"] - benar[k]) for k in berubah if p1[k]["p"] < 0.05]
     if jarak:
         hasil["jarak_hari_median"] = int(np.median(jarak))
         hasil["jarak_hari_p90"] = int(np.percentile(jarak, 90))
         hasil["rentang_hari"] = tahun * 365
-        print(f"    tanggal tebakan meleset {np.median(jarak):.0f} hari "
-              f"(median) dari {tahun * 365} hari rentang")
+        print(
+            f"    tanggal tebakan meleset {np.median(jarak):.0f} hari "
+            f"(median) dari {tahun * 365} hari rentang"
+        )
 
     # Dipecah menurut kebijakan yang dituju sesudah berubah. Faskes yang
     # berubah menjadi oportunis hanya menaikkan tarif pada tiga dari sepuluh
@@ -137,28 +156,33 @@ def utama(n_peserta=20000, tahun=3, seed=7, keluaran="runs/perubahan.json"):
             continue
         per_keb[nm] = {
             "ada": len(punya),
-            "tertangkap": round(float(np.mean(
-                [p1[k]["p"] < 0.05 for k in punya])), 4)}
-        print(f"    berubah jadi {nm:11s} ada {len(punya):2d}, "
-              f"tertangkap {per_keb[nm]['tertangkap']:.0%}")
+            "tertangkap": round(float(np.mean([p1[k]["p"] < 0.05 for k in punya])), 4),
+        }
+        print(
+            f"    berubah jadi {nm:11s} ada {len(punya):2d}, "
+            f"tertangkap {per_keb[nm]['tertangkap']:.0%}"
+        )
     hasil["tertangkap_per_kebijakan_tujuan"] = per_keb
 
     # Nilai tambahnya di atas K4 hanya nyata bila ia menemukan faskes yang
     # K4 lewatkan. Kalau tidak, kepala ini boleh dibuang.
     from nalar.profil import peringkat_faskes, profil_faskes
+
     prof = profil_faskes(e1, s1, minimal_klaim=20, minimal_sebaya=3)
-    atas25 = set(k for k, _ in peringkat_faskes(prof, atas=25))
+    atas25 = {k for k, _ in peringkat_faskes(prof, atas=25)}
     lewat = [k for k in berubah if k not in atas25 and p1[k]["p"] < 0.05]
     hasil["berubah_yang_dilewatkan_k4_tapi_ditemukan_k6"] = len(lewat)
-    hasil["berubah_yang_sudah_ditemukan_k4"] = len(
-        [k for k in berubah if k in atas25])
-    print(f"    dari yang berubah: {hasil['berubah_yang_sudah_ditemukan_k4']} "
-          f"sudah tertangkap K4, {len(lewat)} hanya tertangkap K6")
+    hasil["berubah_yang_sudah_ditemukan_k4"] = len([k for k in berubah if k in atas25])
+    print(
+        f"    dari yang berubah: {hasil['berubah_yang_sudah_ditemukan_k4']} "
+        f"sudah tertangkap K4, {len(lewat)} hanya tertangkap K6"
+    )
 
     catatan["daya_temu"] = hasil
     catatan["contoh"] = [
         {"faskes": f"{k[0]}:{k[1]}", "hari_sebenarnya": benar[k], **p1[k]}
-        for k in berubah[:5]]
+        for k in berubah[:5]
+    ]
 
     os.makedirs(os.path.dirname(keluaran), exist_ok=True)
     with open(keluaran, "w", encoding="utf-8") as f:

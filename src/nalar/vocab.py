@@ -16,7 +16,6 @@ from __future__ import annotations
 
 import csv
 import os
-from collections import defaultdict
 from functools import lru_cache
 
 from . import katalog
@@ -183,6 +182,7 @@ class Kamus:
             self._tambah(s)
         # penanda batas bidang, membawa identitas bidangnya
         from .schema import FIELDS
+
         for f in FIELDS:
             self._tambah(f"[BID:{f}]")
 
@@ -253,7 +253,7 @@ class Kamus:
             m[i, : len(rantai)] = rantai
             mask[i, : len(rantai)] = True
             if len(rantai) < maks:
-                m[i, len(rantai):] = i
+                m[i, len(rantai) :] = i
         return m, mask
 
 
@@ -282,11 +282,21 @@ BARANG = {
 # Harga acuan per satuan, dalam rupiah. Modus penggelembungan menaikkan harga
 # di atas acuan ini, dan selisihnya menjadi kebenaran dasar.
 HARGA_ACUAN = {
-    "ALK001": 45_000, "ALK002": 18_000, "ALK003": 320_000,
-    "ALK004": 95_000, "ALK005": 1_850_000, "ALK006": 3_400_000,
-    "ALK007": 11_500_000, "ALK008": 65_000, "ALK009": 360_000,
-    "ALK010": 22_000, "ALK011": 3_500, "ALK012": 8_000,
-    "ALK013": 140_000, "ALK014": 85_000, "ALK015": 6_200_000,
+    "ALK001": 45_000,
+    "ALK002": 18_000,
+    "ALK003": 320_000,
+    "ALK004": 95_000,
+    "ALK005": 1_850_000,
+    "ALK006": 3_400_000,
+    "ALK007": 11_500_000,
+    "ALK008": 65_000,
+    "ALK009": 360_000,
+    "ALK010": 22_000,
+    "ALK011": 3_500,
+    "ALK012": 8_000,
+    "ALK013": 140_000,
+    "ALK014": 85_000,
+    "ALK015": 6_200_000,
 }
 
 # --- bidang kategorial ------------------------------------------------------

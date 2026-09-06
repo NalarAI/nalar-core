@@ -50,8 +50,11 @@ def _muat() -> dict:
     with open(CSV_TARIF, newline="", encoding="utf-8") as f:
         for r in csv.DictReader(f):
             k = (r["kode"], int(r["regional"]), r["kelas_rs"], r["kepemilikan"])
-            peta[k] = (int(r["tarif_kelas3"]), int(r["tarif_kelas2"]),
-                       int(r["tarif_kelas1"]))
+            peta[k] = (
+                int(r["tarif_kelas3"]),
+                int(r["tarif_kelas2"]),
+                int(r["tarif_kelas1"]),
+            )
     return peta
 
 
@@ -75,12 +78,13 @@ def _cadangan_per_kode() -> dict:
     dari_kode: dict[str, list[tuple[int, int, int]]] = {}
     for (kode, _, _, _), v in _muat().items():
         dari_kode.setdefault(kode, []).append(v)
-    return {k: tuple(int(sum(x[i] for x in v) / len(v)) for i in range(3))
-            for k, v in dari_kode.items()}
+    return {
+        k: tuple(int(sum(x[i] for x in v) / len(v)) for i in range(3))
+        for k, v in dari_kode.items()
+    }
 
 
-_hitung = {"tepat": 0, "cadangan": 0, "cadangan_rawat_jalan": 0,
-           "gagal": 0}
+_hitung = {"tepat": 0, "cadangan": 0, "cadangan_rawat_jalan": 0, "gagal": 0}
 
 
 def statistik_pencarian() -> dict:
@@ -90,12 +94,16 @@ def statistik_pencarian() -> dict:
     bukan diasumsikan terpakai.
     """
     total = sum(_hitung.values()) or 1
-    return {k: v for k, v in _hitung.items()} | {
-        "porsi_tepat": round(_hitung["tepat"] / total, 4)}
+    return dict(_hitung) | {"porsi_tepat": round(_hitung["tepat"] / total, 4)}
 
 
-def tarif_resmi(kode: str, kelas_rawat: int, kelas_rs: str, regional: int,
-                kepemilikan: str = "PEMERINTAH") -> int | None:
+def tarif_resmi(
+    kode: str,
+    kelas_rawat: int,
+    kelas_rs: str,
+    regional: int,
+    kepemilikan: str = "PEMERINTAH",
+) -> int | None:
     """Tarif untuk satu kode pada satu konteks, dalam rupiah.
 
     kelas_rawat 1, 2, atau 3. regional 1 sampai 5. kelas_rs A sampai D.
@@ -133,8 +141,7 @@ def tarif_resmi(kode: str, kelas_rawat: int, kelas_rs: str, regional: int,
     # yang sama dikali rasio yang diukur dari data, bukan ditebak.
     if kode.endswith("-0"):
         dasar = kode[:-2] + "-I"
-        w = (peta.get((dasar, reg, kls, kepemilikan))
-             or _cadangan_per_kode().get(dasar))
+        w = peta.get((dasar, reg, kls, kepemilikan)) or _cadangan_per_kode().get(dasar)
         if w is not None:
             _hitung["cadangan_rawat_jalan"] += 1
             return int(w[idx] * RASIO_RAWAT_JALAN)
@@ -143,25 +150,36 @@ def tarif_resmi(kode: str, kelas_rawat: int, kelas_rs: str, regional: int,
     return None
 
 
-def vektor_tarif(kode_urut, kelas_rawat: int, kelas_rs: str, regional: int,
-                 kepemilikan: str = "PEMERINTAH"):
+def vektor_tarif(
+    kode_urut,
+    kelas_rawat: int,
+    kelas_rs: str,
+    regional: int,
+    kepemilikan: str = "PEMERINTAH",
+):
     """Tarif untuk sederet kode sekaligus, dipakai kepala K2."""
     import numpy as np
+
     return np.array(
-        [tarif_resmi(k, kelas_rawat, kelas_rs, regional, kepemilikan) or 0.0
-         for k in kode_urut], dtype=np.float64)
+        [
+            tarif_resmi(k, kelas_rawat, kelas_rs, regional, kepemilikan) or 0.0
+            for k in kode_urut
+        ],
+        dtype=np.float64,
+    )
 
 
-def matriks_tarif(kode_urut, kelas_rs: str, regional: int,
-                  kepemilikan: str = "PEMERINTAH"):
+def matriks_tarif(
+    kode_urut, kelas_rs: str, regional: int, kepemilikan: str = "PEMERINTAH"
+):
     """Tarif untuk setiap pasangan kode dan kelas rawat.
 
     Bentuk keluaran (jumlah kode, tiga kelas rawat), sama dengan
     TabelTarif.matriks pada versi tabel tebakan.
     """
     import numpy as np
+
     keluar = np.zeros((len(kode_urut), 3), dtype=np.float64)
     for j, kr in enumerate((1, 2, 3)):
-        keluar[:, j] = vektor_tarif(kode_urut, kr, kelas_rs, regional,
-                                    kepemilikan)
+        keluar[:, j] = vektor_tarif(kode_urut, kr, kelas_rs, regional, kepemilikan)
     return keluar

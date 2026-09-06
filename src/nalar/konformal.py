@@ -86,8 +86,9 @@ class Kalibrator:
         return np.asarray(skor) > self.ambang_untuk(kelompok)
 
 
-def periksa_jaminan(skor_uji: np.ndarray, bersih: np.ndarray,
-                    kal: Kalibrator, kelompok=None) -> dict:
+def periksa_jaminan(
+    skor_uji: np.ndarray, bersih: np.ndarray, kal: Kalibrator, kelompok=None
+) -> dict:
     """Apakah jaminannya benar benar terpenuhi secara empiris.
 
     Ini uji T2 pada rancangan. Bila alpha satu persen, laju penandaan terukur
@@ -96,14 +97,17 @@ def periksa_jaminan(skor_uji: np.ndarray, bersih: np.ndarray,
     tanda = kal.tandai(skor_uji, kelompok)
     b = np.asarray(bersih).astype(bool)
     laju = float(tanda[b].mean()) if b.any() else float("nan")
-    return dict(alpha=kal.alpha, laju_penandaan_klaim_bersih=round(laju, 5),
-                batas_lulus=round(kal.alpha * 1.5, 5),
-                lulus=bool(laju <= kal.alpha * 1.5),
-                n_bersih=int(b.sum()), n_ditandai=int(tanda.sum()))
+    return dict(
+        alpha=kal.alpha,
+        laju_penandaan_klaim_bersih=round(laju, 5),
+        batas_lulus=round(kal.alpha * 1.5, 5),
+        lulus=bool(laju <= kal.alpha * 1.5),
+        n_bersih=int(b.sum()),
+        n_ditandai=int(tanda.sum()),
+    )
 
 
-def ambang_sadar_faskes(nilai, faskes_id, alpha: float,
-                        minimal_sisa: int = 100):
+def ambang_sadar_faskes(nilai, faskes_id, alpha: float, minimal_sisa: int = 100):
     """Ambang konformal yang memperhitungkan sedikitnya jumlah faskes.
 
     Jaminan konformal berlaku bila klaim kalibrasi dan klaim uji saling

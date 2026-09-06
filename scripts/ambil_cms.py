@@ -18,15 +18,16 @@ from __future__ import annotations
 
 import json
 import os
-import sys
 
 DIR_DATA = os.path.join(os.path.dirname(__file__), "..", "data", "raw")
 
 # Halaman ini memuat tautan unduhan dan juga memanggil API pencarian dataset.
 # Dua duanya dipanen, mana yang lebih dulu berhasil.
-HALAMAN = ("https://data.cms.gov/provider-summary-by-type-of-service/"
-           "medicare-physician-other-practitioners/"
-           "medicare-physician-other-practitioners-by-provider-and-service")
+HALAMAN = (
+    "https://data.cms.gov/provider-summary-by-type-of-service/"
+    "medicare-physician-other-practitioners/"
+    "medicare-physician-other-practitioners-by-provider-and-service"
+)
 
 
 def utama():
@@ -37,9 +38,12 @@ def utama():
 
     with sync_playwright() as p:
         b = p.chromium.launch(headless=True)
-        hal = b.new_page(user_agent=(
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-            "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"))
+        hal = b.new_page(
+            user_agent=(
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+            )
+        )
 
         # Balasan API disadap dari lalu lintas halaman. Lebih murah daripada
         # menebak alamat titik akhirnya.
@@ -58,8 +62,10 @@ def utama():
             if any(x in h.lower() for x in (".csv", ".zip", "download")):
                 temuan["tautan"].append(h)
 
-        print(f"  {len(temuan['api'])} balasan API tersadap, "
-              f"{len(temuan['tautan'])} tautan unduhan")
+        print(
+            f"  {len(temuan['api'])} balasan API tersadap, "
+            f"{len(temuan['tautan'])} tautan unduhan"
+        )
         for s, u in temuan["api"][:12]:
             print(f"    [{s}] {u[:110]}")
         for t in sorted(set(temuan["tautan"]))[:12]:
@@ -76,23 +82,31 @@ def utama():
         print(f"  uuid dataset: {uuid}")
 
         if uuid:
-            alamat = (f"https://data.cms.gov/data-api/v1/dataset/{uuid}"
-                      f"/data?size=5000&offset=0")
+            alamat = (
+                f"https://data.cms.gov/data-api/v1/dataset/{uuid}"
+                f"/data?size=5000&offset=0"
+            )
             isi = hal.evaluate(
                 """async (u) => { const r = await fetch(u);
-                   return { s: r.status, t: await r.text() }; }""", alamat)
-            print(f"  contoh data: http {isi['s']}, "
-                  f"{len(isi['t'])} aksara")
+                   return { s: r.status, t: await r.text() }; }""",
+                alamat,
+            )
+            print(f"  contoh data: http {isi['s']}, {len(isi['t'])} aksara")
             if isi["s"] == 200:
-                with open(os.path.join(DIR_DATA, "cms_dokter_contoh.json"),
-                          "w", encoding="utf-8") as f:
+                with open(
+                    os.path.join(DIR_DATA, "cms_dokter_contoh.json"),
+                    "w",
+                    encoding="utf-8",
+                ) as f:
                     f.write(isi["t"])
                 print("  ditulis ke data/raw/cms_dokter_contoh.json")
 
-        with open(os.path.join(DIR_DATA, "cms_jejak.json"), "w",
-                  encoding="utf-8") as f:
-            json.dump({"api": temuan["api"],
-                       "tautan": sorted(set(temuan["tautan"]))}, f, indent=1)
+        with open(os.path.join(DIR_DATA, "cms_jejak.json"), "w", encoding="utf-8") as f:
+            json.dump(
+                {"api": temuan["api"], "tautan": sorted(set(temuan["tautan"]))},
+                f,
+                indent=1,
+            )
         b.close()
     return 0
 

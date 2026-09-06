@@ -35,8 +35,7 @@ import numpy as np
 from . import katalog as K
 from .vocab import HARGA_ACUAN
 
-PASANGAN_TERLARANG = [("47.01", "47.09"), ("51.23", "51.22"),
-                      ("79.35", "78.55")]
+PASANGAN_TERLARANG = [("47.01", "47.09"), ("51.23", "51.22"), ("79.35", "78.55")]
 
 
 def mesin_aturan(episodes) -> tuple[np.ndarray, list[list[str]]]:
@@ -115,19 +114,38 @@ def fitur_tangan(episodes) -> np.ndarray:
     baris = []
     for r in episodes:
         acuan = sum(HARGA_ACUAN.get(k, 0) * n for k, n in r["bhp"])
-        baris.append([
-            r["umur"], r["sex"], r["segmen"], r["hak_kelas"], r["f_reg"],
-            r["f_jenis"], r["f_dtpk"], r["rawat_inap"], r["los"],
-            len(r["dxs"]), len(r["prc"]), len(r["obt"]), len(r["lab"]),
-            len(r["bhp"]), r["keparahan"], r["kelas_rawat"],
-            np.log1p(r["tarif"]), np.log1p(r.get("tagih_bhp", 0)),
-            np.log1p(acuan),
-            r.get("tagih_bhp", 0) / max(acuan, 1.0),
-            max(r["d_prev"], 0), r["rujuk"],
-            sum(1 for d in r["dxs"] if d in K.KOMORBID_BY_ICD
-                and K.KOMORBID_BY_ICD[d]["berat"]),
-            1.0 if len(r["lab"]) == 0 else 0.0,
-        ])
+        baris.append(
+            [
+                r["umur"],
+                r["sex"],
+                r["segmen"],
+                r["hak_kelas"],
+                r["f_reg"],
+                r["f_jenis"],
+                r["f_dtpk"],
+                r["rawat_inap"],
+                r["los"],
+                len(r["dxs"]),
+                len(r["prc"]),
+                len(r["obt"]),
+                len(r["lab"]),
+                len(r["bhp"]),
+                r["keparahan"],
+                r["kelas_rawat"],
+                np.log1p(r["tarif"]),
+                np.log1p(r.get("tagih_bhp", 0)),
+                np.log1p(acuan),
+                r.get("tagih_bhp", 0) / max(acuan, 1.0),
+                max(r["d_prev"], 0),
+                r["rujuk"],
+                sum(
+                    1
+                    for d in r["dxs"]
+                    if d in K.KOMORBID_BY_ICD and K.KOMORBID_BY_ICD[d]["berat"]
+                ),
+                1.0 if len(r["lab"]) == 0 else 0.0,
+            ]
+        )
     return np.asarray(baris, dtype=np.float64)
 
 
@@ -188,6 +206,7 @@ class RegresiLogistik:
 #              pembanding yang benar benar sebanding, dan inilah uji T3 yang
 #              sesungguhnya.
 
+
 def fitur_bukti(episodes) -> np.ndarray:
     """Fitur yang hanya memuat bukti, tanpa tarif dan tanpa diagnosis sekunder.
 
@@ -211,12 +230,24 @@ def fitur_bukti(episodes) -> np.ndarray:
             if j is not None:
                 pita[j] = pita_lab(kode, nilai) + 1
         dasar = [
-            r["umur"], r["sex"], r["segmen"], r["hak_kelas"], r["f_reg"],
-            r["f_jenis"], r["f_dtpk"], r["rawat_inap"], r["los"],
+            r["umur"],
+            r["sex"],
+            r["segmen"],
+            r["hak_kelas"],
+            r["f_reg"],
+            r["f_jenis"],
+            r["f_dtpk"],
+            r["rawat_inap"],
+            r["los"],
             {"A": 0, "B": 1, "C": 2, "D": 3, "FKTP": 4}[r["f_kelas"]],
-            r["f_milik"], len(r["prc"]), len(r["obt"]), len(r["lab"]),
-            len(r["bhp"]), sum(n for _, n in r["bhp"]),
-            max(r["d_prev"], 0), r["rujuk"],
+            r["f_milik"],
+            len(r["prc"]),
+            len(r["obt"]),
+            len(r["lab"]),
+            len(r["bhp"]),
+            sum(n for _, n in r["bhp"]),
+            max(r["d_prev"], 0),
+            r["rujuk"],
         ]
         baris.append(np.concatenate([dasar, satu_dxp, pita]))
     return np.asarray(baris, dtype=np.float64)
@@ -227,8 +258,13 @@ def pohon_terawasi(X_tr, y_tr, X_te, nilai_te, seed=0):
     from sklearn.ensemble import HistGradientBoostingClassifier
 
     m = HistGradientBoostingClassifier(
-        max_iter=300, learning_rate=0.08, max_leaf_nodes=63,
-        l2_regularization=1.0, random_state=seed, class_weight="balanced")
+        max_iter=300,
+        learning_rate=0.08,
+        max_leaf_nodes=63,
+        l2_regularization=1.0,
+        random_state=seed,
+        class_weight="balanced",
+    )
     m.fit(X_tr, y_tr)
     p = m.predict_proba(X_te)[:, 1]
     # diperingkat menurut ekspektasi rupiah, bukan menurut peluang saja
@@ -250,13 +286,18 @@ def pohon_normatif(X_tr, tarif_tr, bhp_tr, X_te, tarif_te, bhp_te, seed=0):
 
     def buat():
         return HistGradientBoostingRegressor(
-            max_iter=300, learning_rate=0.08, max_leaf_nodes=63,
-            l2_regularization=1.0, random_state=seed)
+            max_iter=300,
+            learning_rate=0.08,
+            max_leaf_nodes=63,
+            l2_regularization=1.0,
+            random_state=seed,
+        )
 
     m_tarif = buat().fit(X_tr, np.log1p(tarif_tr))
     m_bhp = buat().fit(X_tr, np.log1p(bhp_tr))
     harap_tarif = np.expm1(m_tarif.predict(X_te))
     harap_bhp = np.expm1(m_bhp.predict(X_te))
-    selisih = ((np.asarray(tarif_te, dtype=np.float64) - harap_tarif)
-               + (np.asarray(bhp_te, dtype=np.float64) - harap_bhp))
+    selisih = (np.asarray(tarif_te, dtype=np.float64) - harap_tarif) + (
+        np.asarray(bhp_te, dtype=np.float64) - harap_bhp
+    )
     return np.clip(selisih, 0, None), harap_tarif, harap_bhp

@@ -1,0 +1,54 @@
+name: uji
+
+on:
+  push:
+    branches: [dev, main]
+  pull_request:
+    branches: [dev, main]
+
+jobs:
+  mutu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: pasang uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: pasang python
+        run: uv python install 3.12
+
+      - name: pasang kebutuhan
+        run: uv sync --extra dev
+
+      - name: periksa gaya
+        run: uv run ruff check src tests scripts
+
+      - name: periksa format
+        run: uv run ruff format --check src tests scripts
+
+      - name: jalankan uji
+        run: uv run python -m unittest discover -s tests -v
+
+  # Menjaga agar tidak ada jejak perkakas bantu yang ikut terkirim.
+  # Ini bukan soal rapi, ini soal karya yang dinilai harus jelas siapa
+  # penulisnya.
+  bersih:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: periksa jejak perkakas
+        run: |
+          if git log --format='%s%n%b' | grep -iE 'co-authored-by:.*(claude|anthropic|copilot)'; then
+            echo "ada jejak perkakas bantu di pesan commit"
+            exit 1
+          fi
+          if git ls-files | grep -iE '^\.claude|/\.claude|agents?/|\.mcp\.json'; then
+            echo "ada berkas perkakas bantu yang terlacak"
+            exit 1
+          fi
+          echo "bersih"
