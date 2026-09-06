@@ -15,15 +15,28 @@ import os
 import sys
 
 import numpy as np
-import torch
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from nalar import katalog as K  # noqa: E402
 from nalar.konformal import Kalibrator, ambang  # noqa: E402
-from nalar.model import PerhatianBerbidang  # noqa: E402
 from nalar.schema import N_FIELDS  # noqa: E402
 from nalar.tarif import hitung_keparahan, kelompokkan, tarif  # noqa: E402
+
+# Torch hanya dipakai oleh satu blok uji, yaitu yang memeriksa bias antar
+# bidang pada transformer. Transformer itu sudah dinyatakan kalah pada
+# percobaan kedua belas dan bukan yang dikirim, jadi memaksa setiap orang
+# mengunduh delapan ratus megabita hanya untuk menjalankan uji tidak sepadan.
+# Blok itu dilewati kalau torch tidak ada, dan dilewatinya dicatat, bukan
+# didiamkan.
+try:
+    import torch
+
+    from nalar.model import PerhatianBerbidang
+
+    ADA_TORCH = True
+except ImportError:
+    ADA_TORCH = False
 
 lulus, gagal = 0, 0
 
@@ -41,34 +54,38 @@ def cek(nama, kondisi, catatan=""):
 # ---------------------------------------------------------------------------
 print("\n1. Bias antar-bidang benar benar mengambil nilai yang tepat")
 # ---------------------------------------------------------------------------
-torch.manual_seed(0)
-att = PerhatianBerbidang(d=16, n_kepala=2, pakai_bias_bidang=True)
-with torch.no_grad():
-    att.bias_bidang.copy_(
-        torch.arange(2 * N_FIELDS * N_FIELDS, dtype=torch.float32).view(
-            2, N_FIELDS, N_FIELDS
+if not ADA_TORCH:
+    print("  DILEWATI  torch tidak terpasang, dua uji transformer tidak jalan")
+    print("            pasang dengan: pip install '.[transformer]'")
+else:
+    torch.manual_seed(0)
+    att = PerhatianBerbidang(d=16, n_kepala=2, pakai_bias_bidang=True)
+    with torch.no_grad():
+        att.bias_bidang.copy_(
+            torch.arange(2 * N_FIELDS * N_FIELDS, dtype=torch.float32).view(
+                2, N_FIELDS, N_FIELDS
+            )
         )
+        att.qkv.weight.zero_()  # matikan sumbangan isi, sisakan bias saja
+    B, T = 2, 5
+    x = torch.randn(B, T, 16)
+    fld = torch.tensor([[0, 3, 3, 11, 11], [5, 5, 0, 2, 9]])
+    pad = torch.ones(B, T, dtype=torch.bool)
+
+    # ambil skor sebelum softmax dengan menghitung ulang jalur bias
+    fi = fld.long()
+    pasangan = (fi[:, :, None] * N_FIELDS + fi[:, None, :]).reshape(-1)
+    rata = att.bias_bidang.reshape(2, -1)
+    b = rata.index_select(1, pasangan).view(2, B, T, T).permute(1, 0, 2, 3)
+    harapan = att.bias_bidang[1, fld[0, 2], fld[0, 4]]
+    cek(
+        "nilai bias diambil dari pasangan bidang yang benar",
+        torch.allclose(b[0, 1, 2, 4], harapan),
+        f"{b[0, 1, 2, 4].item()} vs {harapan.item()}",
     )
-    att.qkv.weight.zero_()  # matikan sumbangan isi, sisakan bias saja
-B, T = 2, 5
-x = torch.randn(B, T, 16)
-fld = torch.tensor([[0, 3, 3, 11, 11], [5, 5, 0, 2, 9]])
-pad = torch.ones(B, T, dtype=torch.bool)
 
-# ambil skor sebelum softmax dengan menghitung ulang jalur bias
-fi = fld.long()
-pasangan = (fi[:, :, None] * N_FIELDS + fi[:, None, :]).reshape(-1)
-rata = att.bias_bidang.reshape(2, -1)
-b = rata.index_select(1, pasangan).view(2, B, T, T).permute(1, 0, 2, 3)
-harapan = att.bias_bidang[1, fld[0, 2], fld[0, 4]]
-cek(
-    "nilai bias diambil dari pasangan bidang yang benar",
-    torch.allclose(b[0, 1, 2, 4], harapan),
-    f"{b[0, 1, 2, 4].item()} vs {harapan.item()}",
-)
-
-y = att(x, fld, pad)
-cek("keluaran perhatian berbentuk benar", tuple(y.shape) == (B, T, 16))
+    y = att(x, fld, pad)
+    cek("keluaran perhatian berbentuk benar", tuple(y.shape) == (B, T, 16))
 
 att_mati = PerhatianBerbidang(d=16, n_kepala=2, pakai_bias_bidang=False)
 cek("saklar bias bisa dimatikan untuk ablasi", not hasattr(att_mati, "bias_bidang"))

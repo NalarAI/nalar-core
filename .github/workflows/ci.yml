@@ -13,29 +13,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: pasang uv
-        uses: astral-sh/setup-uv@v3
+      - uses: actions/setup-python@v5
         with:
-          enable-cache: true
+          python-version: "3.12"
 
-      - name: pasang python
-        run: uv python install 3.12
+      # uv dipasang lewat pip, bukan lewat aksi pihak ketiga, supaya alur ini
+      # tidak ikut rusak setiap kali aksi itu berganti versi mayor.
+      - name: pasang uv
+        run: pip install uv
 
+      # torch sengaja tidak dipasang. Model yang dikirim tidak memakainya, dan
+      # dua uji yang memerlukannya melewati diri sendiri dengan pesan.
       - name: pasang kebutuhan
-        run: uv sync --extra dev
+        run: uv pip install --system -e ".[dev]"
 
       - name: periksa gaya
-        run: uv run ruff check src tests scripts
+        run: ruff check src tests scripts
 
       - name: periksa format
-        run: uv run ruff format --check src tests scripts
+        run: ruff format --check src tests scripts
 
       - name: jalankan uji
-        run: uv run python -m unittest discover -s tests -v
+        run: python -m unittest discover -s tests -v
 
-  # Menjaga agar tidak ada jejak perkakas bantu yang ikut terkirim.
-  # Ini bukan soal rapi, ini soal karya yang dinilai harus jelas siapa
-  # penulisnya.
+  # Menjaga agar tidak ada jejak perkakas bantu yang ikut terkirim. Ini bukan
+  # soal rapi, ini soal karya yang dinilai harus jelas siapa penulisnya.
   bersih:
     runs-on: ubuntu-latest
     steps:
@@ -48,7 +50,7 @@ jobs:
             echo "ada jejak perkakas bantu di pesan commit"
             exit 1
           fi
-          if git ls-files | grep -iE '^\.claude|/\.claude|agents?/|\.mcp\.json'; then
+          if git ls-files | grep -iE '^\.claude|/\.claude|^agents?/|\.mcp\.json'; then
             echo "ada berkas perkakas bantu yang terlacak"
             exit 1
           fi
