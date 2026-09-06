@@ -1,0 +1,958 @@
+{
+  "model": "nalar-qwen3-4b",
+  "n": 40,
+  "delta": 0.05,
+  "detik_total": 458.1,
+  "baris": [
+    {
+      "id": "K00000401",
+      "sumber": "aturan",
+      "sebab_mundur": "berkas susunan agen jatuh di saringan",
+      "skor": 1.0,
+      "cacat": [],
+      "cacat_saringan": [
+        {
+          "jenis": "a1",
+          "angka": [
+            10.0
+          ]
+        }
+      ],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 44.89,
+      "token_masuk": 7585,
+      "token_keluar": 330,
+      "panggilan_alat": 4,
+      "detik": 13.58,
+      "n_kata": 95
+    },
+    {
+      "id": "K00001051",
+      "sumber": "aturan",
+      "sebab_mundur": "berkas susunan agen jatuh di saringan",
+      "skor": 1.0,
+      "cacat": [],
+      "cacat_saringan": [
+        {
+          "jenis": "a1",
+          "angka": [
+            1211031.0,
+            36310.0,
+            185490.0
+          ]
+        }
+      ],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 49.575,
+      "token_masuk": 8421,
+      "token_keluar": 357,
+      "panggilan_alat": 4,
+      "detik": 6.16,
+      "n_kata": 100
+    },
+    {
+      "id": "K00002587",
+      "sumber": "aturan",
+      "sebab_mundur": "berkas susunan agen jatuh di saringan",
+      "skor": 1.0,
+      "cacat": [],
+      "cacat_saringan": [
+        {
+          "jenis": "a1",
+          "angka": [
+            712328.0,
+            125722.0,
+            125722.0
+          ]
+        }
+      ],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 53.942,
+      "token_masuk": 9106,
+      "token_keluar": 398,
+      "panggilan_alat": 4,
+      "detik": 8.06,
+      "n_kata": 96
+    },
+    {
+      "id": "K00004554",
+      "sumber": "agen",
+      "sebab_mundur": "",
+      "skor": 0.5,
+      "cacat": [
+        {
+          "jenis": "ikatan",
+          "nama": "selisih",
+          "disebut": 489690.0,
+          "seharusnya": [
+            6047842.0
+          ]
+        }
+      ],
+      "cacat_saringan": [],
+      "n_cacat": 1,
+      "a1": [],
+      "biaya_rp": 52.55,
+      "token_masuk": 9066,
+      "token_keluar": 355,
+      "panggilan_alat": 4,
+      "detik": 9.33,
+      "n_kata": 47
+    },
+    {
+      "id": "K00006512",
+      "sumber": "aturan",
+      "sebab_mundur": "berkas susunan agen jatuh di saringan",
+      "skor": 1.0,
+      "cacat": [],
+      "cacat_saringan": [
+        {
+          "jenis": "a1",
+          "angka": [
+            48584.0,
+            33584.0,
+            21176.0,
+            20205.0
+          ]
+        }
+      ],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 48.925,
+      "token_masuk": 8378,
+      "token_keluar": 341,
+      "panggilan_alat": 4,
+      "detik": 8.62,
+      "n_kata": 92
+    },
+    {
+      "id": "K00006808",
+      "sumber": "aturan",
+      "sebab_mundur": "berkas susunan agen jatuh di saringan",
+      "skor": 1.0,
+      "cacat": [],
+      "cacat_saringan": [
+        {
+          "jenis": "a1",
+          "angka": [
+            5631930.0,
+            56662.0,
+            43616.0,
+            30799.0,
+            30197.0
+          ]
+        }
+      ],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 49.578,
+      "token_masuk": 8380,
+      "token_keluar": 364,
+      "panggilan_alat": 4,
+      "detik": 7.77,
+      "n_kata": 92
+    },
+    {
+      "id": "K00004785",
+      "sumber": "aturan",
+      "sebab_mundur": "berkas susunan agen jatuh di saringan",
+      "skor": 1.0,
+      "cacat": [],
+      "cacat_saringan": [
+        {
+          "jenis": "a1",
+          "angka": [
+            451898.0
+          ]
+        }
+      ],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 52.728,
+      "token_masuk": 8943,
+      "token_keluar": 382,
+      "panggilan_alat": 4,
+      "detik": 8.46,
+      "n_kata": 96
+    },
+    {
+      "id": "K00000460",
+      "sumber": "agen",
+      "sebab_mundur": "",
+      "skor": 0.8,
+      "cacat": [
+        {
+          "jenis": "ikatan",
+          "nama": "selisih",
+          "disebut": 80483.0,
+          "seharusnya": [
+            3303183.0
+          ]
+        }
+      ],
+      "cacat_saringan": [],
+      "n_cacat": 1,
+      "a1": [],
+      "biaya_rp": 49.54,
+      "token_masuk": 8366,
+      "token_keluar": 365,
+      "panggilan_alat": 4,
+      "detik": 7.67,
+      "n_kata": 52
+    },
+    {
+      "id": "K00001251",
+      "sumber": "aturan",
+      "sebab_mundur": "berkas susunan agen jatuh di saringan",
+      "skor": 1.0,
+      "cacat": [],
+      "cacat_saringan": [
+        {
+          "jenis": "a1",
+          "angka": [
+            857065.0,
+            818909.0,
+            586881.0,
+            500605.0,
+            476841.0
+          ]
+        }
+      ],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 50.252,
+      "token_masuk": 8440,
+      "token_keluar": 378,
+      "panggilan_alat": 4,
+      "detik": 8.48,
+      "n_kata": 95
+    },
+    {
+      "id": "K00001653",
+      "sumber": "aturan",
+      "sebab_mundur": "berkas susunan agen jatuh di saringan",
+      "skor": 1.0,
+      "cacat": [],
+      "cacat_saringan": [
+        {
+          "jenis": "a1",
+          "angka": [
+            928724.0,
+            856255.0,
+            588403.0,
+            497790.0,
+            478463.0
+          ]
+        }
+      ],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 49.424,
+      "token_masuk": 8377,
+      "token_keluar": 359,
+      "panggilan_alat": 4,
+      "detik": 8.01,
+      "n_kata": 95
+    },
+    {
+      "id": "K00001047",
+      "sumber": "aturan",
+      "sebab_mundur": "isian yang tidak ada dipakai agen: ['bukti', 'kelompok_tarif', 'selisih_rp', 'total_diajukan_rp', 'total_didukung_bukti_rp']",
+      "skor": 1.0,
+      "cacat": [],
+      "cacat_saringan": [],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 50.856,
+      "token_masuk": 9051,
+      "token_keluar": 297,
+      "panggilan_alat": 4,
+      "detik": 7.1,
+      "n_kata": 104
+    },
+    {
+      "id": "K00006120",
+      "sumber": "agen",
+      "sebab_mundur": "",
+      "skor": 0.5,
+      "cacat": [],
+      "cacat_saringan": [],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 48.341,
+      "token_masuk": 8373,
+      "token_keluar": 321,
+      "panggilan_alat": 4,
+      "detik": 8.43,
+      "n_kata": 47
+    },
+    {
+      "id": "K00000832",
+      "sumber": "aturan",
+      "sebab_mundur": "berkas susunan agen jatuh di saringan",
+      "skor": 1.0,
+      "cacat": [],
+      "cacat_saringan": [
+        {
+          "jenis": "a1",
+          "angka": [
+            857762.0,
+            154571.0,
+            46785.0
+          ]
+        }
+      ],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 50.423,
+      "token_masuk": 8387,
+      "token_keluar": 393,
+      "panggilan_alat": 4,
+      "detik": 10.09,
+      "n_kata": 96
+    },
+    {
+      "id": "K00003204",
+      "sumber": "aturan",
+      "sebab_mundur": "berkas susunan agen jatuh di saringan",
+      "skor": 1.0,
+      "cacat": [],
+      "cacat_saringan": [
+        {
+          "jenis": "a1",
+          "angka": [
+            103486.0,
+            66562.0,
+            58757.0,
+            27783.0
+          ]
+        }
+      ],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 48.862,
+      "token_masuk": 8311,
+      "token_keluar": 350,
+      "panggilan_alat": 4,
+      "detik": 9.15,
+      "n_kata": 92
+    },
+    {
+      "id": "K00001535",
+      "sumber": "aturan",
+      "sebab_mundur": "berkas susunan agen jatuh di saringan",
+      "skor": 1.0,
+      "cacat": [],
+      "cacat_saringan": [
+        {
+          "jenis": "a1",
+          "angka": [
+            109865.0,
+            11334.0,
+            11176.0
+          ]
+        }
+      ],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 49.56,
+      "token_masuk": 8406,
+      "token_keluar": 359,
+      "panggilan_alat": 4,
+      "detik": 9.61,
+      "n_kata": 96
+    },
+    {
+      "id": "K00000780",
+      "sumber": "agen",
+      "sebab_mundur": "",
+      "skor": 0.5,
+      "cacat": [
+        {
+          "jenis": "ikatan",
+          "nama": "selisih",
+          "disebut": 38143.0,
+          "seharusnya": [
+            2201087.0
+          ]
+        },
+        {
+          "jenis": "ikatan",
+          "nama": "selisih",
+          "disebut": 17.0,
+          "seharusnya": [
+            2201087.0
+          ]
+        }
+      ],
+      "cacat_saringan": [],
+      "n_cacat": 2,
+      "a1": [],
+      "biaya_rp": 48.905,
+      "token_masuk": 8338,
+      "token_keluar": 347,
+      "panggilan_alat": 4,
+      "detik": 12.63,
+      "n_kata": 50
+    },
+    {
+      "id": "K00000503",
+      "sumber": "aturan",
+      "sebab_mundur": "isian yang tidak ada dipakai agen: ['kelompok_tarif', 'selisih_rp', 'total_diajukan_rp', 'total_didukung_bukti_rp']",
+      "skor": 1.0,
+      "cacat": [],
+      "cacat_saringan": [],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 50.798,
+      "token_masuk": 9003,
+      "token_keluar": 303,
+      "panggilan_alat": 4,
+      "detik": 8.1,
+      "n_kata": 108
+    },
+    {
+      "id": "K00000558",
+      "sumber": "aturan",
+      "sebab_mundur": "berkas susunan agen jatuh di saringan",
+      "skor": 1.0,
+      "cacat": [],
+      "cacat_saringan": [
+        {
+          "jenis": "a1",
+          "angka": [
+            33618.0,
+            8727.0
+          ]
+        }
+      ],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 49.718,
+      "token_masuk": 8380,
+      "token_keluar": 369,
+      "panggilan_alat": 4,
+      "detik": 8.81,
+      "n_kata": 100
+    },
+    {
+      "id": "K00004103",
+      "sumber": "aturan",
+      "sebab_mundur": "berkas susunan agen jatuh di saringan",
+      "skor": 1.0,
+      "cacat": [],
+      "cacat_saringan": [
+        {
+          "jenis": "a1",
+          "angka": [
+            136160.0
+          ]
+        }
+      ],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 52.904,
+      "token_masuk": 9040,
+      "token_keluar": 372,
+      "panggilan_alat": 4,
+      "detik": 10.23,
+      "n_kata": 104
+    },
+    {
+      "id": "K00003286",
+      "sumber": "agen",
+      "sebab_mundur": "",
+      "skor": 0.5,
+      "cacat": [],
+      "cacat_saringan": [],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 48.304,
+      "token_masuk": 8383,
+      "token_keluar": 318,
+      "panggilan_alat": 4,
+      "detik": 8.92,
+      "n_kata": 45
+    },
+    {
+      "id": "K00004549",
+      "sumber": "agen",
+      "sebab_mundur": "",
+      "skor": 0.5,
+      "cacat": [
+        {
+          "jenis": "ikatan",
+          "nama": "selisih",
+          "disebut": 630766.0,
+          "seharusnya": [
+            1877381.0
+          ]
+        }
+      ],
+      "cacat_saringan": [],
+      "n_cacat": 1,
+      "a1": [],
+      "biaya_rp": 53.386,
+      "token_masuk": 9077,
+      "token_keluar": 383,
+      "panggilan_alat": 4,
+      "detik": 11.14,
+      "n_kata": 51
+    },
+    {
+      "id": "K00002988",
+      "sumber": "aturan",
+      "sebab_mundur": "berkas susunan agen jatuh di saringan",
+      "skor": 1.0,
+      "cacat": [],
+      "cacat_saringan": [
+        {
+          "jenis": "a1",
+          "angka": [
+            765727.0
+          ]
+        }
+      ],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 52.088,
+      "token_masuk": 8920,
+      "token_keluar": 363,
+      "panggilan_alat": 4,
+      "detik": 11.82,
+      "n_kata": 92
+    },
+    {
+      "id": "K00006528",
+      "sumber": "aturan",
+      "sebab_mundur": "berkas susunan agen jatuh di saringan",
+      "skor": 1.0,
+      "cacat": [],
+      "cacat_saringan": [
+        {
+          "jenis": "a1",
+          "angka": [
+            46926.0,
+            11787.0
+          ]
+        }
+      ],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 49.083,
+      "token_masuk": 8382,
+      "token_keluar": 346,
+      "panggilan_alat": 4,
+      "detik": 12.11,
+      "n_kata": 100
+    },
+    {
+      "id": "K00003515",
+      "sumber": "aturan",
+      "sebab_mundur": "berkas susunan agen jatuh di saringan",
+      "skor": 1.0,
+      "cacat": [],
+      "cacat_saringan": [
+        {
+          "jenis": "a1",
+          "angka": [
+            513233.0,
+            175084.0,
+            66123.0,
+            39403.0
+          ]
+        }
+      ],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 54.865,
+      "token_masuk": 9064,
+      "token_keluar": 438,
+      "panggilan_alat": 4,
+      "detik": 11.69,
+      "n_kata": 92
+    },
+    {
+      "id": "K00004590",
+      "sumber": "agen",
+      "sebab_mundur": "",
+      "skor": 0.5,
+      "cacat": [
+        {
+          "jenis": "ikatan",
+          "nama": "selisih",
+          "disebut": 260760.0,
+          "seharusnya": [
+            1536252.0
+          ]
+        }
+      ],
+      "cacat_saringan": [],
+      "n_cacat": 1,
+      "a1": [],
+      "biaya_rp": 52.628,
+      "token_masuk": 9017,
+      "token_keluar": 366,
+      "panggilan_alat": 4,
+      "detik": 13.63,
+      "n_kata": 48
+    },
+    {
+      "id": "K00004385",
+      "sumber": "agen",
+      "sebab_mundur": "",
+      "skor": 0.8,
+      "cacat": [
+        {
+          "jenis": "ikatan",
+          "nama": "selisih",
+          "disebut": 174089.0,
+          "seharusnya": [
+            1399823.0
+          ]
+        }
+      ],
+      "cacat_saringan": [],
+      "n_cacat": 1,
+      "a1": [],
+      "biaya_rp": 53.148,
+      "token_masuk": 9074,
+      "token_keluar": 375,
+      "panggilan_alat": 4,
+      "detik": 9.34,
+      "n_kata": 50
+    },
+    {
+      "id": "K00000462",
+      "sumber": "aturan",
+      "sebab_mundur": "berkas susunan agen jatuh di saringan",
+      "skor": 1.0,
+      "cacat": [],
+      "cacat_saringan": [
+        {
+          "jenis": "a1",
+          "angka": [
+            46727.0,
+            7051.0,
+            5264.0
+          ]
+        }
+      ],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 49.231,
+      "token_masuk": 8336,
+      "token_keluar": 359,
+      "panggilan_alat": 4,
+      "detik": 11.35,
+      "n_kata": 96
+    },
+    {
+      "id": "K00005947",
+      "sumber": "aturan",
+      "sebab_mundur": "berkas susunan agen jatuh di saringan",
+      "skor": 1.0,
+      "cacat": [],
+      "cacat_saringan": [
+        {
+          "jenis": "a1",
+          "angka": [
+            25394.0,
+            5599.0
+          ]
+        }
+      ],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 49.13,
+      "token_masuk": 8368,
+      "token_keluar": 350,
+      "panggilan_alat": 4,
+      "detik": 9.89,
+      "n_kata": 100
+    },
+    {
+      "id": "K00006544",
+      "sumber": "agen",
+      "sebab_mundur": "",
+      "skor": 1.0,
+      "cacat": [
+        {
+          "jenis": "ikatan",
+          "nama": "selisih",
+          "disebut": 197417.0,
+          "seharusnya": [
+            1213044.0
+          ]
+        }
+      ],
+      "cacat_saringan": [],
+      "n_cacat": 1,
+      "a1": [],
+      "biaya_rp": 55.009,
+      "token_masuk": 9047,
+      "token_keluar": 446,
+      "panggilan_alat": 4,
+      "detik": 13.75,
+      "n_kata": 82
+    },
+    {
+      "id": "K00006344",
+      "sumber": "agen",
+      "sebab_mundur": "",
+      "skor": 0.5,
+      "cacat": [
+        {
+          "jenis": "ikatan",
+          "nama": "selisih",
+          "disebut": 364647.0,
+          "seharusnya": [
+            1059577.0
+          ]
+        }
+      ],
+      "cacat_saringan": [],
+      "n_cacat": 1,
+      "a1": [],
+      "biaya_rp": 49.452,
+      "token_masuk": 8365,
+      "token_keluar": 362,
+      "panggilan_alat": 4,
+      "detik": 9.21,
+      "n_kata": 50
+    },
+    {
+      "id": "K00001617",
+      "sumber": "agen",
+      "sebab_mundur": "",
+      "skor": 1.0,
+      "cacat": [
+        {
+          "jenis": "ikatan",
+          "nama": "selisih",
+          "disebut": 99634.0,
+          "seharusnya": [
+            1041079.0
+          ]
+        }
+      ],
+      "cacat_saringan": [],
+      "n_cacat": 1,
+      "a1": [],
+      "biaya_rp": 55.023,
+      "token_masuk": 9062,
+      "token_keluar": 444,
+      "panggilan_alat": 4,
+      "detik": 11.93,
+      "n_kata": 84
+    },
+    {
+      "id": "K00001274",
+      "sumber": "agen",
+      "sebab_mundur": "",
+      "skor": 0.8,
+      "cacat": [
+        {
+          "jenis": "ikatan",
+          "nama": "selisih",
+          "disebut": 138284.0,
+          "seharusnya": [
+            902121.0
+          ]
+        }
+      ],
+      "cacat_saringan": [],
+      "n_cacat": 1,
+      "a1": [],
+      "biaya_rp": 49.662,
+      "token_masuk": 8380,
+      "token_keluar": 367,
+      "panggilan_alat": 4,
+      "detik": 10.3,
+      "n_kata": 50
+    },
+    {
+      "id": "K00000024",
+      "sumber": "aturan",
+      "sebab_mundur": "berkas susunan agen jatuh di saringan",
+      "skor": 1.0,
+      "cacat": [],
+      "cacat_saringan": [
+        {
+          "jenis": "a1",
+          "angka": [
+            70190.0,
+            15205.0
+          ]
+        }
+      ],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 49.944,
+      "token_masuk": 8440,
+      "token_keluar": 367,
+      "panggilan_alat": 4,
+      "detik": 11.57,
+      "n_kata": 100
+    },
+    {
+      "id": "K00001091",
+      "sumber": "agen",
+      "sebab_mundur": "",
+      "skor": 0.5,
+      "cacat": [
+        {
+          "jenis": "ikatan",
+          "nama": "selisih",
+          "disebut": 194285.0,
+          "seharusnya": [
+            521736.0
+          ]
+        }
+      ],
+      "cacat_saringan": [],
+      "n_cacat": 1,
+      "a1": [],
+      "biaya_rp": 49.733,
+      "token_masuk": 8395,
+      "token_keluar": 367,
+      "panggilan_alat": 4,
+      "detik": 19.7,
+      "n_kata": 47
+    },
+    {
+      "id": "K00001342",
+      "sumber": "aturan",
+      "sebab_mundur": "berkas susunan agen jatuh di saringan",
+      "skor": 1.0,
+      "cacat": [],
+      "cacat_saringan": [
+        {
+          "jenis": "a1",
+          "angka": [
+            158435.0
+          ]
+        }
+      ],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 53.618,
+      "token_masuk": 9025,
+      "token_keluar": 400,
+      "panggilan_alat": 4,
+      "detik": 12.85,
+      "n_kata": 100
+    },
+    {
+      "id": "K00002233",
+      "sumber": "aturan",
+      "sebab_mundur": "berkas susunan agen jatuh di saringan",
+      "skor": 1.0,
+      "cacat": [],
+      "cacat_saringan": [
+        {
+          "jenis": "a1",
+          "angka": [
+            2291690.0,
+            2215778.0,
+            1360950.0,
+            1358296.0,
+            1203705.0
+          ]
+        }
+      ],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 53.002,
+      "token_masuk": 9043,
+      "token_keluar": 375,
+      "panggilan_alat": 4,
+      "detik": 24.65,
+      "n_kata": 95
+    },
+    {
+      "id": "K00001095",
+      "sumber": "agen",
+      "sebab_mundur": "",
+      "skor": 0.5,
+      "cacat": [],
+      "cacat_saringan": [],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 48.763,
+      "token_masuk": 8415,
+      "token_keluar": 329,
+      "panggilan_alat": 4,
+      "detik": 14.37,
+      "n_kata": 44
+    },
+    {
+      "id": "K00000488",
+      "sumber": "aturan",
+      "sebab_mundur": "berkas susunan agen jatuh di saringan",
+      "skor": 1.0,
+      "cacat": [],
+      "cacat_saringan": [
+        {
+          "jenis": "a1",
+          "angka": [
+            97475.0,
+            19243.0
+          ]
+        }
+      ],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 53.751,
+      "token_masuk": 8958,
+      "token_keluar": 416,
+      "panggilan_alat": 4,
+      "detik": 19.3,
+      "n_kata": 100
+    },
+    {
+      "id": "K00006707",
+      "sumber": "aturan",
+      "sebab_mundur": "isian yang tidak ada dipakai agen: ['kelompok_tarif', 'selisih_rp', 'total_diajukan_rp', 'total_didukung_bukti_rp']",
+      "skor": 1.0,
+      "cacat": [],
+      "cacat_saringan": [],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 50.566,
+      "token_masuk": 9043,
+      "token_keluar": 288,
+      "panggilan_alat": 4,
+      "detik": 19.42,
+      "n_kata": 95
+    },
+    {
+      "id": "K00000490",
+      "sumber": "aturan",
+      "sebab_mundur": "berkas susunan agen jatuh di saringan",
+      "skor": 1.0,
+      "cacat": [],
+      "cacat_saringan": [
+        {
+          "jenis": "a1",
+          "angka": [
+            114517.0,
+            42924.0,
+            7195.0
+          ]
+        }
+      ],
+      "n_cacat": 0,
+      "a1": [],
+      "biaya_rp": 52.495,
+      "token_masuk": 8953,
+      "token_keluar": 372,
+      "panggilan_alat": 4,
+      "detik": 20.85,
+      "n_kata": 92
+    }
+  ]
+}

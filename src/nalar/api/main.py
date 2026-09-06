@@ -16,17 +16,20 @@ import numpy as np
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
+from ..agen import susun
 from ..profil import peringkat_faskes, perubahan_faskes, profil_faskes
 from .keadaan import KEADAAN, PERINGATAN_RUPIAH
 from .skema import (
     Antrean,
     BarisAntrean,
     BarisProfil,
+    Jejak,
     Keadilan,
     KelompokKeadilan,
     Pengandaian,
     Penilaian,
     Penjelasan,
+    Perkara,
     ProfilGanda,
     Ringkas,
     TitikPerubahan,
@@ -258,6 +261,46 @@ def penjelasan(kid: str) -> Penjelasan:
         pengandaian=pengandaian,
         status=j["status"],
         kalimat_untuk_faskes=kalimat,
+    )
+
+
+@app.get(
+    "/klaim/{kid}/perkara",
+    response_model=Perkara,
+    summary="Berkas perkara untuk verifikator",
+)
+def perkara(kid: str) -> Perkara:
+    """Berkas perkara satu klaim, disusun lapisan agen.
+
+    Yang dilayani versi aturan: deterministik, tidak menuntut model bahasa
+    menyala, dan bisa dijalankan ulang oleh siapa pun yang punya kodenya.
+    Ketika ada model berbobot terbuka di dalam pusat data, Agen Berkas
+    menggantikannya, dan yang jatuh di saringan tetap keluar sebagai versi
+    ini.
+
+    Sengaja terpisah dari penjelasan. Portal fasilitas kesehatan memanggil
+    penjelasan, jadi apa pun yang ditaruh di sana sampai ke peramban pihak
+    yang sedang diperiksa. Berkas perkara menyebut modus yang paling dekat
+    dengan bentuk selisihnya, dan itu keterangan untuk yang memeriksa.
+    """
+    _pastikan_siap()
+    try:
+        KEADAAN.indeks_dari_id(kid)
+    except KeyError:
+        raise HTTPException(404, f"klaim {kid} tidak ada") from None
+
+    p = susun(KEADAAN, kid)
+    r = p["ringkas_jejak"]
+    return Perkara(
+        id=kid,
+        teks=p["teks"],
+        sumber="aturan",
+        jejak=Jejak(
+            n_panggilan=r["n_panggilan"],
+            alat=r["alat"],
+            sidik_akhir=r["sidik_akhir"],
+            a1_lulus=bool(p["a1"]["lulus"]),
+        ),
     )
 
 

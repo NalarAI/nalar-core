@@ -157,6 +157,50 @@ with TestClient(app) as c:
             all(isinstance(x["ubah_selisih_rp"], int) for x in j["pengandaian"]),
         )
 
+        # Berkas perkara. Dokumen verifikator, dan justru karena itu ia harus
+        # terpisah dari penjelasan: portal faskes memanggil penjelasan, jadi
+        # apa pun yang ditaruh di sana sampai ke peramban pihak yang sedang
+        # diperiksa. Dua uji berikut yang menahan keduanya tetap terpisah.
+        pk = c.get(f"/klaim/{kid}/perkara").json()
+        cek("berkas perkara punya jalurnya sendiri", pk["id"] == kid)
+        cek(
+            "berkas perkara tidak ikut di penjelasan yang dibaca portal faskes",
+            "berkas_perkara" not in j and "teks" not in j,
+            str(sorted(j)),
+        )
+        cek(
+            "berkas perkara menyebut selisih dan modus",
+            all(k in pk["teks"].lower() for k in ("selisih", "modus")),
+        )
+        cek(
+            "tiap angka pada berkas perkara berasal dari pemanggilan alat",
+            pk["jejak"]["a1_lulus"],
+        )
+        cek(
+            "jejaknya menyebut alat mana saja yang dipanggil",
+            len(pk["jejak"]["alat"]) == pk["jejak"]["n_panggilan"]
+            and pk["jejak"]["n_panggilan"] >= 4,
+            str(pk["jejak"]["alat"]),
+        )
+        cek(
+            "sidik rantainya berbentuk SHA-256",
+            len(pk["jejak"]["sidik_akhir"]) == 64,
+            pk["jejak"]["sidik_akhir"][:16],
+        )
+        # Dua kali dipanggil harus memberi berkas yang sama. Kalau tidak,
+        # jejaknya tidak bisa dipakai membuktikan apa pun, karena angka yang
+        # sama bisa keluar dari rantai yang berbeda.
+        pk2 = c.get(f"/klaim/{kid}/perkara").json()
+        cek(
+            "berkas perkara bisa dijalankan ulang dan hasilnya sama",
+            pk2["teks"] == pk["teks"],
+        )
+        cek("sumbernya disebut apa adanya", pk["sumber"] in ("aturan", "agen"))
+        cek(
+            "berkas perkara klaim yang tidak ada menjawab 404",
+            c.get("/klaim/KTIDAKADA/perkara").status_code == 404,
+        )
+
     cek(
         "klaim yang tidak ada menghasilkan 404",
         c.get("/klaim/KTIDAKADA").status_code == 404,

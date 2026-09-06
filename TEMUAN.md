@@ -1548,3 +1548,88 @@ apa. Ketelitiannya sekarang mengikuti besaran yang masuk.
 
 Empat tercapai, tiga gagal, dan ketiga kegagalannya punya sebab yang bisa
 ditunjuk beserta angkanya.
+
+---
+
+## Lapisan agen, 7 September 2026: model 4B tidak mengalahkan aturan
+
+`runs/ukur_agen.json`
+
+Pengaturan: Qwen3 4B varian instruksi, berbobot terbuka, berjalan setempat di
+GPU laptop delapan gigabita lewat Ollama. Suhu nol, jendela nalar dua belas
+ribu token. Empat puluh berkas dengan selisih terbesar. Lima alat tersedia,
+dan tidak satu pun di antaranya bisa mengubah penilaian.
+
+Rencananya menuliskan satu aturan yang tidak boleh dilanggar: model bahasa
+tidak pernah menentukan sebuah berkas ditandai atau tidak, dan tidak pernah
+menyebut angka rupiah yang tidak berasal dari pemanggilan alat. Percobaan ini
+menguji yang kedua.
+
+### Yang berjalan
+
+Tidak ada satu pun angka tak bersumber pada berkas perkara yang benar benar
+keluar. Target A1 terpenuhi, dan terpenuhinya bukan karena modelnya patuh.
+
+Biayanya Rp 51 per berkas, dibanding ongkos periksa manual Rp 750 ribu. Itu
+sepersepuluh ribu, sepuluh kali lebih murah daripada ambang A7 yang kami
+tulis sebelum percobaan. Lamanya sebelas setengah detik per berkas.
+
+### Yang gagal, dan ini yang lebih penting
+
+Dua puluh enam dari empat puluh berkas mundur ke versi aturan. Dua puluh tiga
+di antaranya mundur karena berkasnya tidak lolos penjaga A1, artinya model
+tetap mengetik angka yang tidak pernah dikembalikan alat, sekalipun arahannya
+melarang mengetik angka sama sekali dan menyediakan nama isian untuk tiap
+besaran yang mungkin dibutuhkannya.
+
+Angka yang diketiknya bukan karangan bebas. Ia mengambil nilai mutlak dari
+butir pengandaian yang bertanda negatif, lalu menuliskannya sebagai
+penurunan. Itu persis cacat yang pernah lolos ke antarmuka kami sendiri
+beberapa hari sebelumnya, dan sekarang model kecil mengulanginya tanpa
+diajari.
+
+Dari empat belas berkas yang lolos saringan cepat, sebelas membawa cacat
+ikatan: sebuah nama diikuti angka yang bukan miliknya. Satu contohnya menulis
+selisih Rp 489.690 padahal selisih berkas itu Rp 6.047.842. Angka yang
+disebutnya sah, ia memang dikembalikan alat, hanya saja ia milik satu butir
+bukti, bukan milik selisih. Penjaga A1 tidak bisa menangkap yang seperti itu,
+dan memang bukan tugasnya.
+
+Jadi dari empat puluh berkas, tiga keluar dari agen dalam keadaan bersih.
+
+### Putusannya
+
+Rencana sudah menuliskan apa yang dilakukan bila ini terjadi. Berkas perkara
+versi aturan adalah garis dasar, dan agen yang tidak mengalahkannya dicabut.
+Model 4B tidak mengalahkannya, jadi yang dilayani peragaan tetap versi
+aturan, dan itu yang sudah dikerjakan kode tanpa perlu diubah: berkas yang
+jatuh di saringan otomatis keluar sebagai versi aturan.
+
+Yang tidak dicabut lapisan alat, jejak audit, dan kedua penjaganya. Ketiganya
+justru terbukti bekerja, dan ketiganya yang membuat kegagalan ini terlihat
+sebagai angka alih alih sebagai surat salah yang terlanjur dikirim.
+
+### Tiga hal yang dipelajari
+
+**Larangan pada arahan bukan penjagaan.** Model 4B melanggar larangan
+mengetik angka pada lebih dari separuh berkas. Yang menahan bukan
+arahannya, melainkan penjaga yang memeriksa keluarannya.
+
+**Penjaga yang benar menangkap penulisnya sendiri.** Penjaga A1 ditulis
+sebelum ada agen, dan yang pertama ditangkapnya penyusun berbasis aturan
+buatan kami. Kalau ia ditulis sesudah agennya jadi, yang terjadi bukan
+penjagaan melainkan penyesuaian penjaga terhadap kelakuan agen.
+
+**Angka yang benar bisa dilekatkan pada nama yang salah.** Ini kelas cacat
+yang tidak tersentuh pemeriksaan asal usul angka, muncul pada sebelas dari
+empat belas berkas, dan hanya terlihat oleh pemeriksaan yang membongkar tiap
+pernyataan jadi pasangan nama dan nilai. Pemeriksaan itu terlalu mahal untuk
+dijalankan pada tiap berkas, dan itu sebabnya gerbang layak kirim ditera,
+bukan ditetapkan.
+
+### Batasan percobaan ini
+
+Empat puluh berkas, satu model, satu benih. Model yang lebih besar hampir
+pasti lebih patuh, dan yang belum diuji berapa besar yang cukup. Yang bisa
+disimpulkan cuma satu: 4B tidak cukup, dan lapisan penjaganya menahan
+ketidakcukupan itu tanpa satu pun surat salah keluar.

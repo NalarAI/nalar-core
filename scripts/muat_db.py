@@ -236,11 +236,28 @@ def utama() -> int:
                 )
             print(f"    penandaan alpha {al} selesai", flush=True)
 
-        print("[4] penjelasan dan bukti pendukung")
+        print("[4] penjelasan, bukti pendukung, dan berkas perkara")
         penjelasan: list[dict] = []
         pengandaian: list[dict] = []
+        perkara: list[dict] = []
         for i, kid in enumerate(klaim, start=1):
             j = c.get(f"/klaim/{kid}/penjelasan").json()
+            # Berkas perkara diminta lewat jalurnya sendiri, bukan ditempelkan
+            # ke penjelasan. Portal faskes membaca tabel penjelasan, dan
+            # berkas perkara menyebut modus yang paling dekat dengan bentuk
+            # selisihnya. Itu keterangan untuk yang memeriksa.
+            pk = c.get(f"/klaim/{kid}/perkara").json()
+            perkara.append(
+                {
+                    "klaim_id": kid,
+                    "teks": pk["teks"],
+                    "sumber": pk["sumber"],
+                    "n_panggilan": pk["jejak"]["n_panggilan"],
+                    "alat": pk["jejak"]["alat"],
+                    "sidik_akhir": pk["jejak"]["sidik_akhir"],
+                    "a1_lulus": pk["jejak"]["a1_lulus"],
+                }
+            )
             penjelasan.append(
                 {
                     "klaim_id": kid,
@@ -340,6 +357,7 @@ def utama() -> int:
         ("perubahan", perubahan),
         ("penjelasan", penjelasan),
         ("pengandaian", pengandaian),
+        ("perkara", perkara),
         ("pilihan", pilihan),
         (
             "terbitan",

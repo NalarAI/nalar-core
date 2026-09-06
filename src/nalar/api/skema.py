@@ -105,6 +105,24 @@ class Pengandaian(BaseModel):
     ubah_selisih_rp: int
 
 
+class Jejak(BaseModel):
+    """Ringkasan jejak pemanggilan alat yang menyusun sebuah berkas perkara.
+
+    Yang disimpan bukan isi hasilnya, melainkan alat mana yang dipanggil dan
+    sidik rantainya. Rantai sidik itu yang membuat satu baris tidak bisa
+    disunting tanpa merusak seluruh baris sesudahnya, dan itu yang bisa
+    ditunjukkan ketika fasilitas kesehatan menanyakan asal sebuah angka.
+    """
+
+    n_panggilan: int
+    alat: list[str]
+    sidik_akhir: str
+    a1_lulus: bool = Field(
+        description="Tidak ada angka pada berkas perkara yang tidak berasal "
+        "dari pemanggilan alat."
+    )
+
+
 class Penjelasan(BaseModel):
     """Penjelasan satu klaim, dalam bentuk yang bisa dibantah."""
 
@@ -115,6 +133,29 @@ class Penjelasan(BaseModel):
     pengandaian: list[Pengandaian]
     status: str = Field(description="Kalimat yang boleh dikirim ke faskes apa adanya.")
     kalimat_untuk_faskes: str
+
+
+class Perkara(BaseModel):
+    """Berkas perkara satu klaim. Dokumen verifikator, bukan surat untuk faskes.
+
+    Dipisahkan dari Penjelasan dengan sengaja, dan pemisahannya bukan soal
+    kerapian. Portal fasilitas kesehatan memanggil Penjelasan, jadi apa pun
+    yang ditaruh di sana sampai ke peramban pihak yang sedang diperiksa,
+    sekalipun antarmukanya tidak menampilkannya. Berkas perkara menyebut
+    modus kecurangan yang paling dekat dengan bentuk selisihnya, dan itu
+    keterangan untuk yang memeriksa, bukan untuk yang diperiksa.
+    """
+
+    id: str
+    teks: str = Field(
+        description="Bukti pada berkas, tarif resmi yang berlaku, dan modus "
+        "yang paling dekat beserta jangkauan NALAR atasnya."
+    )
+    sumber: str = Field(
+        description="aturan, atau agen. Versi aturan deterministik dan tidak "
+        "menuntut model bahasa menyala."
+    )
+    jejak: Jejak
 
 
 class BarisAntrean(BaseModel):

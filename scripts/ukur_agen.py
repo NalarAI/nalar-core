@@ -81,6 +81,10 @@ def ukur(n: int, model: str, alamat: str | None, delta: float) -> dict:
                 "sebab_mundur": h["sebab_mundur"],
                 "skor": h["skor"],
                 "cacat": d["cacat"],
+                # Cacat yang menjatuhkan berkas di saringan cepat. Tanpa
+                # ini laporan hanya bilang berapa yang mundur, dan tidak
+                # bilang kenapa, sehingga tidak ada yang bisa diperbaiki.
+                "cacat_saringan": h["cacat"],
                 "n_cacat": len(d["cacat"]),
                 "a1": [c for c in d["cacat"] if c.get("jenis") == "a1"],
                 "biaya_rp": h["penyelia"]["biaya_rp"],
@@ -125,6 +129,9 @@ def laporkan(hasil: dict) -> None:
     sebab: dict[str, int] = {}
     for b in mundur:
         kunci = b["sebab_mundur"].split(":")[0]
+        for c in b.get("cacat_saringan") or []:
+            kunci = f"{kunci}, {c['jenis']}"
+            break
         sebab[kunci] = sebab.get(kunci, 0) + 1
     for s, c in sorted(sebab.items(), key=lambda x: -x[1]):
         print(f"      {c:3d}  {s}")
