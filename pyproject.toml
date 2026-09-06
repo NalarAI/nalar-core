@@ -26,7 +26,9 @@ dependencies = [
 transformer = ["torch>=2.4"]
 # Untuk menyiapkan data acuan dari sumber aslinya.
 data = ["pymupdf>=1.24", "playwright>=1.47"]
-dev = ["ruff>=0.6", "pytest>=8.0"]
+# Peladen HTTP yang menyajikan detektor ke website.
+api = ["fastapi>=0.115", "uvicorn[standard]>=0.30", "pydantic>=2.9"]
+dev = ["ruff>=0.6", "pytest>=8.0", "httpx>=0.27"]
 
 [project.urls]
 Repository = "https://github.com/NalarAI/nalar-core"

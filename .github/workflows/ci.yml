@@ -25,7 +25,7 @@ jobs:
       # torch sengaja tidak dipasang. Model yang dikirim tidak memakainya, dan
       # dua uji yang memerlukannya melewati diri sendiri dengan pesan.
       - name: pasang kebutuhan
-        run: uv pip install --system -e ".[dev]"
+        run: uv pip install --system -e ".[api,dev]"
 
       - name: periksa gaya
         run: ruff check src tests scripts
@@ -33,8 +33,11 @@ jobs:
       - name: periksa format
         run: ruff format --check src tests scripts
 
-      - name: jalankan uji
+      - name: uji inti
         run: python tests/test_inti.py
+
+      - name: uji peladen
+        run: python tests/test_api.py
 
   # Menjaga agar tidak ada jejak perkakas bantu yang ikut terkirim. Ini bukan
   # soal rapi, ini soal karya yang dinilai harus jelas siapa penulisnya.

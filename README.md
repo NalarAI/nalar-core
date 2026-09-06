@@ -52,10 +52,38 @@ bentuk modelnya: kalibrasi konformal, evaluasi terhadap pelaku yang
 beradaptasi, tarif Permenkes yang sungguhan, keluaran dalam rupiah, dan
 penjelasan yang bisa dibantah.
 
+## Peladen
+
+Detektor disajikan lewat HTTP supaya website bisa memakainya. Modelnya
+dilatih sekali saat peladen menyala, dan menggeser alpha di layar tidak
+melatih ulang apa pun, karena alpha tidak mengubah tarif yang wajar bagi
+sebuah klaim. Ia hanya mengubah seberapa berani kita menandainya.
+
+```
+pip install -e ".[api]"
+uvicorn nalar.api.main:app --reload
+```
+
+Dokumentasi titik akhirnya terbuka sendiri di `/docs`.
+
+| Titik akhir | Isinya |
+|---|---|
+| `/ringkas` | Angka halaman muka, termasuk rasio pengembalian |
+| `/antrean` | Antrean audit sadar biaya, dengan alasan tiap baris masuk |
+| `/klaim/{id}` | Penilaian satu klaim |
+| `/klaim/{id}/penjelasan` | Bukti yang bila ada akan menggugurkan penandaan |
+| `/profil` | Dua daftar faskes, menurut rupiah dan menurut posisi |
+| `/keadilan` | Laju penandaan per kelas faskes, dan apakah masih adil |
+| `/perubahan` | Faskes yang perilakunya bergeser sepanjang waktu |
+
+Seluruh data yang dilayani peladen ini buatan. Tidak ada klaim peserta JKN
+yang sungguhan, sesuai ketentuan lomba dan sesuai akal sehat.
+
 ## Menjalankan
 
 ```
 python tests/test_inti.py               25 uji, semuanya harus lulus
+python tests/test_api.py                25 uji peladen
 python scripts/uji_detektor.py          model yang dikirim, ujung ke ujung
 python scripts/uji_ketahanan.py         lima benih, empat prevalensi, pisah waktu
 python scripts/uji_lawan.py             tiga pelaku yang beradaptasi
