@@ -1274,3 +1274,171 @@ kecil secara guna.
 - T1 pada seribu klaim, 1,896 kali melawan target dua kali
 - T3, pohon normatif tetap mengalahkan NALAR
 - Uji transfer gagal, dan sebabnya sudah ditulis di atas
+
+---
+
+## Seberapa kokoh angkanya, dan satu kegagalan yang harus ditulis besar
+
+### Kestabilan benih. Ini mengubah cara seluruh angka kami boleh dikutip.
+
+Semua yang kami laporkan sampai sekarang berasal dari satu benih acak. Lima
+benih dijalankan, dan hasilnya membelah dua kelompok yang sangat berbeda
+sifatnya.
+
+| Ukuran | Rata rata | Sebaran relatif | Terendah | Tertinggi |
+|---|---:|---:|---:|---:|
+| Rupiah pada seribu klaim | 1.398 jt | **40,0%** | 841 jt | 2.304 jt |
+| Porsi batas atas | 0,752 | **10,1%** | 0,688 | 0,882 |
+| Peningkatan atas mesin aturan | 1,853 | 8,4% | 1,608 | 2,027 |
+| Laju penandaan klaim bersih | 0,0125 | 18,5% | - | - |
+| Kelebihan berarah | 1,341 | 12,4% | 1,148 | 1,579 |
+
+Angka rupiah bergeser empat puluh persen antar benih. **Rp 1.249,3 juta tidak
+boleh dikutip sendirian.** Yang stabil adalah porsi batas atas, dan itu memang
+alasan kami memilihnya sebagai metrik utama sejak rancangan. Sekarang alasan
+itu punya bukti, bukan hanya niat.
+
+Dua hal lain yang keluar dari sini. Peningkatan atas mesin aturan 1,853 dengan
+simpangan 0,155, jadi target T1 yang dua kali itu berada di dalam jangkauan
+satu simpangan, dan satu dari lima benih benar benar mencapainya di 2,027.
+Jujurnya: T1 gagal pada rata rata, lulus pada satu benih. Bukan gagal telak.
+
+Dan keadilan berarah lulus di kelima benih, tertinggi 1,579 melawan batas dua.
+Perbaikan penyaringan kontaminasi itu nyata, bukan kebetulan satu benih.
+
+### Kepekaan prevalensi. Hasil terkuat yang tidak kami duga.
+
+Prevalensi 22 persen faskes nakal adalah asumsi kami, dan semua berdiri di
+atasnya. Yang diperiksa: apakah detektornya masih berguna kalau kecurangan
+jauh lebih jarang.
+
+| Faskes nakal | Klaim curang | Rupiah pada seribu | Porsi batas atas | Atas aturan |
+|---:|---:|---:|---:|---:|
+| 8% | 0,8% | 145 jt | 0,711 | 1,775 |
+| 15% | 3,0% | 927 jt | 0,767 | 1,506 |
+| 22% | 4,5% | 1.249 jt | 0,713 | 1,896 |
+| 35% | 6,7% | 2.099 jt | 0,803 | 1,676 |
+
+Rupiahnya turun sembilan kali lipat dari yang tertinggi ke yang terendah,
+tapi porsi batas atas hampir tidak bergerak. Mutunya tidak bergantung pada
+seberapa banyak kecurangan yang ada, yang bergantung hanya uangnya. Itu
+perilaku yang benar untuk sistem pengawasan, dan artinya angka mutu kami tidak
+dibesarkan oleh asumsi prevalensi yang mungkin terlalu tinggi.
+
+Satu batasnya ditemukan di ujung atas. Pada 35 persen, kelebihan berarah naik
+ke 2,025 dan melewati batas dua. Jadi jaminan keadilan kami berlaku sampai
+sekitar dua puluh dua persen dan mulai selip di atas itu.
+
+### Pemisahan menurut waktu. T7 akhirnya tuntas.
+
+Belum pernah dijalankan sama sekali sampai sekarang, dan inilah bentuk
+pemakaian yang sebenarnya: dilatih pada masa lalu, dipakai pada masa depan.
+Dua tahun pertama untuk latih dan kalibrasi, tahun ketiga untuk uji.
+
+Porsi batas atas 0,756 melawan 0,713 pada pemisahan menurut faskes. Rasionya
+1,06, jadi sedikit lebih baik, bukan lebih buruk. Jaminan konformal tetap
+berlaku, laju penandaan klaim bersih 0,71 persen. Keadilan 1,457, lulus.
+
+T7 naik dari tercapai sebagian menjadi tercapai.
+
+### Target T6 gagal pada model yang benar benar kami kirim.
+
+Ini lubang yang harus ditulis besar. Rancangan menyebut T6 sebagai hasil
+terkuat kami, dan angkanya diukur pada transformer. Sejak percobaan kedua
+belas yang kami kirim adalah pohon berpenguat. Jadi klaim terkuat pada dokumen
+kami diukur pada model yang sudah tidak ada.
+
+Diukur ulang pada detektor yang dikirim:
+
+| Pelaku | Diambil | Tertangkap | **Uang yang lolos** | Maks per klaim |
+|---|---:|---:|---:|---:|
+| serakah | 1.793 jt | 78,5% | 385 jt | 36,2 jt |
+| hati hati | 273 jt | 0,0% | 273 jt | 27,0 jt |
+| menyebar | 1.268 jt | 54,4% | **579 jt** | 30,6 jt |
+
+Penurunan keuntungan maksimum per klaim hanya 25,6 persen melawan batas
+setengah. **Gagal.** Transformer dulu mencapai 96 persen.
+
+Dan ada yang lebih buruk daripada sekadar gagal. Pelaku menyebar meloloskan
+lebih banyak uang daripada pelaku serakah, 579 juta melawan 385 juta. Sistem
+kami membuat menyebar lebih menguntungkan daripada serakah. Itu kebalikan dari
+yang seharusnya dilakukan sistem pengawasan.
+
+Pembandingnya tetap perlu disebut supaya tidak salah baca. Melawan mesin
+aturan, pelaku hati hati meloloskan 1.440 juta. Melawan detektor kami, 273
+juta. Jadi detektornya jauh lebih baik daripada aturan, ia hanya tidak membuat
+kecurangan berhenti sepadan.
+
+### Kepala kelompok sebaya juga gagal, dan sekarang kami tahu kenapa.
+
+Rancangan sudah menyiapkan jawabannya: deteksi per klaim akan gagal menangkap
+pelaku menyebar, dan yang seharusnya menangkap adalah kepala kelompok sebaya.
+Kalimat berikutnya kami tulis sendiri, bahwa kalau kepala itu juga gagal kami
+akan menuliskan gagal.
+
+Diuji. Satu rumah sakit dibuat menagih tepat di bawah garis pada seluruh klaim
+yang bisa diserang. Ia mengambil Rp 36,4 juta, yaitu sepuluh persen dari
+seluruh tagihannya. Peringkat profilnya 221 dari 238 sebelum diserang, dan 221
+sesudahnya. Tidak bergerak satu langkah pun.
+
+Sebabnya diukur, bukan diduga, dan angkanya menutup perkara.
+
+  Serangan menggeser rata rata selisih faskes       0,156 jt
+  Lantai deteksi pada 233 klaim, dua simpangan      0,189 jt
+
+Serangannya memang berada di bawah lantai derau. Simpangan baku selisih di
+dalam satu faskes 1,44 juta, sedangkan antar faskes hanya 0,076 juta. Derau di
+dalam faskes hampir dua puluh kali lebih besar daripada sinyal antar faskes.
+Tidak ada penaksir rata rata rupiah yang bisa melihat serangan ini, berapa pun
+pintarnya. Itu bukan kekurangan penyusutan Bayes kami, itu batas informasi.
+
+Dua percobaan perbaikan dijalankan dan keduanya gagal. Memakai selisih yang
+tidak dipotong di nol tidak menggerakkan peringkat sama sekali, dan malah
+menurunkan presisi tugas biasa dari 1,000 ke 0,760. Membuang klaim yang
+kelompoknya menahan diri juga tidak menolong.
+
+### Ukuran posisi. Mekanismenya benar, kalibrasinya belum.
+
+Kalau pelakunya menagih tepat di bawah garis, maka yang harus diukur adalah
+jaraknya ke garis, bukan rupiahnya. Selisih dibagi ambang kelompoknya sendiri.
+Nol berarti persis sebesar yang didukung bukti, satu berarti persis di ambang.
+
+Pada serangan yang sama, ukuran ini bergeser 3,6 simpangan baku di dalam
+faskes itu. Bandingkan dengan rata rata rupiah yang tenggelam di bawah derau.
+Mekanismenya benar.
+
+Tapi arahnya bukan melintang, melainkan memanjang. Sesudah diserang, faskes
+itu hanya berada 0,52 simpangan di atas sebaran antar faskes, jadi
+membandingkannya dengan tetangganya tetap tidak menunjukkan apa apa. Yang
+menunjukkan adalah membandingkannya dengan dirinya sendiri di masa lalu.
+Artinya penangkap pelaku beradaptasi adalah kepala titik perubahan, bukan
+kepala kelompok sebaya. Itu membalik pembagian tugas yang kami tulis di
+rancangan.
+
+Diuji, dan hasilnya setengah jalan. Pada rumah sakit yang mengambil Rp 30,9
+juta, ukuran posisi memberi p sebesar 0,0025 sedangkan rupiah 0,0848. Jadi
+posisi menangkap yang rupiah lewatkan. Tapi dua rumah sakit lain yang
+mengambil jauh lebih sedikit terlewat oleh keduanya, dan tanggal tebakannya
+tetap tidak berguna.
+
+Dan kalibrasinya meleset. Pada data tanpa serangan apa pun, sembilan koma dua
+persen faskes ditandai berubah pada ambang lima persen, hampir dua kali
+nominal. Dugaan bahwa penyebabnya klaim yang menahan diri diuji dan salah:
+porsinya stabil sepanjang waktu, dan membuangnya justru menaikkan angka itu ke
+sembilan koma enam. Dugaan yang tersisa, belum diuji, adalah klaim dari satu
+pasien yang berkerumun di waktu berdekatan sehingga syarat keterpertukaran uji
+permutasi tidak berlaku.
+
+Jadi ukuran posisi dikirim sebagai alat pemeringkat dengan kalibrasi yang
+diketahui meleset, bukan sebagai uji peluang. Nilai p nya dibaca sebagai
+urutan, bukan sebagai probabilitas, dan itu ditulis di tempat angkanya
+muncul.
+
+### Yang masih terbuka
+
+- T6 gagal pada model yang dikirim, dan pelaku menyebar meloloskan lebih
+  banyak uang daripada pelaku serakah
+- Kalibrasi uji permutasi pada ukuran posisi meleset dua kali lipat
+- Kontrol negatif LEIE, terhalang di sisi data
+- Uji latih di sintetis uji di nyata, gagal
+- T3, pohon normatif tetap mengalahkan transformer yang kami rancang

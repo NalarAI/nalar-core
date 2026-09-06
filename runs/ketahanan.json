@@ -1,0 +1,174 @@
+{
+ "kestabilan_benih": {
+  "baris": [
+   {
+    "n_uji": 42624,
+    "rupiah_pada_k_jt": 1249.3,
+    "porsi_batas_atas": 0.7125,
+    "peningkatan_atas_aturan": 1.896,
+    "laju_penandaan_bersih": 0.01103,
+    "keadilan_simetris": 1.88,
+    "keadilan_berarah": 1.579,
+    "porsi_menahan_diri": 0.0361,
+    "seed": 7
+   },
+   {
+    "n_uji": 40214,
+    "rupiah_pada_k_jt": 1105.4,
+    "porsi_batas_atas": 0.7312,
+    "peningkatan_atas_aturan": 2.027,
+    "laju_penandaan_bersih": 0.01264,
+    "keadilan_simetris": 1.369,
+    "keadilan_berarah": 1.278,
+    "porsi_menahan_diri": 0.0393,
+    "seed": 11
+   },
+   {
+    "n_uji": 38308,
+    "rupiah_pada_k_jt": 2304.4,
+    "porsi_batas_atas": 0.8816,
+    "peningkatan_atas_aturan": 1.911,
+    "laju_penandaan_bersih": 0.01641,
+    "keadilan_simetris": 3.064,
+    "keadilan_berarah": 1.148,
+    "porsi_menahan_diri": 0.0459,
+    "seed": 23
+   },
+   {
+    "n_uji": 42157,
+    "rupiah_pada_k_jt": 1491.5,
+    "porsi_batas_atas": 0.7449,
+    "peningkatan_atas_aturan": 1.608,
+    "laju_penandaan_bersih": 0.01115,
+    "keadilan_simetris": 1.336,
+    "keadilan_berarah": 1.27,
+    "porsi_menahan_diri": 0.0355,
+    "seed": 42
+   },
+   {
+    "n_uji": 41720,
+    "rupiah_pada_k_jt": 840.9,
+    "porsi_batas_atas": 0.688,
+    "peningkatan_atas_aturan": 1.824,
+    "laju_penandaan_bersih": 0.01107,
+    "keadilan_simetris": 1.804,
+    "keadilan_berarah": 1.428,
+    "porsi_menahan_diri": 0.0593,
+    "seed": 101
+   }
+  ],
+  "ringkas": {
+   "rupiah_pada_k_jt": {
+    "rata": 1398.3,
+    "sd": 558.6568,
+    "min": 840.9,
+    "maks": 2304.4,
+    "sebaran_relatif": 0.3995
+   },
+   "porsi_batas_atas": {
+    "rata": 0.7516,
+    "sd": 0.0757,
+    "min": 0.688,
+    "maks": 0.8816,
+    "sebaran_relatif": 0.1007
+   },
+   "peningkatan_atas_aturan": {
+    "rata": 1.8532,
+    "sd": 0.1552,
+    "min": 1.608,
+    "maks": 2.027,
+    "sebaran_relatif": 0.0837
+   },
+   "laju_penandaan_bersih": {
+    "rata": 0.0125,
+    "sd": 0.0023,
+    "min": 0.011,
+    "maks": 0.0164,
+    "sebaran_relatif": 0.1853
+   },
+   "keadilan_berarah": {
+    "rata": 1.3406,
+    "sd": 0.1662,
+    "min": 1.148,
+    "maks": 1.579,
+    "sebaran_relatif": 0.124
+   }
+  }
+ },
+ "kepekaan_prevalensi": [
+  {
+   "n_uji": 42605,
+   "rupiah_pada_k_jt": 145.3,
+   "porsi_batas_atas": 0.7105,
+   "peningkatan_atas_aturan": 1.775,
+   "laju_penandaan_bersih": 0.0168,
+   "keadilan_simetris": 2.802,
+   "keadilan_berarah": 1.149,
+   "porsi_menahan_diri": 0.0408,
+   "prevalensi": 0.08,
+   "porsi_klaim_curang": 0.0078
+  },
+  {
+   "n_uji": 41877,
+   "rupiah_pada_k_jt": 927.2,
+   "porsi_batas_atas": 0.7675,
+   "peningkatan_atas_aturan": 1.506,
+   "laju_penandaan_bersih": 0.01536,
+   "keadilan_simetris": 1.283,
+   "keadilan_berarah": 1.136,
+   "porsi_menahan_diri": 0.0439,
+   "prevalensi": 0.15,
+   "porsi_klaim_curang": 0.0301
+  },
+  {
+   "n_uji": 42624,
+   "rupiah_pada_k_jt": 1249.3,
+   "porsi_batas_atas": 0.7125,
+   "peningkatan_atas_aturan": 1.896,
+   "laju_penandaan_bersih": 0.01103,
+   "keadilan_simetris": 1.88,
+   "keadilan_berarah": 1.579,
+   "porsi_menahan_diri": 0.0361,
+   "prevalensi": 0.22,
+   "porsi_klaim_curang": 0.0449
+  },
+  {
+   "n_uji": 42291,
+   "rupiah_pada_k_jt": 2098.7,
+   "porsi_batas_atas": 0.8034,
+   "peningkatan_atas_aturan": 1.676,
+   "laju_penandaan_bersih": 0.007,
+   "keadilan_simetris": 2.687,
+   "keadilan_berarah": 2.025,
+   "porsi_menahan_diri": 0.0394,
+   "prevalensi": 0.35,
+   "porsi_klaim_curang": 0.0672
+  }
+ ],
+ "pemisahan_waktu": {
+  "menurut_waktu": {
+   "n_uji": 76511,
+   "rupiah_pada_k_jt": 1292.6,
+   "porsi_batas_atas": 0.7558,
+   "peningkatan_atas_aturan": 1.804,
+   "laju_penandaan_bersih": 0.0071,
+   "keadilan_simetris": 1.658,
+   "keadilan_berarah": 1.457,
+   "porsi_menahan_diri": 0.0296,
+   "hari_potong": 730,
+   "n_latih": 87790
+  },
+  "menurut_faskes": {
+   "n_uji": 42624,
+   "rupiah_pada_k_jt": 1249.3,
+   "porsi_batas_atas": 0.7125,
+   "peningkatan_atas_aturan": 1.896,
+   "laju_penandaan_bersih": 0.01103,
+   "keadilan_simetris": 1.88,
+   "keadilan_berarah": 1.579,
+   "porsi_menahan_diri": 0.0361
+  },
+  "rasio_porsi_batas_atas": 1.061,
+  "jaminan_konformal_masih_berlaku": true
+ }
+}

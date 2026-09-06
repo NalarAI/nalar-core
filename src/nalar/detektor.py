@@ -155,6 +155,38 @@ class Detektor:
             "selisih": np.clip(s_tarif + s_bhp, 0, None),
         }
 
+    def posisi(self, episodes) -> np.ndarray:
+        """Seberapa dekat tagihan sebuah klaim ke garis penandaannya.
+
+        Nol berarti persis sebesar yang didukung bukti. Satu berarti persis di
+        ambang. Negatif berarti menagih di bawah yang wajar.
+
+        Ini bukan hiasan atas selisih rupiah, ini menjawab serangan yang tidak
+        bisa dilihat selisih rupiah. Pelaku yang beradaptasi menagih tepat di
+        bawah garis, tidak pernah melewatinya, jadi tidak ada satu klaim pun
+        yang ditandai. Terukurnya begini. Satu rumah sakit mengambil Rp 36,4
+        juta, sepuluh persen dari seluruh tagihannya, dengan cara itu. Rata
+        rata selisih rupiahnya bergeser 0,156 juta, sedangkan lantai deteksi
+        pada 233 klaim adalah 0,189 juta. Serangannya memang berada di bawah
+        derau, jadi tidak ada penaksir rata rata rupiah yang bisa melihatnya.
+
+        Pada ukuran posisi, serangan yang sama bergeser 3,6 simpangan baku.
+        Sebabnya pembaginya ambang kelompok, sehingga ragam antar klaim yang
+        besarnya berbeda beda ikut terbagi habis, dan yang tersisa tinggal
+        perilaku menagihnya.
+
+        Klaim yang kelompoknya menahan diri diberi nol, bukan dibuang, supaya
+        rata rata faskes tidak berubah arti hanya karena sebagian klaimnya
+        tidak bisa dinilai.
+        """
+        d = self.skor(episodes)
+        s = d["selisih_tarif"] + d["selisih_tagihan"]
+        amb, _ = self.ambang_untuk(episodes)
+        sah = np.isfinite(amb) & (amb > 0)
+        keluar = np.zeros(len(s), dtype=np.float64)
+        keluar[sah] = np.clip(s[sah] / amb[sah], -1.0, 1.0)
+        return keluar
+
     # -- kalibrasi ----------------------------------------------------------
 
     @staticmethod

@@ -197,6 +197,12 @@
   "n_faskes_dibuang": 19,
   "porsi_klaim_dibuang": 0.0343
  },
+ "posisi": {
+  "rata_seluruh_klaim": 0.00673,
+  "rata_antar_faskes_besar": 0.00536,
+  "sd_antar_faskes_besar": 0.04378,
+  "n_faskes_besar": 184
+ },
  "contoh_penjelasan": [
   {
    "status": "ketidaksesuaian yang perlu dikonfirmasi",

@@ -144,7 +144,21 @@ def utama(n_peserta=20000, tahun=3, seed=7, fktp=900, fkrtl=150,
         "porsi_klaim_dibuang": det.porsi_klaim_dibuang,
     }
 
-    print("[8] contoh penjelasan")
+    print("[8] posisi terhadap garis, ukuran yang menjawab pelaku beradaptasi")
+    pos = det.posisi(e_te)
+    per_f = {}
+    for i, r in enumerate(e_te):
+        per_f.setdefault((int(r["f_jenis"]), int(r["faskes"])), []).append(i)
+    rata_f = [float(np.mean(pos[v])) for v in per_f.values() if len(v) >= 100]
+    catatan["posisi"] = {
+        "rata_seluruh_klaim": round(float(pos.mean()), 5),
+        "rata_antar_faskes_besar": round(float(np.mean(rata_f)), 5),
+        "sd_antar_faskes_besar": round(float(np.std(rata_f)), 5),
+        "n_faskes_besar": len(rata_f),
+    }
+    print(f"    {catatan['posisi']}")
+
+    print("[9] contoh penjelasan")
     urut = np.argsort(-s)
     contoh = []
     for j in urut[:3]:
