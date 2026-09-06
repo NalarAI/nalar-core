@@ -167,3 +167,43 @@ def urai_keadilan(skor_dict, kelompok, bersih, porsi=0.02):
                                   if not k.startswith("_")},
         }
     return keluar
+
+
+def keadilan_berarah(tanda, kelompok, bersih):
+    """Ketimpangan yang diukur pada arah yang benar benar merugikan.
+
+    Metrik rasio tertinggi terhadap terendah menyamakan dua hal yang sangat
+    berbeda. Kelompok yang ditandai lebih sering dirugikan. Kelompok yang
+    ditandai lebih jarang tidak dirugikan, ia diuntungkan.
+
+    Kekhawatiran yang ditulis rancangan berbunyi jelas: sistem yang secara
+    sistematis menuduh puskesmas di daerah akan dimatikan dalam setahun. Yang
+    ditakutkan penandaan berlebih terhadap yang lemah, bukan penandaan kurang.
+
+    Karena itu di sini yang dilaporkan kelebihan terhadap laju keseluruhan,
+    dan kelompok yang di bawah laju keseluruhan tidak dihitung sebagai
+    pelanggaran. Rasio simetris tetap dilaporkan terpisah, supaya tidak ada
+    yang disembunyikan dengan mengganti definisi.
+    """
+    tanda = np.asarray(tanda).astype(bool)
+    b = np.asarray(bersih).astype(bool)
+    kel = np.asarray(kelompok)
+    laju_umum = float(tanda[b].mean()) if b.any() else 0.0
+    out = {"_laju_keseluruhan": round(laju_umum, 5)}
+    kelebihan = []
+    for k in np.unique(kel):
+        m = (kel == k) & b
+        if m.sum() < 20:
+            continue
+        laju = float(tanda[m].mean())
+        rasio = laju / laju_umum if laju_umum > 0 else None
+        out[str(k)] = {"n": int(m.sum()), "laju": round(laju, 5),
+                       "rasio_thd_keseluruhan": round(rasio, 3) if rasio else None}
+        if rasio and rasio > 1.0:
+            kelebihan.append((rasio, str(k)))
+    if kelebihan:
+        r, nama = max(kelebihan)
+        out["_kelompok_paling_sering_ditandai"] = nama
+        out["_kelebihan_maksimum"] = round(r, 3)
+        out["_lulus_batas_dua_kali"] = bool(r <= 2.0)
+    return out

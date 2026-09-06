@@ -904,3 +904,112 @@ sampai ada bukti yang mendukungnya.
 | T5 keadilan antar kelompok | tercapai tipis, 1,77 dan 2,02 pada dua jalan |
 | T6 ketahanan pelaku | **tercapai** |
 | T7 faskes tak dikenal | tercapai |
+
+---
+
+## Detektor yang diusulkan, 6 September 2026
+
+`src/nalar/detektor.py`, diuji lewat `scripts/uji_detektor.py`,
+hasil di `runs/detektor.json`, bobot di `runs/detektor.pkl`.
+
+Sampai percobaan 12, kesimpulan sudah menyatakan pohon berpenguat yang menang,
+tapi tidak ada satu berkas pun yang berisi konfigurasi itu sebagai model jadi.
+Yang ada masih transformer yang sudah dinyatakan kalah. Berkas ini menutup
+jarak antara kesimpulan dan barang yang bisa dipakai.
+
+Isinya: penebak normatif berbasis pohon, kalibrasi konformal bertingkat,
+antrean audit yang sadar biaya, dan lapisan penjelasan. Tidak memakai satu pun
+label kecurangan.
+
+### Hasil
+
+| k | Rupiah ditemukan | Porsi batas atas |
+|---|---:|---:|
+| 50 | 222,3 jt | 0,336 |
+| 100 | 381,1 jt | 0,448 |
+| 500 | 1.005,6 jt | 0,679 |
+| 1000 | 1.249,3 jt | 0,713 |
+
+Peningkatan atas mesin aturan 1,896 kali pada seribu klaim. Atas garis dasar
+urutkan menurut nilai klaim, 1,276 kali.
+
+Jaminan konformal terpenuhi: laju penandaan klaim bersih 0,673 persen pada
+alpha dua persen.
+
+### Antrean audit, dan angka yang bisa dibawa ke rapat
+
+Dari kapasitas seribu pemeriksaan, antrean hanya terisi 541. Sisanya tidak
+diisi karena selisihnya lebih kecil daripada biaya memeriksanya, jadi memeriksa
+tidak sepadan. Itu perilaku yang benar, bukan kekurangan.
+
+  Rupiah ditemukan       Rp 942,2 juta
+  Biaya audit            Rp 405,8 juta pada asumsi Rp 750.000 per berkas
+  **Rasio pengembalian   2,32 banding 1**
+
+NHS melaporkan 3 banding 1 untuk program yang sudah berjalan bertahun tahun.
+Angka kami sejenis dan bisa dibandingkan langsung. Biaya per berkas adalah
+parameter kebijakan yang harus diisi BPJS, bukan angka yang kami tetapkan.
+
+### Penjelasan yang bisa dibantah
+
+Contoh keluaran pada klaim berperingkat teratas:
+
+  Tarif ditagihkan            Rp 134.341.600
+  Tarif didukung bukti        Rp  72.141.295
+  Selisih                     Rp  62.187.912
+
+  Bukti yang bila ada akan mengubah penilaian:
+    leukosit      menurunkan selisih Rp 4.725.894
+    trombosit     menurunkan selisih Rp 3.928.075
+    kreatinin     menurunkan selisih Rp 3.258.344
+
+  Status: ketidaksesuaian yang perlu dikonfirmasi
+
+Bentuk ini yang membuat P5 pada rancangan bisa dijalankan. Rumah sakit tidak
+menerima skor, ia menerima daftar pemeriksaan yang bila dikirim akan menggugurkan
+penandaannya. Kata curang tidak pernah muncul.
+
+### Keadilan: empat percobaan perbaikan, dan satu kegagalan yang jujur
+
+Perbaikan yang dicoba, berurutan, beserta hasilnya:
+
+1. Kunci kalibrasi ditambah status daerah tertinggal dan ada tidaknya
+   laboratorium. Rasio daerah tertinggal turun dari 5,3 ke 3,6.
+2. Kalibrasi mundur bertingkat, dari kunci halus ke kasar. Turun tipis ke 3,63.
+3. Syarat jumlah faskes minimum per kelompok. **Gagal dan salah sasaran**:
+   yang menahan diri malah rumah sakit kelas B, sedangkan daerah tertinggal
+   tidak berubah. Dikembalikan.
+4. Pengecualian kebijakan yang eksplisit untuk daerah tertinggal.
+
+Yang keempat berhasil untuk arah yang berbahaya. Faskes di daerah tertinggal
+sekarang 0,0 persen melawan 0,70 persen. Tapi itu bukan perbaikan teknis, itu
+keputusan untuk tidak menandai apa pun di sana sampai kami bisa menjamin
+keadilannya. Mereka tetap masuk lewat porsi sampel acak lima persen.
+
+Dan target T5 tetap gagal, pada dua ukuran sekaligus:
+
+| Ukuran | Nilai | Batas | Lulus |
+|---|---:|---:|---|
+| Rasio simetris antar kelas faskes | 5,263 | 2,0 | tidak |
+| Kelebihan berarah, kelompok terbanyak ditandai | 2,588 pada kelas B | 2,0 | tidak |
+
+Rasio simetris yang 5,26 itu justru naik setelah perbaikan, karena FKTP
+sekarang ditandai lebih jarang. Ditandai lebih jarang bukan kerugian, jadi
+ukuran simetris menyamakan dua hal yang berbeda. Karena itu ditambahkan ukuran
+berarah, yang hanya menghitung kelompok yang ditandai di atas laju keseluruhan.
+
+Ukuran berarah pun gagal, 2,588 pada rumah sakit kelas B. Tapi arah masalahnya
+sudah berpindah dari puskesmas di daerah terpencil ke rumah sakit besar, dan
+itu posisi yang jauh lebih bisa dipertahankan.
+
+Ukuran simetris tetap dilaporkan, supaya tidak ada yang disembunyikan dengan
+mengganti definisi setelah melihat hasil.
+
+### Yang masih terbuka
+
+- Uji latih di sintetis uji di nyata terhadap DE-SynPUF, belum dijalankan
+- Kontrol negatif pada label LEIE, belum dijalankan
+- Kepala K4 kelompok sebaya, presisi 0,2 sampai 0,3 melawan tebakan acak 0,16,
+  belum diperbaiki dan belum dipensiunkan resmi
+- Kepala K6 titik perubahan, belum ditulis
+- Ketimpangan pada rumah sakit kelas B, 2,588 kali
