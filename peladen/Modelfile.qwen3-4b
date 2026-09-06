@@ -1,0 +1,22 @@
+# Model penutur untuk lapisan agen NALAR.
+#
+# Yang diubah dari bawaannya hanya dua, dan keduanya punya sebab.
+#
+# Jendela nalar dinaikkan ke 12 ribu token. Bawaan Ollama 4.096, dan itu
+# tidak cukup: arahan, skema lima alat, dan hasil ambil_berkas beserta
+# hitung_pengandaian sudah melewatinya. Yang terjadi kalau kekecilan bukan
+# galat, melainkan potongan percakapan yang hilang diam diam, dan model
+# menyusun berkas perkara di atas keterangan yang tidak lagi dilihatnya.
+#
+# Suhu nol. Yang dinilai dari model ini ketaatannya memanggil alat yang
+# benar, bukan keragaman kalimatnya. Keluaran yang bisa diulang juga syarat
+# supaya jejak auditnya berarti.
+#
+# Pasang dengan:
+#   ollama create nalar-qwen3-4b -f peladen/Modelfile.qwen3-4b
+
+FROM qwen3:4b-instruct
+
+PARAMETER num_ctx 12288
+PARAMETER temperature 0
+PARAMETER top_p 0.9

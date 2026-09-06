@@ -12,6 +12,7 @@ sampai ke urutan bagiannya, supaya perbandingannya lurus.
 from __future__ import annotations
 
 from .alat import GalatAlat, Perkakas
+from .dalam import kumpulkan_fakta
 from .jejak import Jejak
 from .periksa import periksa_a1
 
@@ -92,10 +93,17 @@ def susun(keadaan, id_berkas: str) -> dict:
     baris.append(batas["entri"][0]["isi"])
 
     teks = "\n".join(baris)
+    # Hasil alatnya ikut dikembalikan, bukan dibuang sesudah dipakai. Berkas
+    # perkara ini garis dasar yang harus dikalahkan agen, jadi ia harus bisa
+    # diperiksa dengan pemeriksaan yang sama, dan pemeriksaan dalam menuntut
+    # fakta alatnya, bukan sekadar himpunan angkanya.
+    hasil = [x for x in (berkas, hitung, tarif, modus, batas) if x is not None]
     return {
         "id": id_berkas,
         "teks": teks,
         "jejak": jejak,
         "a1": periksa_a1(teks, jejak),
         "ringkas_jejak": jejak.ringkas(),
+        "hasil": hasil,
+        "fakta": kumpulkan_fakta(hasil),
     }

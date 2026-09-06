@@ -51,6 +51,12 @@ jobs:
       - name: uji lapisan agen
         run: python tests/test_agen.py
 
+      # Tahap dua. Penutur yang dipakai bernaskah, bukan model sungguhan,
+      # supaya alur ini tidak menuntut bobot terpasang di pelari. Pengukuran
+      # dengan model sungguhan dijalankan tangan lewat scripts/ukur_agen.py.
+      - name: uji agen berkas dan agen sanggah
+        run: python tests/test_agen_dua.py
+
   # Menjaga agar tidak ada jejak perkakas bantu yang ikut terkirim. Ini bukan
   # soal rapi, ini soal karya yang dinilai harus jelas siapa penulisnya.
   bersih:

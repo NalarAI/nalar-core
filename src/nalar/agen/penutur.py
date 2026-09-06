@@ -1,0 +1,196 @@
+"""Sambungan ke model bahasa, beserta penutur tiruan yang dipakai menguji.
+
+Model bahasanya berbobot terbuka dan berjalan di dalam pusat data. Itu bukan
+pilihan gaya. Aturan lomba melarang data peserta JKN yang nyata keluar tanpa
+izin, dan rancangan NALAR sejak awal menolak mengirim isi berkas ke luar.
+Maka yang disambung di sini peladen setempat yang bicara dengan tata cara
+OpenAI, bukan layanan berbayar di luar.
+
+Tiga hal yang sengaja dibuat begini.
+
+Tidak ada pustaka tambahan. Yang dipakai urllib bawaan Python. Menambah
+ketergantungan yang harus ikut lolos pemeriksaan keamanan BPJS bukan harga
+yang pantas untuk satu permintaan HTTP.
+
+Penutur tiruan bukan tempelan untuk uji. Ia bentuk baku yang dipakai ketika
+tidak ada model yang menyala, dan seluruh lapisan agen tetap bisa dijalankan
+tanpa satu pun bobot terpasang. Yang keluar tetap berkas perkara versi
+aturan, dan itu memang yang dijanjikan rencana.
+
+Cacah token dicatat tiap balasan, karena target A7 mengikat: biaya token per
+berkas harus di bawah Rp 500, dibanding ongkos periksa manual Rp 750 ribu.
+Yang tidak dihitung tidak bisa dijaga.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import urllib.error
+import urllib.request
+from dataclasses import dataclass, field
+
+# Harga acuan sewa GPU, bukan harga jual layanan. Sebuah RTX 4090 setara
+# disewa sekitar Rp 6.000 per jam, dan model 4B berbobot 4 bit di atasnya
+# mengeluarkan sekitar 60 token per detik pada satu aliran. Itu jatuh di
+# sekitar Rp 0,028 per token keluaran. Angka ini dipakai menghitung A7 dan
+# ditulis di sini supaya bisa dibantah, bukan disembunyikan di dalam kode.
+RP_PER_TOKEN_KELUAR = 0.028
+RP_PER_TOKEN_MASUK = 0.0047
+
+
+class GalatPenutur(Exception):
+    """Model bahasa tidak bisa dihubungi, atau menjawab di luar bentuk."""
+
+
+@dataclass
+class Balasan:
+    """Satu giliran jawaban model: bicara, atau memanggil alat."""
+
+    teks: str = ""
+    panggilan: list[dict] = field(default_factory=list)
+    token_masuk: int = 0
+    token_keluar: int = 0
+
+    @property
+    def memanggil(self) -> bool:
+        return bool(self.panggilan)
+
+    def biaya_rp(self) -> float:
+        return (
+            self.token_masuk * RP_PER_TOKEN_MASUK
+            + self.token_keluar * RP_PER_TOKEN_KELUAR
+        )
+
+
+class Penutur:
+    """Bentuk yang harus dipenuhi apa pun yang menggantikan model bahasa."""
+
+    nama = "dasar"
+
+    def balas(self, pesan: list[dict], alat: list[dict]) -> Balasan:
+        raise NotImplementedError
+
+    def hidup(self) -> bool:
+        return False
+
+
+class PenuturTiruan(Penutur):
+    """Penutur bernaskah. Tidak menebak apa pun, hanya mengulang yang ditulis.
+
+    Dipakai untuk dua hal. Menguji bahwa lingkaran pemanggilan alat, anggaran,
+    dan penjaganya bekerja tanpa perlu bobot model terpasang. Dan menguji
+    bahwa penjaganya memang menangkap, dengan sengaja memberi naskah yang
+    mengarang angka.
+    """
+
+    nama = "tiruan"
+
+    def __init__(self, naskah: list[Balasan]):
+        self.naskah = list(naskah)
+        self.giliran = 0
+
+    def balas(self, pesan: list[dict], alat: list[dict]) -> Balasan:
+        if self.giliran >= len(self.naskah):
+            raise GalatPenutur("naskah penutur tiruan habis")
+        b = self.naskah[self.giliran]
+        self.giliran += 1
+        return b
+
+    def hidup(self) -> bool:
+        return True
+
+
+class PenuturSetempat(Penutur):
+    """Peladen model berbobot terbuka di dalam jaringan, tata cara OpenAI.
+
+    Cocok untuk Ollama, llama.cpp server, maupun vLLM. Yang dipakai hanya
+    bagian yang ketiganya sama, jadi menukar mesinnya tidak menyentuh kode
+    ini sama sekali.
+    """
+
+    nama = "setempat"
+
+    def __init__(
+        self,
+        alamat: str | None = None,
+        model: str | None = None,
+        suhu: float = 0.0,
+        tenggat_detik: float = 600.0,
+    ):
+        self.alamat = (
+            alamat or os.environ.get("NALAR_MODEL_URL") or "http://127.0.0.1:11434/v1"
+        ).rstrip("/")
+        self.model = model or os.environ.get("NALAR_MODEL") or "nalar-qwen3-4b"
+        # Suhu nol. Yang dinilai dari model ini ketaatannya memanggil alat
+        # yang benar, bukan keragaman kalimatnya. Keluaran yang bisa diulang
+        # juga syarat agar jejak auditnya berarti.
+        self.suhu = suhu
+        self.tenggat = tenggat_detik
+
+    def hidup(self) -> bool:
+        try:
+            with urllib.request.urlopen(f"{self.alamat}/models", timeout=3) as r:
+                return r.status == 200
+        except (urllib.error.URLError, OSError, TimeoutError):
+            return False
+
+    def balas(self, pesan: list[dict], alat: list[dict]) -> Balasan:
+        badan = {
+            "model": self.model,
+            "messages": pesan,
+            "temperature": self.suhu,
+            "tools": [{"type": "function", "function": a} for a in alat],
+        }
+        permintaan = urllib.request.Request(
+            f"{self.alamat}/chat/completions",
+            data=json.dumps(badan, ensure_ascii=False).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(permintaan, timeout=self.tenggat) as r:
+                jawab = json.loads(r.read().decode("utf-8"))
+        except (urllib.error.URLError, OSError, TimeoutError) as e:
+            raise GalatPenutur(f"peladen model tidak menjawab: {e}") from None
+        except json.JSONDecodeError:
+            raise GalatPenutur("jawaban peladen bukan JSON") from None
+
+        try:
+            pesan_balik = jawab["choices"][0]["message"]
+        except (KeyError, IndexError):
+            raise GalatPenutur("jawaban peladen tidak punya choices") from None
+
+        pakai = jawab.get("usage") or {}
+        panggilan = []
+        for p in pesan_balik.get("tool_calls") or []:
+            f = p.get("function") or {}
+            mentah = f.get("arguments") or "{}"
+            try:
+                arg = json.loads(mentah) if isinstance(mentah, str) else dict(mentah)
+            except json.JSONDecodeError:
+                # Argumen yang tidak bisa dibaca bukan alasan berhenti. Ia
+                # dilewatkan apa adanya supaya alatnya sendiri yang menolak,
+                # dan penolakan itu ikut tercatat di jejak.
+                arg = {"__tak_terbaca__": mentah}
+            panggilan.append(
+                {"nama": f.get("name", ""), "argumen": arg, "id": p.get("id", "")}
+            )
+
+        return Balasan(
+            teks=(pesan_balik.get("content") or "").strip(),
+            panggilan=panggilan,
+            token_masuk=int(pakai.get("prompt_tokens") or 0),
+            token_keluar=int(pakai.get("completion_tokens") or 0),
+        )
+
+
+def penutur_baku() -> Penutur:
+    """Penutur setempat kalau menyala, kalau tidak penutur yang tidak bicara.
+
+    Yang dikembalikan ketika tidak ada model menyala bukan galat, melainkan
+    penutur yang selalu menolak. Lapisan di atasnya menerjemahkan penolakan
+    itu jadi berkas perkara versi aturan, dan itu memang keluaran yang sah.
+    """
+    p = PenuturSetempat()
+    return p if p.hidup() else Penutur()
