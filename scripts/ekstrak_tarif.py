@@ -40,7 +40,9 @@ import fitz  # PyMuPDF
 
 AKAR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 PDF = os.path.join(AKAR, "data", "raw", "permenkes3_2023.pdf")
-KELUAR = os.path.join(AKAR, "data", "processed")
+# Tabel tarif ditulis ke dalam paket, supaya ikut terbawa ketika dipasang.
+# Ringkasannya tetap di data/processed, karena itu bahan baca manusia.
+KELUAR = os.path.join(AKAR, "src", "nalar", "data")
 
 POLA_KODE = re.compile(r"^([A-Z])-(\d)-(\d{2})-(I{1,3}|0)$")
 # Nilai tarif selalu memakai titik ribuan. Mengharuskan minimal satu kelompok

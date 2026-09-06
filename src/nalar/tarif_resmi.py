@@ -26,8 +26,23 @@ from functools import lru_cache
 
 from .tarif import Kelompok, kelompokkan  # noqa: F401  dipakai ulang
 
+# Tabel tarif tinggal di dalam paket, bukan di folder data pada akar
+# repositori.
+#
+# Alasannya ditemukan saat menyiapkan penerapan, dan cukup mahal untuk
+# diabaikan. Ketika dipasang sebagai paket, berkas modul mendarat di
+# site-packages, sehingga jalur naik dua tingkat menunjuk ke tempat yang
+# sama sekali lain. Berkasnya tidak ditemukan, dan seluruh alur diam diam
+# jatuh ke tarif tebakan. Ablasi kami menunjukkan tarif tebakan membuat
+# ketimpangan antar kelas faskes naik dari 1,737 ke 3,539, jadi kegagalan
+# senyap itu bukan hal kecil.
+#
+# Jalur pada akar repositori tetap diperiksa sebagai cadangan, supaya salinan
+# lama pada mesin pengembangan tetap terbaca.
 AKAR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-CSV_TARIF = os.path.join(AKAR, "data", "processed", "tarif_inacbg.csv")
+_DI_PAKET = os.path.join(os.path.dirname(__file__), "data", "tarif_inacbg.csv")
+_DI_REPO = os.path.join(AKAR, "data", "processed", "tarif_inacbg.csv")
+CSV_TARIF = _DI_PAKET if os.path.exists(_DI_PAKET) else _DI_REPO
 
 ROMAWI = {0: "0", 1: "I", 2: "II", 3: "III"}
 

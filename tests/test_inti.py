@@ -94,6 +94,35 @@ else:
     )
 
 # ---------------------------------------------------------------------------
+print("\n1b. Tabel tarif resmi benar benar terbaca")
+# ---------------------------------------------------------------------------
+# Penjaga untuk kegagalan senyap. Kalau berkas tarif tidak ditemukan, seluruh
+# alur jatuh ke tarif tebakan tanpa memberi tahu siapa pun, dan ablasi kami
+# menunjukkan itu menaikkan ketimpangan antar kelas faskes dari 1,737 ke 3,539.
+# Cacat ini pernah benar benar terjadi ketika paket dipasang, karena jalurnya
+# dihitung relatif terhadap akar repositori.
+from nalar import tarif_resmi as _tr  # noqa: E402
+
+cek(
+    "berkas tarif ada di tempat yang dicari kode",
+    os.path.exists(_tr.CSV_TARIF),
+    _tr.CSV_TARIF,
+)
+_peta = _tr._muat()
+# 76.970 baris CSV menyatu jadi 34.140 kunci, karena tiga kelas rawat pada
+# satu baris kunci disimpan sebagai satu nilai bertiga.
+cek(
+    "tabel tarif memuat puluhan ribu kunci, bukan kosong",
+    len(_peta) > 30_000,
+    f"terbaca {len(_peta)} kunci",
+)
+cek(
+    "jumlah kode unik mendekati 885 seperti pada Permenkes",
+    800 <= len({k[0] for k in _peta}) <= 900,
+    f"{len({k[0] for k in _peta})} kode",
+)
+
+# ---------------------------------------------------------------------------
 print("\n2. Jaminan konformal terpenuhi pada data buatan")
 # ---------------------------------------------------------------------------
 rng = np.random.default_rng(0)

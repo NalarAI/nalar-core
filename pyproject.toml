@@ -39,6 +39,9 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/nalar"]
+# Tabel tarif Permenkes ikut ke dalam wheel. Tanpa ini, paket yang terpasang
+# jatuh ke tarif tebakan tanpa memberi tahu siapa pun.
+artifacts = ["src/nalar/data/*.csv"]
 
 [tool.ruff]
 line-length = 88
