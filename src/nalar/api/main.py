@@ -223,7 +223,7 @@ def penjelasan(kid: str) -> Penjelasan:
         Pengandaian(
             kode=b["bukti"],
             nama=KEADAAN.nama_bukti(b["bukti"]),
-            menurunkan_selisih_rp=int(b["perubahan_selisih_rp"]),
+            ubah_selisih_rp=int(b["perubahan_selisih_rp"]),
         )
         for b in j["bukti_yang_bila_ada_akan_mengubah_penilaian"]
     ]
@@ -235,11 +235,20 @@ def penjelasan(kid: str) -> Penjelasan:
         # Sekarang yang diubah hanya angkanya.
         return "Rp " + f"{int(n):,}".replace(",", ".")
 
+    # Kalimatnya menyebut nilai berkas utuh, bukan bagian tarif paketnya saja.
+    #
+    # Selisih menjumlahkan selisih tarif paket dan selisih barang habis pakai.
+    # Versi sebelumnya mengutip dua angka tarif lalu menyebut selisih total, dan
+    # pengurangannya tidak pernah cocok. Fasilitas kesehatan yang menghitung
+    # ulang akan menemukan angka yang tidak bertemu, dan itu alasan yang sah
+    # untuk tidak mempercayai seluruh suratnya.
+    diajukan = int(a["tarif_ditagihkan"]) + int(a["tagihan_barang_ditagihkan"])
+    wajar = int(a["tarif_didukung_bukti"]) + int(a["tagihan_barang_wajar"])
     kalimat = (
-        f"Tarif yang diajukan {rp(a['tarif_ditagihkan'])}, sedangkan tarif "
-        f"wajar menurut bukti pada berkas ini {rp(a['tarif_didukung_bukti'])}. "
-        f"Selisih {rp(selisih)}. Mohon melengkapi bukti berikut bila tersedia, "
-        "atau menyampaikan alasan klinisnya."
+        f"Nilai yang diajukan {rp(diajukan)}, sedangkan yang didukung bukti "
+        f"pada berkas ini {rp(wajar)}. Selisih {rp(selisih)}, mencakup tarif "
+        "paket dan barang habis pakai. Mohon melengkapi bukti berikut bila "
+        "tersedia, atau menyampaikan alasan klinisnya."
     )
     return Penjelasan(
         id=kid,
@@ -367,8 +376,8 @@ def perubahan(
                 kelas_faskes=r["f_kelas"],
                 n_klaim=v["n_sebelum"] + v["n_sesudah"],
                 hari_ganti=v["hari_ganti"],
-                rata_sebelum=float(v["rata_sebelum_rp"]),
-                rata_sesudah=float(v["rata_sesudah_rp"]),
+                rata_sebelum=float(v["rata_sebelum"]),
+                rata_sesudah=float(v["rata_sesudah"]),
                 p=v["p"],
             )
         )

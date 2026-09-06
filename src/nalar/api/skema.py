@@ -92,11 +92,17 @@ class Penilaian(BaseModel):
 
 
 class Pengandaian(BaseModel):
-    """Satu bukti yang bila ada akan menurunkan selisih."""
+    """Satu bukti yang tidak ada di berkas, beserta akibatnya bila ada.
+
+    Nilainya selisih sekarang dikurangi selisih seandainya bukti itu ada.
+    Positif berarti bukti menurunkan selisih, negatif berarti menaikkannya.
+    Keduanya dikirim apa adanya, karena antarmuka yang mengambil nilai
+    mutlaknya akan menampilkan bukti yang memperburuk sebagai pengurang.
+    """
 
     kode: str
     nama: str
-    menurunkan_selisih_rp: int
+    ubah_selisih_rp: int
 
 
 class Penjelasan(BaseModel):

@@ -262,13 +262,23 @@ def titik_perubahan(
             return rng.permutation(v)
 
     lebih = sum(1 for _ in range(n_acak) if cari(acak())[0] >= beda)
+
+    # Dibulatkan ke empat angka di belakang koma, bukan ke bilangan bulat.
+    #
+    # Fungsi ini dipakai dua kali: sekali pada selisih rupiah, sekali pada
+    # posisi terhadap ambang yang nilainya di rentang minus satu sampai satu.
+    # Pembulatan ke bilangan bulat memusnahkan ukuran kedua: seluruh rata rata
+    # posisi jatuh jadi nol atau minus satu, dan tabel perubahan pola sempat
+    # melaporkan "perubahan 0,000" untuk faskes yang justru terdeteksi berubah.
+    sebelum = float(mentah[:potong].mean())
+    sesudah = float(mentah[potong:].mean())
     return {
         "hari_ganti": int(h[potong]),
         "n_sebelum": potong,
         "n_sesudah": n - potong,
-        "rata_sebelum_rp": round(float(mentah[:potong].mean())),
-        "rata_sesudah_rp": round(float(mentah[potong:].mean())),
-        "lonjakan_rp": round(float(mentah[potong:].mean() - mentah[:potong].mean())),
+        "rata_sebelum": round(sebelum, 4),
+        "rata_sesudah": round(sesudah, 4),
+        "lonjakan": round(sesudah - sebelum, 4),
         "lonjakan_peringkat": round(float(beda), 4),
         "p": round((lebih + 1) / (n_acak + 1), 4),
     }

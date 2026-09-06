@@ -255,7 +255,7 @@ def utama() -> int:
                         "urutan": u,
                         "kode": b["kode"],
                         "nama": b["nama"],
-                        "menurunkan_selisih_rp": b["menurunkan_selisih_rp"],
+                        "ubah_selisih_rp": b["ubah_selisih_rp"],
                     }
                 )
             if i % 100 == 0:

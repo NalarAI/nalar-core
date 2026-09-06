@@ -18,6 +18,7 @@ Jalankan:
 from __future__ import annotations
 
 import os
+import re
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
@@ -119,13 +120,41 @@ with TestClient(app) as c:
             "penjelasan memuat kalimat yang bisa dikirim ke faskes",
             len(j["kalimat_untuk_faskes"]) > 40,
         )
+        # Fasilitas kesehatan akan menghitung ulang kalimat ini. Kalau tiga
+        # angkanya tidak bertemu, seluruh suratnya kehilangan wibawa. Versi
+        # sebelumnya mengutip dua angka tarif paket lalu menyebut selisih total
+        # yang juga memuat barang habis pakai, dan pengurangannya tidak pernah
+        # cocok.
+        rp_kalimat = [
+            int(x.replace(".", ""))
+            for x in re.findall(r"Rp ([\d.]+)", j["kalimat_untuk_faskes"])
+        ]
+        cek(
+            "kalimat untuk faskes memuat tiga angka rupiah",
+            len(rp_kalimat) == 3,
+            f"ditemukan {len(rp_kalimat)}",
+        )
+        cek(
+            "pengurangan pada kalimat untuk faskes cocok",
+            len(rp_kalimat) == 3 and rp_kalimat[0] - rp_kalimat[1] == rp_kalimat[2],
+            str(rp_kalimat),
+        )
         cek(
             "kata curang tidak muncul di penjelasan",
             not any(k in str(j).lower() for k in ("curang", "fraud", "kecurangan")),
         )
+        # Namanya dulu "tiap pengandaian menurunkan selisih". Namanya salah:
+        # yang diperiksa cuma bahwa nilainya tidak nol, dan pada data sungguhan
+        # sebagian butir memang bertanda negatif, artinya melampirkannya justru
+        # menaikkan selisih. Antarmuka yang mengambil nilai mutlaknya karena itu
+        # menampilkan bukti yang memperburuk sebagai pengurang.
         cek(
-            "tiap pengandaian menurunkan selisih, bukan menaikkan",
-            all(x["menurunkan_selisih_rp"] != 0 for x in j["pengandaian"]),
+            "tiap pengandaian membawa perubahan yang berarti",
+            all(abs(x["ubah_selisih_rp"]) > 1000 for x in j["pengandaian"]),
+        )
+        cek(
+            "arah perubahan terbawa apa adanya, tidak dipaksa positif",
+            all(isinstance(x["ubah_selisih_rp"], int) for x in j["pengandaian"]),
         )
 
     cek(
