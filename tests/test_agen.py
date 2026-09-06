@@ -160,6 +160,13 @@ else:
 
 print("\n7. Target A1 pada berkas perkara berbasis aturan")
 n_perkara, n_langgar, contoh = 0, 0, []
+# Kosakata menuduh diperiksa di sini, bukan hanya di uji ujung ke ujung.
+# Pustaka aturan memuat judul peraturan yang menyebut kecurangan, dan
+# pencariannya bisa memunculkannya kalau pertanyaannya bergeser sedikit.
+# Yang dijaga bukan kata pada pustakanya, melainkan kata yang benar benar
+# keluar ke berkas perkara.
+DILARANG = ("curang", "fraud", "kecurangan", "penipuan")
+n_menuduh, contoh_kata = 0, []
 for i in ID:
     hasil = susun(K, i)
     n_perkara += 1
@@ -167,7 +174,18 @@ for i in ID:
         n_langgar += 1
         if len(contoh) < 3:
             contoh.append((i, hasil["a1"]["angka_tak_bersumber"]))
+    rendah = hasil["teks"].lower()
+    ada = [k for k in DILARANG if k in rendah]
+    if ada:
+        n_menuduh += 1
+        if len(contoh_kata) < 3:
+            contoh_kata.append((i, ada))
 
+cek(
+    f"tidak ada kosakata menuduh pada {n_perkara} berkas perkara",
+    n_menuduh == 0,
+    f"{n_menuduh} berkas, contoh {contoh_kata}",
+)
 cek(
     f"tidak ada angka tak bersumber pada {n_perkara} berkas perkara",
     n_langgar == 0,

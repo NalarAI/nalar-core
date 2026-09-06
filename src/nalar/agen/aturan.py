@@ -284,8 +284,8 @@ DASAR = [
         "judul": "Batas keputusan sistem",
         "isi": (
             "NALAR memberi urutan prioritas pemeriksaan. Keputusan menyetujui, "
-            "meminta kelengkapan, atau meneruskan ke tim pencegahan kecurangan "
-            "diambil verifikator yang berwenang."
+            "meminta kelengkapan, atau meneruskan ke unit yang berwenang "
+            "menanganinya diambil verifikator, bukan sistem ini."
         ),
         "sumber": "Rancangan NALAR bagian batas dan ketentuan layanan",
     },
