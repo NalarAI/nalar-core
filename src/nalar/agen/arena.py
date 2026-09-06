@@ -119,7 +119,7 @@ def jalankan(
     # ratusan panggilan, dan agen menjalankan puluhan siasat.
     semua, batas = [], []
     for pos in sasar:
-        v = varian(episodes[calon[pos]], gerakan)
+        v = varian(episodes[calon[pos]], gerakan, penskor=penskor)
         batas.append((pos, len(semua), len(semua) + len(v)))
         semua.extend(v)
     if not semua:

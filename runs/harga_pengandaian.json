@@ -1,0 +1,164 @@
+{
+  "pengaturan": {
+    "peserta": 20000,
+    "tahun": 3,
+    "benih": 7,
+    "klaim": 400,
+    "belajar": 50,
+    "keluar": "runs/harga_pengandaian.json"
+  },
+  "per_siasat": {
+    "hati hati, lampiran sembarang": {
+      "penuh": {
+        "nama": "hati hati, lampiran sembarang",
+        "pengetahuan": "penuh",
+        "n_sasaran": 400,
+        "n_diserang": 165,
+        "diambil_rp": 384220500,
+        "lolos_rp": 384220500,
+        "maks_per_klaim_rp": 15877700,
+        "maks_lolos_rp": 15877700,
+        "rerata_per_klaim_rp": 2328609,
+        "porsi_tertangkap": 0.0
+      },
+      "buta": {
+        "nama": "hati hati, lampiran sembarang",
+        "pengetahuan": "buta",
+        "n_sasaran": 400,
+        "n_diserang": 285,
+        "diambil_rp": 1936301300,
+        "lolos_rp": 263412200,
+        "maks_per_klaim_rp": 35261200,
+        "maks_lolos_rp": 15877700,
+        "rerata_per_klaim_rp": 6794040,
+        "porsi_tertangkap": 0.614
+      },
+      "belajar": {
+        "nama": "hati hati, lampiran sembarang",
+        "pengetahuan": "belajar",
+        "n_sasaran": 400,
+        "n_diserang": 202,
+        "diambil_rp": 429367100,
+        "lolos_rp": 230707000,
+        "maks_per_klaim_rp": 4404500,
+        "maks_lolos_rp": 4404500,
+        "rerata_per_klaim_rp": 2125580,
+        "porsi_tertangkap": 0.396
+      }
+    },
+    "hati hati, lampiran menurut daftar": {
+      "penuh": {
+        "nama": "hati hati, lampiran menurut daftar",
+        "pengetahuan": "penuh",
+        "n_sasaran": 400,
+        "n_diserang": 188,
+        "diambil_rp": 438111600,
+        "lolos_rp": 438111600,
+        "maks_per_klaim_rp": 15877700,
+        "maks_lolos_rp": 15877700,
+        "rerata_per_klaim_rp": 2330381,
+        "porsi_tertangkap": 0.0
+      },
+      "buta": {
+        "nama": "hati hati, lampiran menurut daftar",
+        "pengetahuan": "buta",
+        "n_sasaran": 400,
+        "n_diserang": 285,
+        "diambil_rp": 1936301300,
+        "lolos_rp": 315275100,
+        "maks_per_klaim_rp": 35261200,
+        "maks_lolos_rp": 15877700,
+        "rerata_per_klaim_rp": 6794040,
+        "porsi_tertangkap": 0.5123
+      },
+      "belajar": {
+        "nama": "hati hati, lampiran menurut daftar",
+        "pengetahuan": "belajar",
+        "n_sasaran": 400,
+        "n_diserang": 219,
+        "diambil_rp": 540661400,
+        "lolos_rp": 335008900,
+        "maks_per_klaim_rp": 6019600,
+        "maks_lolos_rp": 6019600,
+        "rerata_per_klaim_rp": 2468774,
+        "porsi_tertangkap": 0.2877
+      }
+    },
+    "menyebar, lampiran sembarang": {
+      "penuh": {
+        "nama": "menyebar, lampiran sembarang",
+        "pengetahuan": "penuh",
+        "n_sasaran": 400,
+        "n_diserang": 285,
+        "diambil_rp": 1326953800,
+        "lolos_rp": 312695800,
+        "maks_per_klaim_rp": 27238400,
+        "maks_lolos_rp": 15877700,
+        "rerata_per_klaim_rp": 4655978,
+        "porsi_tertangkap": 0.4105
+      },
+      "buta": {
+        "nama": "menyebar, lampiran sembarang",
+        "pengetahuan": "buta",
+        "n_sasaran": 400,
+        "n_diserang": 285,
+        "diambil_rp": 1936301300,
+        "lolos_rp": 263412200,
+        "maks_per_klaim_rp": 35261200,
+        "maks_lolos_rp": 15877700,
+        "rerata_per_klaim_rp": 6794040,
+        "porsi_tertangkap": 0.614
+      },
+      "belajar": {
+        "nama": "menyebar, lampiran sembarang",
+        "pengetahuan": "belajar",
+        "n_sasaran": 400,
+        "n_diserang": 214,
+        "diambil_rp": 468894200,
+        "lolos_rp": 226337300,
+        "maks_per_klaim_rp": 11604100,
+        "maks_lolos_rp": 4404500,
+        "rerata_per_klaim_rp": 2191094,
+        "porsi_tertangkap": 0.4252
+      }
+    },
+    "menyebar, lampiran menurut daftar": {
+      "penuh": {
+        "nama": "menyebar, lampiran menurut daftar",
+        "pengetahuan": "penuh",
+        "n_sasaran": 400,
+        "n_diserang": 285,
+        "diambil_rp": 1326953800,
+        "lolos_rp": 355561800,
+        "maks_per_klaim_rp": 27238400,
+        "maks_lolos_rp": 15877700,
+        "rerata_per_klaim_rp": 4655978,
+        "porsi_tertangkap": 0.3298
+      },
+      "buta": {
+        "nama": "menyebar, lampiran menurut daftar",
+        "pengetahuan": "buta",
+        "n_sasaran": 400,
+        "n_diserang": 285,
+        "diambil_rp": 1936301300,
+        "lolos_rp": 315275100,
+        "maks_per_klaim_rp": 35261200,
+        "maks_lolos_rp": 15877700,
+        "rerata_per_klaim_rp": 6794040,
+        "porsi_tertangkap": 0.5123
+      },
+      "belajar": {
+        "nama": "menyebar, lampiran menurut daftar",
+        "pengetahuan": "belajar",
+        "n_sasaran": 400,
+        "n_diserang": 228,
+        "diambil_rp": 568209900,
+        "lolos_rp": 327261700,
+        "maks_per_klaim_rp": 11604100,
+        "maks_lolos_rp": 6019600,
+        "rerata_per_klaim_rp": 2492149,
+        "porsi_tertangkap": 0.3114
+      }
+    }
+  }
+}

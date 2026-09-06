@@ -1933,3 +1933,71 @@ Kedua, angka T6 kami selama ini diukur pada pelaku yang paling kuat yang bisa
 dibayangkan. Itu tetap yang dilaporkan, karena melaporkan yang lebih lemah
 berarti menghibur diri sendiri. Tapi sekarang ada dua angka, dan yang kedua
 menunjukkan detektornya bekerja lebih baik daripada yang tertulis.
+
+---
+
+## Harga daftar pengandaian yang kami tampilkan sendiri, 7 September 2026
+
+`runs/harga_pengandaian.json`
+
+Percobaan sebelumnya menyimpulkan bahwa portal faskes tidak boleh jadi tempat
+mencoba coba, dan pekerjaannya membatasi berapa kali sebuah berkas boleh
+dihitung ulang. Waktu hendak mengerjakannya, ternyata batas itu tidak ada
+gunanya, karena tidak ada yang dihitung ulang.
+
+Portal tidak memanggil apa pun ketika bukti dicentang. Ia menghitung dari
+daftar yang sudah ada di jawaban: bukti apa saja yang bila dilampirkan
+menurunkan selisih, beserta besar penurunan tiap butirnya, seluruhnya
+sekaligus, dalam satu jawaban.
+
+Jadi bukan pelaku yang bertanya berkali kali. Kami yang memberikan seluruh
+petanya sekali jalan.
+
+### Harganya diukur
+
+Dua siasat kembar diadu, beda pada satu hal saja. Melampirkan pemeriksaan
+sembarang, dan melampirkan pemeriksaan teratas menurut daftar itu.
+
+| Siasat | Pengetahuan | Sembarang | Menurut daftar | |
+|---|---|---:|---:|---:|
+| hati hati | penuh | 384,2 jt | 438,1 jt | +14,0% |
+| hati hati | buta | 263,4 jt | 315,3 jt | +19,7% |
+| hati hati | belajar | 230,7 jt | **335,0 jt** | **+45,2%** |
+| menyebar | penuh | 312,7 jt | 355,6 jt | +13,7% |
+| menyebar | buta | 263,4 jt | 315,3 jt | +19,7% |
+| menyebar | belajar | 226,3 jt | 327,3 jt | +44,6% |
+
+Yang paling mahal justru baris paling realistis. Pelaku yang tidak bisa
+menanyai skor mendapat empat puluh lima persen lebih banyak dari daftar yang
+kami tampilkan sendiri.
+
+Itu masuk akal sesudah dilihat: daftarnya menggantikan persis kemampuan yang
+tidak ia punya. Mencabut akses skor menurunkan uang yang lolos sepertiga,
+lalu daftar pengandaian mengembalikan hampir seluruhnya.
+
+### Menyembunyikan angkanya tidak menolong
+
+Reaksi pertama kami menyembunyikan besar penurunan tiap butir dan menampilkan
+urutannya saja. Itu tidak menolong, dan sebabnya ada di gerakan yang dipakai
+mengukur: ia cuma memakai urutannya. Tiga butir teratas, tanpa melihat satu
+angka pun.
+
+Urutannya sendiri yang bocor, dan urutan itu persis yang dibutuhkan faskes
+yang jujur. Tidak ada cara memberi urutan kepada yang berhak tanpa memberi
+urutan kepada yang tidak.
+
+### Dan daftarnya tetap ditampilkan
+
+Tanpa daftar itu, penandaan cuma tuduhan yang tidak bisa dibantah. Faskes
+yang buktinya sah akan kalah karena tidak tahu bukti mana yang diminta, dan
+itu persis keadaan yang kami bilang hendak diperbaiki.
+
+Yang berubah bukan keputusannya, melainkan bahwa harganya sekarang tertulis.
+Empat puluh lima persen lebih banyak uang lolos pada pelaku yang paling
+mungkin ada di lapangan. Angka itu masuk ke bagian risiko, bukan disimpan.
+
+Yang bisa dikerjakan tanpa mencabut daftarnya ada dua, dan keduanya sudah ada
+bentuknya di sistem. Porsi sampel acak pada antrean, yang membuat tidak ada
+berkas yang bisa dipastikan aman berapa pun rapinya siasat. Dan profil
+faskes, yang menanyakan siapa yang paling sering menagih di dekat garis, bukan
+berkas mana yang melewatinya.

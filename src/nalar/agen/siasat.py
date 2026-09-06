@@ -82,6 +82,15 @@ GERAKAN = {
         ),
         "parameter": {"n": {"jenis": "bilangan", "min": 1, "maks": 4}},
     },
+    "lampirkan_lab_terbaik": {
+        "keterangan": (
+            "Lampirkan pemeriksaan penunjang yang paling menurunkan selisih, "
+            "bukan yang mana saja. Ini persis daftar yang portal fasilitas "
+            "kesehatan tampilkan hari ini, lengkap dengan besar penurunan "
+            "tiap butirnya."
+        ),
+        "parameter": {"n": {"jenis": "bilangan", "min": 1, "maks": 4}},
+    },
     "gelembungkan_barang": {
         "keterangan": (
             "Naikkan tagihan bahan habis pakai sekian persen. Ini modus M07."
@@ -225,6 +234,50 @@ def _tambah_prosedur(d: dict, n: int = 1) -> None:
     _hitung_ulang_tarif(d)
 
 
+def urutan_pengandaian(r: dict, penskor) -> list[str]:
+    """Kode pemeriksaan, terurut dari yang paling menurunkan selisih.
+
+    Ini persis daftar yang portal fasilitas kesehatan tampilkan hari ini,
+    lengkap dengan besar penurunan tiap butirnya, seluruhnya sekaligus,
+    dalam satu jawaban.
+
+    Daftar itu inti janji kami kepada faskes. Tanpa daftar itu, penandaan
+    cuma tuduhan yang tidak bisa dibantah, dan faskes yang buktinya sah tetap
+    kalah karena tidak tahu bukti mana yang diminta. Dengan daftar itu, ia
+    tahu persis apa yang perlu dikirim.
+
+    Dan daftar yang sama adalah peta bagi yang ingin menghindar. Fungsi ini
+    ada supaya harga peta itu bisa diukur, bukan diperkirakan.
+
+    Dihitung sekali dari berkas apa adanya, bukan dari tiap varian. Itu bukan
+    penghematan, itu yang benar: faskes membaca daftar untuk berkas yang ia
+    ajukan, bukan untuk berkas yang belum pernah ada.
+    """
+    ada = {k for k, _ in r["lab"]}
+    kandidat = [k for k in PEMERIKSAAN if k not in ada]
+    if not kandidat:
+        return []
+    tiruan = []
+    for k in kandidat:
+        t = copy.deepcopy(r)
+        t["lab"] = list(r["lab"]) + [(k, 1.0)]
+        tiruan.append(t)
+    skor = penskor([r] + tiruan)
+    dasar = float(skor[0])
+    turun = [(dasar - float(x), k) for x, k in zip(skor[1:], kandidat)]
+    turun.sort(reverse=True)
+    return [k for t, k in turun if t > 0]
+
+
+def _lampirkan_lab_terbaik(d: dict, n: int = 1, urutan: list | None = None) -> None:
+    """Lampirkan pemeriksaan teratas pada daftar pengandaian berkas ini."""
+    if not urutan:
+        return _lampirkan_lab(d, n)
+    ada = {k for k, _ in d["lab"]}
+    pilih = [k for k in urutan if k not in ada][: max(1, int(n))]
+    d["lab"] = list(d["lab"]) + [(k, 1.0) for k in pilih]
+
+
 def _lampirkan_lab(d: dict, n: int = 1) -> None:
     ada = {k for k, _ in d["lab"]}
     kandidat = [k for k in PEMERIKSAAN if k not in ada]
@@ -241,6 +294,7 @@ _TERAP = {
     "naikkan_kelas": _naikkan_kelas,
     "tambah_prosedur": _tambah_prosedur,
     "lampirkan_lab": _lampirkan_lab,
+    "lampirkan_lab_terbaik": _lampirkan_lab_terbaik,
     "gelembungkan_barang": _gelembungkan_barang,
 }
 
@@ -277,7 +331,12 @@ def _nilai_parameter(jenis: str, g: dict) -> list[dict]:
     return susunan
 
 
-def varian(r: dict, gerakan: list[dict]) -> list[dict]:
+# Gerakan yang perlu tahu skor berkasnya untuk memilih. Dipisah supaya
+# gerakan lain tetap bisa dijalankan tanpa penebak sama sekali.
+BUTUH_PENSKOR = {"lampirkan_lab_terbaik"}
+
+
+def varian(r: dict, gerakan: list[dict], penskor=None) -> list[dict]:
     """Seluruh berkas yang mungkin sesudah gerakan diterapkan.
 
     Yang dikembalikan salinan. Berkas aslinya tidak pernah disentuh, dan itu
@@ -285,6 +344,13 @@ def varian(r: dict, gerakan: list[dict]) -> list[dict]:
     siasat, dan satu siasat yang mengubahnya akan mencemari seluruh
     pengukuran sesudahnya tanpa satu pun tanda.
     """
+    # Daftar pengandaian dihitung sekali untuk berkas ini, bukan sekali per
+    # varian. Kalau tidak, satu siasat memakan ratusan ribu penskoran dan
+    # pengukurannya tidak pernah selesai.
+    urutan = None
+    if penskor is not None and any(g["jenis"] in BUTUH_PENSKOR for g in gerakan):
+        urutan = urutan_pengandaian(r, penskor)
+
     susunan: list[list[dict]] = [[]]
     for g in gerakan:
         jenis = g["jenis"]
@@ -298,7 +364,10 @@ def varian(r: dict, gerakan: list[dict]) -> list[dict]:
     for langkah in susunan:
         d = copy.deepcopy(r)
         for g in langkah:
-            _TERAP[g["jenis"]](d, **{k: v for k, v in g.items() if k != "jenis"})
+            arg = {k: v for k, v in g.items() if k != "jenis"}
+            if g["jenis"] in BUTUH_PENSKOR:
+                arg["urutan"] = urutan
+            _TERAP[g["jenis"]](d, **arg)
         keluar.append(d)
     return keluar
 
