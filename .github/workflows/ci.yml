@@ -45,6 +45,12 @@ jobs:
       - name: uji konsistensi angka
         run: python tests/test_konsistensi.py
 
+      # Lapisan agen. Yang paling penting di antaranya penjaga A1: tidak ada
+      # satu pun angka pada berkas perkara yang tidak berasal dari alat.
+      # Diukur pada enam puluh berkas tiap kali alur ini jalan.
+      - name: uji lapisan agen
+        run: python tests/test_agen.py
+
   # Menjaga agar tidak ada jejak perkakas bantu yang ikut terkirim. Ini bukan
   # soal rapi, ini soal karya yang dinilai harus jelas siapa penulisnya.
   bersih:
