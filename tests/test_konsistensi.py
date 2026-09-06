@@ -121,8 +121,7 @@ with TestClient(app) as c:
     )
     cek(
         "urutan pengenal klaim sama persis",
-        [b["penilaian"]["id"] for b in a["baris"]]
-        == [K.id_klaim(int(i)) for i in idx],
+        [b["penilaian"]["id"] for b in a["baris"]] == [K.id_klaim(int(i)) for i in idx],
     )
     rp = round(float(K.selisih[idx].sum())) if len(idx) else 0
     cek(
@@ -139,15 +138,17 @@ with TestClient(app) as c:
     cek(
         "urutan faskes pada daftar rupiah sama",
         [b["faskes"] for b in pr["antrean_rupiah"]]
-        == [K.nama_faskes(next(x for x in eps
-                              if (int(x["f_jenis"]), int(x["faskes"])) == kk))
-            for kk, _ in langsung],
+        == [
+            K.nama_faskes(
+                next(x for x in eps if (int(x["f_jenis"]), int(x["faskes"])) == kk)
+            )
+            for kk, _ in langsung
+        ],
     )
     cek(
         "kelebihan rupiah baris teratas sama",
         not langsung
-        or pr["antrean_rupiah"][0]["kelebihan_rp"]
-        == int(langsung[0][1]["kelebihan"]),
+        or pr["antrean_rupiah"][0]["kelebihan_rp"] == int(langsung[0][1]["kelebihan"]),
     )
 
     print("\n6. Menggeser alpha menggeser ambang, bukan penebaknya")
