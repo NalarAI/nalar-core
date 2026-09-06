@@ -10,6 +10,8 @@ oleh buktinya sendiri, tanpa satu pun contoh kecurangan berlabel.**
 Untuk Healthkathon BPJS Kesehatan 2026, kategori Efisiensi Risiko pada
 Fasilitas Kesehatan.
 
+Peragaannya hidup di **https://nalar-six.vercel.app**
+
 | | |
 |---|---|
 | Porsi batas atas pada seribu klaim | 0,713 |
@@ -62,6 +64,15 @@ sebuah klaim. Ia hanya mengubah seberapa berani kita menandainya.
 ```
 pip install -e ".[api]"
 uvicorn nalar.api.main:app --reload
+```
+
+Atau berwadah, untuk pemasangan di dalam. Rancangan menyebut satu syarat yang
+tidak bisa ditawar: penilaian dijalankan di tempat data berada, dan tidak ada
+klaim yang dikirim keluar untuk diskor.
+
+```
+docker build -t nalar-api .
+docker run -p 8000:7860 nalar-api
 ```
 
 Dokumentasi titik akhirnya terbuka sendiri di `/docs`.
