@@ -5,6 +5,7 @@ Untuk Healthkathon BPJS Kesehatan 2026, kategori Efisiensi Risiko pada
 Fasilitas Kesehatan.
 
 Rancangan lengkapnya ada di `../rancangan_model_ai_nalar_jkn.yaml`.
+Seluruh hasil percobaan beserta kegagalannya ada di `TEMUAN.md`.
 Berkas ini hanya menjelaskan kode yang sudah jalan.
 
 ## Gagasannya satu kalimat
@@ -13,29 +14,66 @@ Kecurangan tidak perlu dikenali dari contohnya. Ia bisa dikenali dari seberapa
 jauh sebuah klaim menyimpang dari apa yang dibutuhkan untuk menjelaskan dirinya
 sendiri.
 
-Model dilatih dengan menutup sebagian isi klaim lalu menebaknya dari sisanya.
-Tidak ada satu pun label kecurangan yang dipakai saat melatih. Skor lahir dari
-kesulitan menebak, dan diterjemahkan ke rupiah lewat tabel tarif.
+Satu penebak mempelajari berapa tarif yang wajar bagi bukti yang menyertai
+sebuah klaim. Selisih antara yang ditagih dan yang didukung bukti menjadi
+skornya. Tidak ada satu pun label kecurangan yang dipakai saat melatih.
+
+## Yang benar benar dikirim
+
+`src/nalar/detektor.py`. Isinya pohon berpenguat sebagai penebak normatif,
+kalibrasi konformal bertingkat yang himpunannya disaring dari kontaminasi,
+dua profil faskes, antrean audit yang sadar biaya, dan lapisan penjelasan.
+
+Transformer yang ditulis dari nol ada di `model.py`, `tokenizer.py`, dan
+`train.py`, dan ia kalah. Pohon normatif mencapai porsi batas atas 0,721
+melawan 0,649 miliknya. Kodenya ditinggalkan utuh karena percobaan yang
+menghasilkan kesimpulan itu harus bisa diulang, bukan karena masih dipakai.
+
+Yang tetap dipakai dari rancangan adalah bagian yang tidak bergantung pada
+bentuk modelnya: kalibrasi konformal, evaluasi terhadap pelaku yang
+beradaptasi, tarif Permenkes yang sungguhan, keluaran dalam rupiah, dan
+penjelasan yang bisa dibantah.
 
 ## Menjalankan
 
 ```
-python tests/test_inti.py                 # 25 uji, semuanya harus lulus
-python scripts/percobaan.py --peserta 8000 --langkah 400
+python tests/test_inti.py               25 uji, semuanya harus lulus
+python scripts/uji_detektor.py          model yang dikirim, ujung ke ujung
+python scripts/uji_ketahanan.py         lima benih, empat prevalensi, pisah waktu
+python scripts/uji_lawan.py             tiga pelaku yang beradaptasi
+python scripts/uji_profil.py            profil faskes melawan tiga pembanding
+python scripts/uji_perubahan.py         kepala titik perubahan
+python scripts/uji_transfer.py          latih di sintetis, uji di klaim Amerika
 ```
 
-Hasil percobaan ditulis ke `runs/percobaan.json`.
+Hasilnya ditulis ke `runs/`. Butuh Python 3.12, scikit-learn, dan NumPy.
+PyTorch hanya diperlukan untuk menjalankan ulang percobaan transformer.
 
-Butuh Python 3.12, PyTorch, dan NumPy. Tidak butuh yang lain.
-
-Untuk GPU, pakai venv proyek:
+Pakai venv proyek supaya versinya sama:
 
 ```
-./.venv/Scripts/python.exe scripts/percobaan.py --peserta 20000 --fkrtl 150     --fktp 900 --langkah 3000 --batch 128 --d 256 --lapis 8 --kepala 8 --dff 1024
+./.venv/Scripts/python.exe scripts/uji_detektor.py
 ```
 
-Di RTX 5060 satu langkah memakan 0,104 detik untuk model tujuh juta parameter,
-sekitar lima puluh kali lebih cepat daripada CPU mesin ini.
+## Angka yang berlaku
+
+| Ukuran | Nilai |
+|---|---|
+| Porsi batas atas pada seribu klaim | 0,713 |
+| Rasio pengembalian audit | 2,32 banding 1 |
+| Laju penandaan klaim bersih | 1,10 persen pada alpha dua persen |
+| Keadilan berarah | 1,579, batasnya dua |
+| Presisi profil faskes pada 25 teratas | 1,000 |
+
+Satu peringatan yang harus ikut. Rupiah yang ditemukan bergeser empat puluh
+persen antar benih acak, jadi angka rupiah tidak boleh dikutip sendirian.
+Porsi batas atas hanya bergeser sepuluh persen, dan itulah metrik yang
+dipakai. Rinciannya di `TEMUAN.md`.
+
+Empat dari tujuh target tercapai. Tiga gagal, dan ketiganya punya sebab yang
+bisa ditunjuk beserta angkanya. Yang paling perlu dibaca lebih dulu adalah
+kegagalan T6: rumah sakit yang mau membayar ongkos mencoba coba sampai tahu
+di mana garisnya masih bisa mengambil uang tanpa satu klaim pun ditandai.
 
 ## Isi
 
@@ -57,6 +95,12 @@ sekitar lima puluh kali lebih cepat daripada CPU mesin ini.
 | `konformal.py` | Kalibrasi konformal dengan jaminan laju penandaan |
 | `pembanding.py` | Mesin aturan, regresi logistik, fitur tangan |
 | `metrik.py` | Rupiah pada k, presisi pada k, keadilan antar-kelompok |
+| `detektor.py` | **Yang dikirim.** Penebak normatif, kalibrasi, antrean, penjelasan |
+| `profil.py` | Profil faskes dengan penyusutan Bayes, dan titik perubahan |
+| `tarif_resmi.py` | Tarif Permenkes 3/2023, 76.970 baris dari 885 kode |
+| `peta_cbg.py` | Peta 66 kondisi ke kelompok INA-CBG yang sungguhan |
+| `adversarial.py` | Tiga pelaku yang beradaptasi, serakah hati hati menyebar |
+| `nyata.py` | Pemuat DE-SynPUF dan LEIE, untuk uji terhadap data nyata |
 
 ## Yang dipakai dari luar
 
