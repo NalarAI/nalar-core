@@ -2001,3 +2001,17 @@ bentuknya di sistem. Porsi sampel acak pada antrean, yang membuat tidak ada
 berkas yang bisa dipastikan aman berapa pun rapinya siasat. Dan profil
 faskes, yang menanyakan siapa yang paling sering menagih di dekat garis, bukan
 berkas mana yang melewatinya.
+
+### Satu batasan yang berlaku pada seluruh angka lawan di atas
+
+Gelanggangnya cuma memodelkan ambang penandaan dan lantai biaya pemeriksaan.
+Ia tidak memodelkan porsi sampel acak pada antrean audit, padahal antrean
+yang benar benar dikirim mengisi lima persen tempatnya dengan undian.
+
+Artinya seluruh angka "uang yang lolos" di bagian bagian lawan adalah batas
+atas. Berkas yang lolos ambang di gelanggang kami tidak pernah diperiksa,
+sedangkan pada sistem yang dikirim ia masih punya peluang kena undian.
+
+Ditulis di sini, bukan di catatan kaki, karena batas atas yang disebut
+sebagai hasil adalah cara paling halus melebih lebihkan kegagalan sendiri.
+Arah kesimpulannya tidak berubah, besarnya berubah.
