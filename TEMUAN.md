@@ -2104,3 +2104,28 @@ Lima tercapai, satu gagal, satu tidak terukur. A3 menuntut verifikator
 sungguhan membaca berkas perkara sungguhan, dan itu tidak ada di lomba ini.
 Menggantinya dengan ukuran buatan lalu menyebutnya tercapai akan jadi
 kebohongan yang paling mudah tidak ketahuan, jadi ia ditulis tidak terukur.
+
+### Angka aslinya mengubah ambang Agen Pola, dan menemukan cacat di halaman sendiri
+
+Ambang Agen Pola mula mula ditulis tanpa melihat data: nilai p paling besar
+0,01 dan pergeseran sekurangnya Rp 500 ribu. Diukur pada data peragaan,
+keduanya mustahil. Nilai p terkecil yang bisa dicapai uji permutasi dua ratus
+kali adalah 0,0149, dan pergeseran terbesar di seluruh seratus empat faskes
+Rp 517 ribu.
+
+Yang lebih penting muncul dari mengukurnya. Uji titik perubahan dijalankan
+pada tiap faskes yang klaimnya cukup banyak, jadi seratus empat faskes
+berarti seratus empat uji. Pada ambang lima persen tanpa koreksi, sekitar
+lima akan lolos karena undian. Yang benar benar lolos tujuh.
+
+Halaman analitik kami sendiri menampilkan ketujuhnya, di bawah judul "Faskes
+yang perlu ditanya", tanpa satu kalimat pun yang menyebut bahwa lima di
+antaranya diperkirakan undian.
+
+Jadi ambang Agen Pola sekarang dikendalikan Benjamini-Hochberg pada laju
+penemuan palsu sepuluh persen, bukan angka tetap. Hasilnya nol perkara, dan
+nol itu jawaban yang benar.
+
+Panelnya tetap tampil ketika nol, dan justru itu isinya yang paling berguna:
+seratus empat faskes diuji, tujuh lolos tanpa koreksi, nol tersisa sesudahnya.
+Tanpa kalimat itu, tabel di bawahnya terbaca seperti tujuh temuan.

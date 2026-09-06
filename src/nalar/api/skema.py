@@ -158,6 +158,56 @@ class Perkara(BaseModel):
     jejak: Jejak
 
 
+class PerkaraPola(BaseModel):
+    """Satu perkara yang dibuka Agen Pola karena polanya bergeser.
+
+    Bedanya dengan baris tabel titik perubahan bukan isinya, melainkan siapa
+    yang memilih. Tabel menyusun daftar terurut dan menyerahkan pemilihan
+    kepada pembacanya. Perkara ini sudah melewati ambang yang ditetapkan
+    sebelum satu perkara pun dibuka, dan membawa nomor berkas yang menyumbang
+    sehingga bisa langsung dibuka.
+    """
+
+    faskes: str
+    kelas_faskes: str
+    hari_ganti: int
+    rata_sebelum_rp: int
+    rata_sesudah_rp: int
+    geser_rp: int
+    p: float
+    n_klaim: int
+    n_sesudah: int
+    berkas_penyumbang: list[str]
+    catatan: str = Field(
+        description="Pergeseran punya banyak sebab wajar. Yang diminta "
+        "pemeriksaan, bukan kesimpulan."
+    )
+
+
+class LaporanPola(BaseModel):
+    """Keluaran Agen Pola. Daftar kosong adalah jawaban yang sah.
+
+    Ambang p tidak ditetapkan angka tetap, melainkan dikendalikan terhadap
+    banyaknya faskes yang diuji. Seratus faskes berarti seratus uji, dan pada
+    ambang lima persen tanpa koreksi lima di antaranya lolos karena undian.
+    """
+
+    n_faskes_diuji: int
+    n_perkara: int
+    n_lolos_tanpa_koreksi: int = Field(
+        description="Berapa yang akan lolos pada ambang lima persen tanpa "
+        "koreksi. Selisihnya dengan n_perkara adalah yang diperkirakan undian."
+    )
+    sebab_kosong: str = Field(
+        description="Kenapa tidak ada perkara yang dibuka. Kosong ketika ada."
+    )
+    perkara: list[PerkaraPola]
+    fdr: float
+    batas_p: float
+    minimal_klaim: int
+    minimal_geser_rp: int
+
+
 class BarisAntrean(BaseModel):
     peringkat: int
     penilaian: Penilaian

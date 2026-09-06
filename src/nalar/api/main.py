@@ -16,7 +16,7 @@ import numpy as np
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from ..agen import susun
+from ..agen import awasi_pola, susun
 from ..pembulatan import bulat_berkas
 from ..profil import peringkat_faskes, perubahan_faskes, profil_faskes
 from .keadaan import KEADAAN, PERINGATAN_RUPIAH
@@ -27,10 +27,12 @@ from .skema import (
     Jejak,
     Keadilan,
     KelompokKeadilan,
+    LaporanPola,
     Pengandaian,
     Penilaian,
     Penjelasan,
     Perkara,
+    PerkaraPola,
     ProfilGanda,
     Ringkas,
     TitikPerubahan,
@@ -330,6 +332,33 @@ def perkara(kid: str) -> Perkara:
             sidik_akhir=r["sidik_akhir"],
             a1_lulus=bool(p["a1"]["lulus"]),
         ),
+    )
+
+
+@app.get("/pola", response_model=LaporanPola, summary="Perkara yang dibuka Agen Pola")
+def pola() -> LaporanPola:
+    """Faskes yang polanya bergeser cukup jauh untuk pantas ditanya.
+
+    Yang membedakannya dari titik perubahan pada /perubahan bukan hitungannya,
+    melainkan siapa yang memilih. Yang di sana daftar terurut, dan pembacanya
+    yang memutuskan mana yang layak dikejar. Yang di sini sudah melewati
+    ambang yang ditetapkan lebih dulu, dan membawa nomor berkas yang
+    menyumbang.
+
+    Daftar kosong adalah jawaban yang sah, dan yang paling sering benar.
+    """
+    _pastikan_siap()
+    h = awasi_pola(KEADAAN)
+    return LaporanPola(
+        n_faskes_diuji=h["n_faskes_diuji"],
+        n_perkara=h["n_perkara"],
+        n_lolos_tanpa_koreksi=h["n_lolos_tanpa_koreksi"],
+        sebab_kosong=h["sebab_kosong"],
+        perkara=[PerkaraPola(**p) for p in h["perkara"]],
+        fdr=h["ambang"]["fdr"],
+        batas_p=h["ambang"]["batas_p"],
+        minimal_klaim=h["ambang"]["minimal_klaim"],
+        minimal_geser_rp=h["ambang"]["minimal_geser_rp"],
     )
 
 

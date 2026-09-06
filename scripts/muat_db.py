@@ -278,6 +278,38 @@ def utama() -> int:
             if i % 100 == 0:
                 print(f"    {i}/{len(klaim)}", flush=True)
 
+        print("[4b] Agen Pola")
+        pl = c.get("/pola").json()
+        pola_ringkas = [
+            {
+                "id": 1,
+                "n_faskes_diuji": pl["n_faskes_diuji"],
+                "n_perkara": pl["n_perkara"],
+                "n_lolos_tanpa_koreksi": pl["n_lolos_tanpa_koreksi"],
+                "sebab_kosong": pl["sebab_kosong"],
+                "fdr": pl["fdr"],
+                "batas_p": pl["batas_p"],
+                "minimal_klaim": pl["minimal_klaim"],
+            }
+        ]
+        pola = [
+            {
+                "faskes": q["faskes"],
+                "kelas_faskes": q["kelas_faskes"],
+                "hari_ganti": q["hari_ganti"],
+                "rata_sebelum_rp": q["rata_sebelum_rp"],
+                "rata_sesudah_rp": q["rata_sesudah_rp"],
+                "geser_rp": q["geser_rp"],
+                "p": q["p"],
+                "n_klaim": q["n_klaim"],
+                "n_sesudah": q["n_sesudah"],
+                "berkas_penyumbang": q["berkas_penyumbang"],
+                "catatan": q["catatan"],
+            }
+            for q in pl["perkara"]
+        ]
+        print(f"    {pl['n_perkara']} perkara dari {pl['n_faskes_diuji']} faskes")
+
         print("[5] keadilan, profil, dan titik perubahan")
         keadilan: list[dict] = []
         for al in ALPHA:
@@ -358,6 +390,8 @@ def utama() -> int:
         ("penjelasan", penjelasan),
         ("pengandaian", pengandaian),
         ("perkara", perkara),
+        ("pola_ringkas", pola_ringkas),
+        ("pola", pola),
         ("pilihan", pilihan),
         (
             "terbitan",
