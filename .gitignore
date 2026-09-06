@@ -21,3 +21,6 @@ rahasia/
 .ruff_cache/
 .pytest_cache/
 .mypy_cache/
+
+# tangkapan layar kerja, tidak untuk dikirim
+artefak/
