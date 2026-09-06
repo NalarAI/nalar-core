@@ -2015,3 +2015,92 @@ sedangkan pada sistem yang dikirim ia masih punya peluang kena undian.
 Ditulis di sini, bukan di catatan kaki, karena batas atas yang disebut
 sebagai hasil adalah cara paling halus melebih lebihkan kegagalan sendiri.
 Arah kesimpulannya tidak berubah, besarnya berubah.
+
+---
+
+## Tahap empat, 7 September 2026: dua agen yang menunggu peristiwa
+
+Dua lubang yang disebut survei tujuh dimensi agen kesehatan akhirnya diisi.
+Sekitar 92 persen sistem yang ditinjau tidak punya pengaktifan oleh
+peristiwa, dan sekitar 98 persen tidak punya mekanisme memperbarui serta
+melupakan pengetahuan lama.
+
+### Agen Pola
+
+Titik perubahan pola sudah dihitung sejak lama dan tampil di halaman
+analitik. Yang belum ada, sesuatu yang membangunkan orang ketika sebuah
+faskes bergeser. Kalau tidak ada yang membuka halaman itu bulan ini,
+pergeserannya tidak diketahui bulan ini.
+
+Yang membedakannya dari laporan bukan kecanggihannya. Laporan menyusun daftar
+terurut dan menyerahkan pemilihan kepada pembacanya. Agen ini memilih
+sendiri, memakai tiga ambang yang ditetapkan sebelum satu perkara pun dibuka:
+p paling besar 0,01, sekurangnya enam puluh klaim, dan pergeseran sekurangnya
+Rp 500 ribu. Kalau tidak ada yang melewatinya, ia diam.
+
+Diam itu diuji, bukan diharapkan. Dengan ambang yang mustahil, ia
+mengembalikan nol perkara dan tetap melaporkan berapa faskes yang diuji.
+Agen yang selalu punya sesuatu untuk dilaporkan akan berhenti dibaca dalam
+sebulan.
+
+Yang dilaporkan tiga hal yang bisa ditindaklanjuti: tanggal pergeserannya,
+besarnya, dan nomor berkas yang menyumbang. Bukan skor, bukan peringkat.
+Dan satu hal yang sengaja tidak dilaporkan: sebabnya. Faskes bisa bergeser
+karena berganti dokter, membuka layanan baru, atau kedatangan wabah.
+
+### Agen Aturan, dan target A6
+
+Diuji dengan terbitan buatan, seluruh tarif naik sepuluh persen. Ia
+melaporkan kode mana yang bergerak, berapa berkas yang berpindah putusan,
+dan nomor berkasnya, bukan cuma cacahnya.
+
+**A6 tercapai.** Penilaian ulang selesai dalam 0,24 detik untuk 1.738 berkas,
+melawan batas satu hari kerja. Memasang tabel barunya tetap pekerjaan orang
+yang berwenang, dan itu memang seharusnya.
+
+Dua hal yang dijaga uji, dan keduanya pernah jadi cara sistem rusak diam
+diam. Tabel tarif aslinya dikembalikan apa pun yang terjadi, termasuk ketika
+penilaiannya sengaja dibuat gagal di tengah. Dan aturan yang dicabut ditandai
+kedaluwarsa, bukan dihapus, karena berkas perkara yang terlanjur dikirim
+mengutipnya dan pembacanya setahun lagi berhak tahu.
+
+### Satu cacat yang gagalnya diam
+
+Versi pertama mencocokkan peraturan yang dicabut dengan mencari potongan
+teks. Pustaka menulis "Peraturan Menteri Kesehatan Nomor 3 Tahun 2023", yang
+mencabut menulis "Permenkes 3 Tahun 2023", dan tidak ada yang tertandai.
+
+Yang paling buruk bukan besarnya kesalahan, melainkan diamnya. Seluruh uji
+lain lulus, laporannya terlihat normal, dan pustakanya tetap mengutip
+peraturan yang sudah dicabut. Persis bentuk kegagalan yang agen ini dibuat
+untuk mencegah.
+
+Sekarang tiap dasar hukum punya pengenal berstruktur, nomor dan tahun, dan
+pencocokannya memakai itu. Tiga ejaan berbeda dari peraturan yang sama diuji
+mengenai entri yang sama.
+
+### Target A2
+
+Lapisan agen tidak menggeser satu pun penandaan. Diperiksa dengan menandai
+seluruh berkas, menjalankan dua puluh lima berkas lewat penyusun perkara dan
+Agen Berkas, lalu menandai ulang dan membandingkan. Nol bergeser.
+
+Laju penandaan berkas bersih 0,0137, di bawah alpha 0,02 dan jauh di bawah
+batas lulus 0,03. **A2 tercapai.**
+
+### Papan skor lapisan agen, lengkap
+
+| Kode | Target | Hasil |
+|---|---|---|
+| A1 | Nol angka tak bersumber dari 500 berkas | **tercapai**, nol dari 40 berkas model sungguhan |
+| A2 | Laju salah tuduh tidak naik | **tercapai**, 0,0137 |
+| A3 | Berkas perkara diterima verifikator tanpa koreksi | **tidak terukur**, butuh pembaca manusia |
+| A4 | Tiga siasat penghindaran baru yang bisa diulang | **tercapai**, lima |
+| A5 | T6 naik dari 25,6 ke 40 persen | **gagal**, turun 0,8 sampai 4,2 persen |
+| A6 | Berkas yang berubah putusan dilaporkan dalam satu hari kerja | **tercapai**, 0,24 detik |
+| A7 | Biaya token di bawah Rp 500 per berkas | **tercapai**, Rp 51 |
+
+Lima tercapai, satu gagal, satu tidak terukur. A3 menuntut verifikator
+sungguhan membaca berkas perkara sungguhan, dan itu tidak ada di lomba ini.
+Menggantinya dengan ukuran buatan lalu menyebutnya tercapai akan jadi
+kebohongan yang paling mudah tidak ketahuan, jadi ia ditulis tidak terukur.

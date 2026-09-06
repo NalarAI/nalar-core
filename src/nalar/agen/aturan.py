@@ -251,6 +251,7 @@ MODUS = [
 DASAR = [
     {
         "kode": "D01",
+        "peraturan": {"jenis": "Permenkes", "nomor": 3, "tahun": 2023},
         "judul": "Dasar tarif INA-CBG",
         "isi": (
             "Besaran tarif tiap kelompok INA-CBG ditetapkan menurut kode kelompok, "
@@ -261,6 +262,7 @@ DASAR = [
     },
     {
         "kode": "D02",
+        "peraturan": {"jenis": "Permenkes", "nomor": 16, "tahun": 2019},
         "judul": "Pencegahan dan penanganan kecurangan JKN",
         "isi": (
             "Pencegahan kecurangan diselenggarakan bersama oleh BPJS Kesehatan, "

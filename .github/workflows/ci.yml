@@ -64,6 +64,10 @@ jobs:
       - name: uji lapisan lawan
         run: python tests/test_lawan.py
 
+      # Tahap empat. Agen Pola dan Agen Aturan, plus target A2 dan A6.
+      - name: uji agen pola dan agen aturan
+        run: python tests/test_agen_empat.py
+
   # Menjaga agar tidak ada jejak perkakas bantu yang ikut terkirim. Ini bukan
   # soal rapi, ini soal karya yang dinilai harus jelas siapa penulisnya.
   bersih:

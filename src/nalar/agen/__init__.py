@@ -26,8 +26,10 @@ from .penutur import Balasan, GalatPenutur, Penutur, PenuturSetempat, PenuturTir
 from .penyelia import Anggaran, Penyelia, RantaiDiputus
 from .periksa import angka_tak_bersumber, periksa_a1
 from .perkara import susun
+from .pola import jalankan as awasi_pola
 from .sanggah import jalankan as baca_sanggahan
 from .sanggah import petakan_bukti
+from .terbitan import jalankan as tanggapi_terbitan
 
 __all__ = [
     "Alat",
@@ -44,6 +46,7 @@ __all__ = [
     "Perkakas",
     "RantaiDiputus",
     "angka_tak_bersumber",
+    "awasi_pola",
     "baca_sanggahan",
     "isi_lubang",
     "kumpulkan_fakta",
@@ -55,5 +58,6 @@ __all__ = [
     "susun",
     "susun_agen",
     "susun_isian",
+    "tanggapi_terbitan",
     "tera",
 ]
