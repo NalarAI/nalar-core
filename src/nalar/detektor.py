@@ -544,7 +544,7 @@ class Detektor:
         pengandaian.sort(key=lambda x: -abs(x["perubahan_selisih_rp"]))
 
         return {
-            "status": "ketidaksesuaian yang perlu dikonfirmasi",
+            "status": "perlu konfirmasi kelengkapan bukti",
             "angka": {
                 "tarif_ditagihkan": int(r["tarif"]),
                 "tarif_didukung_bukti": round(float(s["harapan_tarif"][0])),
@@ -563,10 +563,9 @@ class Detektor:
                 "jumlah_obat": len(r["obt"]),
             },
             "catatan": (
-                "Angka di atas bukan tuduhan. Ia menyatakan bahwa tarif yang "
-                "ditagihkan lebih besar daripada yang dapat dijelaskan bukti "
-                "yang menyertai klaim ini. Fasilitas kesehatan berhak "
-                "melengkapi bukti sebelum ada konsekuensi apa pun."
+                "Angka di atas bukan tuduhan, melainkan selisih antara tarif "
+                "yang diajukan dan tarif wajar menurut bukti pada berkas. "
+                "Faskes berhak melengkapi bukti sebelum ada konsekuensi apa pun."
             ),
         }
 

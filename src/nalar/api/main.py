@@ -236,11 +236,10 @@ def penjelasan(kid: str) -> Penjelasan:
         return "Rp " + f"{int(n):,}".replace(",", ".")
 
     kalimat = (
-        f"Tarif yang ditagihkan {rp(a['tarif_ditagihkan'])} sedangkan yang "
-        f"dapat dijelaskan bukti pada klaim ini "
-        f"{rp(a['tarif_didukung_bukti'])}. Selisihnya {rp(selisih)}. "
-        "Mohon melengkapi bukti berikut bila tersedia, atau menyampaikan "
-        "alasan klinisnya."
+        f"Tarif yang diajukan {rp(a['tarif_ditagihkan'])}, sedangkan tarif "
+        f"wajar menurut bukti pada berkas ini {rp(a['tarif_didukung_bukti'])}. "
+        f"Selisih {rp(selisih)}. Mohon melengkapi bukti berikut bila tersedia, "
+        "atau menyampaikan alasan klinisnya."
     )
     return Penjelasan(
         id=kid,

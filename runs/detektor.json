@@ -2,282 +2,274 @@
  "n_kelompok_kalibrasi": 17,
  "metrik": {
   "_batas_atas": {
-   "50": 662275589,
-   "100": 849804231,
-   "250": 1174312452,
-   "500": 1480143129,
-   "1000": 1753578083
+   "50": 927490295,
+   "100": 1216561271,
+   "250": 1602276354,
+   "500": 1925749038,
+   "1000": 2197589282
   },
   "detektor": {
    "rupiah_pada_k": {
-    "50": 222341156,
-    "100": 381058016,
-    "250": 697304479,
-    "500": 1005633939,
-    "1000": 1249341550
+    "50": 558817800,
+    "100": 742950054,
+    "250": 1151537095,
+    "500": 1498254352,
+    "1000": 1719545047
    },
    "presisi_pada_k": {
-    "50": 0.3,
-    "100": 0.35,
-    "250": 0.528,
-    "500": 0.634,
-    "1000": 0.577
+    "50": 0.58,
+    "100": 0.46,
+    "250": 0.56,
+    "500": 0.626,
+    "1000": 0.551
    },
    "porsi_batas_atas": {
-    "50": 0.3357,
-    "100": 0.4484,
-    "250": 0.5938,
-    "500": 0.6794,
-    "1000": 0.7125
+    "50": 0.6025,
+    "100": 0.6107,
+    "250": 0.7187,
+    "500": 0.778,
+    "1000": 0.7825
    },
    "peningkatan_atas_aturan": {
-    "50": 1.75,
-    "100": 1.542,
-    "250": 1.635,
-    "500": 1.753,
-    "1000": 1.896
+    "50": 1.267,
+    "100": 1.221,
+    "250": 1.383,
+    "500": 1.48,
+    "1000": 1.517
    },
    "peningkatan_atas_nilai_klaim": {
-    "50": 0.745,
-    "100": 0.841,
-    "250": 1.144,
-    "500": 1.241,
-    "1000": 1.276
+    "50": 1.842,
+    "100": 1.084,
+    "250": 1.154,
+    "500": 1.147,
+    "1000": 1.173
    }
   },
   "mesin_aturan": {
    "rupiah_pada_k": {
-    "50": 127058517,
-    "100": 247183499,
-    "250": 426568127,
-    "500": 573550793,
-    "1000": 658915553
+    "50": 441041210,
+    "100": 608610359,
+    "250": 832609499,
+    "500": 1012157679,
+    "1000": 1133521982
    },
    "presisi_pada_k": {
-    "50": 0.38,
-    "100": 0.47,
-    "250": 0.48,
-    "500": 0.446,
-    "1000": 0.312
+    "50": 0.48,
+    "100": 0.55,
+    "250": 0.496,
+    "500": 0.464,
+    "1000": 0.336
    },
    "porsi_batas_atas": {
-    "50": 0.1919,
-    "100": 0.2909,
-    "250": 0.3632,
-    "500": 0.3875,
-    "1000": 0.3758
+    "50": 0.4755,
+    "100": 0.5003,
+    "250": 0.5196,
+    "500": 0.5256,
+    "1000": 0.5158
    }
   },
   "nilai_klaim": {
    "rupiah_pada_k": {
-    "50": 298625474,
-    "100": 453036554,
-    "250": 609689243,
-    "500": 810148648,
-    "1000": 978796482
+    "50": 303308136,
+    "100": 685231763,
+    "250": 998146653,
+    "500": 1306648334,
+    "1000": 1466377245
    },
    "presisi_pada_k": {
-    "50": 0.26,
-    "100": 0.24,
-    "250": 0.216,
-    "500": 0.252,
-    "1000": 0.199
+    "50": 0.2,
+    "100": 0.33,
+    "250": 0.316,
+    "500": 0.322,
+    "1000": 0.235
    },
    "porsi_batas_atas": {
-    "50": 0.4509,
-    "100": 0.5331,
-    "250": 0.5192,
-    "500": 0.5473,
-    "1000": 0.5582
+    "50": 0.327,
+    "100": 0.5633,
+    "250": 0.623,
+    "500": 0.6785,
+    "1000": 0.6673
    }
   }
  },
  "konformal": {
   "alpha": 0.02,
-  "laju_penandaan_klaim_bersih": 0.01103,
+  "laju_penandaan_klaim_bersih": 0.00908,
   "batas_lulus": 0.03,
   "lulus": true,
-  "n_ditandai": 897,
-  "n_menahan_diri": 1537,
-  "porsi_menahan_diri": 0.0361
+  "n_ditandai": 781,
+  "n_menahan_diri": 1247,
+  "porsi_menahan_diri": 0.0299
  },
  "keadilan": {
   "simetris_kelas_faskes": {
    "B": {
-    "n": 4363,
-    "laju": 0.01742
+    "n": 4314,
+    "laju": 0.01484
    },
    "C": {
-    "n": 2586,
-    "laju": 0.00967
+    "n": 2616,
+    "laju": 0.00535
    },
    "D": {
-    "n": 4413,
-    "laju": 0.01722
+    "n": 4398,
+    "laju": 0.01251
    },
    "FKTP": {
-    "n": 29349,
-    "laju": 0.00927
+    "n": 28632,
+    "laju": 0.00803
    },
-   "_rasio_maks_min": 1.879,
-   "_lulus_batas_dua_kali": true
+   "_rasio_maks_min": 2.774,
+   "_lulus_batas_dua_kali": false
   },
   "simetris_daerah_tertinggal": {
    "0": {
-    "n": 39249,
-    "laju": 0.01144
+    "n": 38760,
+    "laju": 0.00937
    },
    "1": {
-    "n": 1462,
+    "n": 1200,
     "laju": 0.0
    },
    "_rasio_maks_min": null,
    "_lulus_batas_dua_kali": false
   },
   "berarah_kelas_faskes": {
-   "_laju_keseluruhan": 0.01103,
+   "_laju_keseluruhan": 0.00908,
    "B": {
-    "n": 4363,
-    "laju": 0.01742,
-    "rasio_thd_keseluruhan": 1.579
+    "n": 4314,
+    "laju": 0.01484,
+    "rasio_thd_keseluruhan": 1.633
    },
    "C": {
-    "n": 2586,
-    "laju": 0.00967,
-    "rasio_thd_keseluruhan": 0.877
+    "n": 2616,
+    "laju": 0.00535,
+    "rasio_thd_keseluruhan": 0.589
    },
    "D": {
-    "n": 4413,
-    "laju": 0.01722,
-    "rasio_thd_keseluruhan": 1.562
+    "n": 4398,
+    "laju": 0.01251,
+    "rasio_thd_keseluruhan": 1.377
    },
    "FKTP": {
-    "n": 29349,
-    "laju": 0.00927,
-    "rasio_thd_keseluruhan": 0.84
+    "n": 28632,
+    "laju": 0.00803,
+    "rasio_thd_keseluruhan": 0.884
    },
    "_kelompok_paling_sering_ditandai": "B",
-   "_kelebihan_maksimum": 1.579,
+   "_kelebihan_maksimum": 1.633,
    "_lulus_batas_dua_kali": true
   },
   "berarah_daerah_tertinggal": {
-   "_laju_keseluruhan": 0.01103,
+   "_laju_keseluruhan": 0.00908,
    "0": {
-    "n": 39249,
-    "laju": 0.01144,
-    "rasio_thd_keseluruhan": 1.037
+    "n": 38760,
+    "laju": 0.00937,
+    "rasio_thd_keseluruhan": 1.031
    },
    "1": {
-    "n": 1462,
+    "n": 1200,
     "laju": 0.0,
     "rasio_thd_keseluruhan": null
    },
    "_kelompok_paling_sering_ditandai": "0",
-   "_kelebihan_maksimum": 1.037,
+   "_kelebihan_maksimum": 1.031,
    "_lulus_batas_dua_kali": true
   }
  },
  "antrean": {
   "kapasitas": 1000,
-  "terisi": 541,
-  "rupiah_ditemukan": 942206559,
-  "porsi_batas_atas": 0.6227,
-  "biaya_audit_total": 405750000,
-  "rasio_pengembalian": 2.32
+  "terisi": 596,
+  "rupiah_ditemukan": 1430207967,
+  "porsi_batas_atas": 0.7148,
+  "biaya_audit_total": 447000000,
+  "rasio_pengembalian": 3.2
  },
  "profil_faskes": {
-  "n_dinilai": 238,
-  "prevalensi_dasar": 0.1807,
+  "n_dinilai": 241,
+  "prevalensi_dasar": 0.1826,
   "presisi@10": 1.0,
-  "presisi@25": 1.0,
-  "presisi@50": 0.74
+  "presisi@25": 0.96,
+  "presisi@50": 0.72
  },
  "penyaringan_kalibrasi": {
   "z_saring": 1.0,
-  "n_faskes_dibuang": 19,
-  "porsi_klaim_dibuang": 0.0343
+  "n_faskes_dibuang": 20,
+  "porsi_klaim_dibuang": 0.0356
  },
  "posisi": {
-  "rata_seluruh_klaim": 0.00673,
-  "rata_antar_faskes_besar": 0.00536,
-  "sd_antar_faskes_besar": 0.04378,
-  "n_faskes_besar": 184
+  "rata_seluruh_klaim": 0.01366,
+  "rata_antar_faskes_besar": 0.0094,
+  "sd_antar_faskes_besar": 0.05568,
+  "n_faskes_besar": 183
  },
  "contoh_penjelasan": [
   {
    "status": "ketidaksesuaian yang perlu dikonfirmasi",
    "angka": {
-    "tarif_ditagihkan": 134341600,
-    "tarif_didukung_bukti": 72141295,
-    "tagihan_barang_ditagihkan": 213500,
-    "tagihan_barang_wajar": 225893,
-    "nilai_barang_menurut_harga_acuan": 213500,
-    "selisih_rp": 62187912
+    "tarif_ditagihkan": 55364400,
+    "tarif_didukung_bukti": 26356947,
+    "tagihan_barang_ditagihkan": 28500,
+    "tagihan_barang_wajar": 24540,
+    "nilai_barang_menurut_harga_acuan": 28500,
+    "selisih_rp": 29011414
    },
    "bukti_yang_bila_ada_akan_mengubah_penilaian": [
     {
-     "bukti": "LEUKO",
-     "perubahan_selisih_rp": -4725894
-    },
-    {
-     "bukti": "TROMB",
-     "perubahan_selisih_rp": -3928075
-    },
-    {
-     "bukti": "KREA",
-     "perubahan_selisih_rp": -3258344
-    },
-    {
      "bukti": "ALB",
-     "perubahan_selisih_rp": -1834719
+     "perubahan_selisih_rp": 815672
+    },
+    {
+     "bukti": "LEUKO",
+     "perubahan_selisih_rp": -458620
     },
     {
      "bukti": "NA",
-     "perubahan_selisih_rp": 274519
+     "perubahan_selisih_rp": 411489
+    },
+    {
+     "bukti": "KREA",
+     "perubahan_selisih_rp": -99161
     }
    ],
    "konteks": {
-    "kelompok_tarif_ditagihkan": "P-8-02-III",
-    "kelas_rawat": 2,
-    "lama_rawat": 17,
-    "jumlah_diagnosis_sekunder": 3,
-    "jumlah_pemeriksaan": 2,
-    "jumlah_obat": 2
+    "kelompok_tarif_ditagihkan": "P-8-04-III",
+    "kelas_rawat": 3,
+    "lama_rawat": 3,
+    "jumlah_diagnosis_sekunder": 4,
+    "jumlah_pemeriksaan": 5,
+    "jumlah_obat": 4
    },
    "catatan": "Angka di atas bukan tuduhan. Ia menyatakan bahwa tarif yang ditagihkan lebih besar daripada yang dapat dijelaskan bukti yang menyertai klaim ini. Fasilitas kesehatan berhak melengkapi bukti sebelum ada konsekuensi apa pun."
   },
   {
    "status": "ketidaksesuaian yang perlu dikonfirmasi",
    "angka": {
-    "tarif_ditagihkan": 90193800,
-    "tarif_didukung_bukti": 45447634,
-    "tagihan_barang_ditagihkan": 57000,
-    "tagihan_barang_wajar": 15294,
-    "nilai_barang_menurut_harga_acuan": 57000,
-    "selisih_rp": 44787872
+    "tarif_ditagihkan": 36511100,
+    "tarif_didukung_bukti": 9718791,
+    "tagihan_barang_ditagihkan": 852000,
+    "tagihan_barang_wajar": 533981,
+    "nilai_barang_menurut_harga_acuan": 852000,
+    "selisih_rp": 27110328
    },
    "bukti_yang_bila_ada_akan_mengubah_penilaian": [
     {
-     "bukti": "LEUKO",
-     "perubahan_selisih_rp": -3905122
+     "bukti": "ALB",
+     "perubahan_selisih_rp": 8435437
+    },
+    {
+     "bukti": "NA",
+     "perubahan_selisih_rp": 6561749
     },
     {
      "bukti": "KREA",
-     "perubahan_selisih_rp": -3320991
-    },
-    {
-     "bukti": "TROMB",
-     "perubahan_selisih_rp": -2579978
-    },
-    {
-     "bukti": "ALB",
-     "perubahan_selisih_rp": -302468
+     "perubahan_selisih_rp": 5215766
     }
    ],
    "konteks": {
-    "kelompok_tarif_ditagihkan": "P-8-04-III",
+    "kelompok_tarif_ditagihkan": "C-4-10-III",
     "kelas_rawat": 1,
-    "lama_rawat": 6,
+    "lama_rawat": 12,
     "jumlah_diagnosis_sekunder": 2,
     "jumlah_pemeriksaan": 3,
     "jumlah_obat": 1
@@ -287,42 +279,38 @@
   {
    "status": "ketidaksesuaian yang perlu dikonfirmasi",
    "angka": {
-    "tarif_ditagihkan": 114921200,
-    "tarif_didukung_bukti": 87559689,
-    "tagihan_barang_ditagihkan": 183000,
-    "tagihan_barang_wajar": 144081,
-    "nilai_barang_menurut_harga_acuan": 183000,
-    "selisih_rp": 27400430
+    "tarif_ditagihkan": 115314700,
+    "tarif_didukung_bukti": 89090637,
+    "tagihan_barang_ditagihkan": 165500,
+    "tagihan_barang_wajar": 143014,
+    "nilai_barang_menurut_harga_acuan": 165500,
+    "selisih_rp": 26246549
    },
    "bukti_yang_bila_ada_akan_mengubah_penilaian": [
     {
-     "bukti": "NA",
-     "perubahan_selisih_rp": 9298059
-    },
-    {
-     "bukti": "TROMB",
-     "perubahan_selisih_rp": 2787307
+     "bukti": "ALB",
+     "perubahan_selisih_rp": 3629060
     },
     {
      "bukti": "LEUKO",
-     "perubahan_selisih_rp": 2412191
-    },
-    {
-     "bukti": "HB",
-     "perubahan_selisih_rp": 2411651
+     "perubahan_selisih_rp": -2380482
     },
     {
      "bukti": "KREA",
-     "perubahan_selisih_rp": 2388528
+     "perubahan_selisih_rp": -389927
+    },
+    {
+     "bukti": "TROMB",
+     "perubahan_selisih_rp": -389927
     }
    ],
    "konteks": {
     "kelompok_tarif_ditagihkan": "P-8-02-III",
     "kelas_rawat": 3,
-    "lama_rawat": 10,
-    "jumlah_diagnosis_sekunder": 1,
-    "jumlah_pemeriksaan": 0,
-    "jumlah_obat": 1
+    "lama_rawat": 13,
+    "jumlah_diagnosis_sekunder": 3,
+    "jumlah_pemeriksaan": 4,
+    "jumlah_obat": 4
    },
    "catatan": "Angka di atas bukan tuduhan. Ia menyatakan bahwa tarif yang ditagihkan lebih besar daripada yang dapat dijelaskan bukti yang menyertai klaim ini. Fasilitas kesehatan berhak melengkapi bukti sebelum ada konsekuensi apa pun."
   }
