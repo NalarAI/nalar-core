@@ -55,7 +55,7 @@ def cek(nama, kondisi, catatan=""):
 print("\n1. Bias antar-bidang benar benar mengambil nilai yang tepat")
 # ---------------------------------------------------------------------------
 if not ADA_TORCH:
-    print("  DILEWATI  torch tidak terpasang, dua uji transformer tidak jalan")
+    print("  DILEWATI  torch tidak terpasang, tiga uji transformer tidak jalan")
     print("            pasang dengan: pip install '.[transformer]'")
 else:
     torch.manual_seed(0)
@@ -87,8 +87,11 @@ else:
     y = att(x, fld, pad)
     cek("keluaran perhatian berbentuk benar", tuple(y.shape) == (B, T, 16))
 
-att_mati = PerhatianBerbidang(d=16, n_kepala=2, pakai_bias_bidang=False)
-cek("saklar bias bisa dimatikan untuk ablasi", not hasattr(att_mati, "bias_bidang"))
+    att_mati = PerhatianBerbidang(d=16, n_kepala=2, pakai_bias_bidang=False)
+    cek(
+        "saklar bias bisa dimatikan untuk ablasi",
+        not hasattr(att_mati, "bias_bidang"),
+    )
 
 # ---------------------------------------------------------------------------
 print("\n2. Jaminan konformal terpenuhi pada data buatan")
