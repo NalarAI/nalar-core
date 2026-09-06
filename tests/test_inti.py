@@ -217,4 +217,13 @@ cek("kedua sisi tidak kosong", tr.sum() > 0 and te.sum() > 0)
 
 # ---------------------------------------------------------------------------
 print(f"\n{lulus} lulus, {gagal} gagal")
-sys.exit(1 if gagal else 0)
+
+# Keluar dengan kode galat hanya ketika berkas ini dijalankan langsung.
+#
+# Tanpa penjaga ini, sys.exit terpanggil saat modulnya diimpor, dan unittest
+# discover menganggapnya galat impor walaupun seluruh uji lulus. Kami sempat
+# tidak melihatnya karena membaca keluaran cetak, bukan kode keluarnya, dan
+# pipa ke tail menutupi kode itu. Pelajarannya: memeriksa uji harus lewat kode
+# keluar, bukan lewat apa yang tercetak.
+if __name__ == "__main__":
+    sys.exit(1 if gagal else 0)
