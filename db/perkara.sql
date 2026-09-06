@@ -43,3 +43,32 @@ create policy "baca perkara"
 
 grant usage on schema nalar to anon, authenticated;
 grant select on nalar.perkara to anon, authenticated;
+
+-- Fungsi pengosong ikut diperbarui. Ia menyebut tabelnya satu satu, jadi
+-- tabel baru yang tidak ikut disebut tidak akan pernah dikosongkan, dan
+-- pemuatan berikutnya jatuh pada bentrok kunci utama tanpa pesan yang
+-- menjelaskan sebabnya.
+create or replace function nalar.kosongkan()
+returns void
+language plpgsql
+security definer
+set search_path = nalar, public
+as $$
+begin
+  truncate table
+    nalar.antrean,
+    nalar.pengandaian,
+    nalar.penjelasan,
+    nalar.perkara,
+    nalar.penandaan,
+    nalar.antrean_ringkas,
+    nalar.ringkas,
+    nalar.keadilan,
+    nalar.profil_faskes,
+    nalar.perubahan,
+    nalar.pilihan,
+    nalar.terbitan,
+    nalar.klaim
+  cascade;
+end;
+$$;
