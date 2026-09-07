@@ -170,6 +170,10 @@ def tanya_model(surat: str) -> list:
         headers={
             "Content-Type": "application/json",
             "Authorization": f"Bearer {KUNCI}",
+            # Penyedia awan yang berdiri di belakang Cloudflare menolak
+            # penanda bawaan urllib dengan galat 1010, dan galat itu
+            # tidak menyebut sebabnya sama sekali.
+            "User-Agent": "nalar/1.0",
         },
         method="POST",
     )

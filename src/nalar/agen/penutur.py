@@ -115,6 +115,7 @@ class PenuturSetempat(Penutur):
         self,
         alamat: str | None = None,
         model: str | None = None,
+        kunci: str | None = None,
         suhu: float = 0.0,
         tenggat_detik: float = 600.0,
     ):
@@ -122,6 +123,9 @@ class PenuturSetempat(Penutur):
             alamat or os.environ.get("NALAR_MODEL_URL") or "http://127.0.0.1:11434/v1"
         ).rstrip("/")
         self.model = model or os.environ.get("NALAR_MODEL") or "nalar-qwen3-4b"
+        # Kunci untuk penyedia awan. Kosong untuk model setempat, dan
+        # kosong berarti kepala Authorization tidak dikirim sama sekali.
+        self.kunci = kunci or os.environ.get("NALAR_MODEL_KEY") or ""
         # Suhu nol. Yang dinilai dari model ini ketaatannya memanggil alat
         # yang benar, bukan keragaman kalimatnya. Keluaran yang bisa diulang
         # juga syarat agar jejak auditnya berarti.
@@ -130,7 +134,14 @@ class PenuturSetempat(Penutur):
 
     def hidup(self) -> bool:
         try:
-            with urllib.request.urlopen(f"{self.alamat}/models", timeout=3) as r:
+            permintaan = urllib.request.Request(
+                f"{self.alamat}/models",
+                headers={
+                    "User-Agent": "nalar/1.0",
+                    **({"Authorization": f"Bearer {self.kunci}"} if self.kunci else {}),
+                },
+            )
+            with urllib.request.urlopen(permintaan, timeout=3) as r:
                 return r.status == 200
         except (urllib.error.URLError, OSError, TimeoutError):
             return False
@@ -145,7 +156,14 @@ class PenuturSetempat(Penutur):
         permintaan = urllib.request.Request(
             f"{self.alamat}/chat/completions",
             data=json.dumps(badan, ensure_ascii=False).encode("utf-8"),
-            headers={"Content-Type": "application/json"},
+            # Penanda agen pengguna wajib ada. Ollama tidak peduli, tapi
+            # penyedia awan yang berdiri di belakang Cloudflare menolak
+            # bawaan urllib dengan galat 1010 yang tidak menyebut sebab.
+            headers={
+                "Content-Type": "application/json",
+                "User-Agent": "nalar/1.0",
+                **({"Authorization": f"Bearer {self.kunci}"} if self.kunci else {}),
+            },
             method="POST",
         )
         try:
