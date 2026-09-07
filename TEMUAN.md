@@ -2096,7 +2096,7 @@ batas lulus 0,03. **A2 tercapai.**
 | A2 | Laju salah tuduh tidak naik | **tercapai**, 0,0137 |
 | A3 | Berkas perkara diterima verifikator tanpa koreksi | **tidak terukur**, butuh pembaca manusia |
 | A4 | Tiga siasat penghindaran baru yang bisa diulang | **tercapai**, lima |
-| A5 | T6 naik dari 25,6 ke 40 persen | **gagal**, turun 0,8 sampai 4,2 persen |
+| A5 | T6 naik dari 25,6 ke 40 persen | **gagal**, dan ukurannya goyah: 0,18 sampai 0,55 pada enam benih |
 | A6 | Berkas yang berubah putusan dilaporkan dalam satu hari kerja | **tercapai**, 0,24 detik |
 | A7 | Biaya token di bawah Rp 500 per berkas | **tercapai**, Rp 51 |
 
@@ -2356,3 +2356,129 @@ Sekarang ketiganya disebut terpisah. Yang dicentang, yang memang sudah
 tercatat, dan yang terbaca tapi tidak menurunkan selisih berkas ini. Peladen
 juga berhenti membuang pemeriksaan yang sudah ada di berkas, dan mulai
 menyebutnya.
+
+## A5 dikejar sekali lagi, dan yang ketemu bukan yang dicari, 7 September 2026
+
+A5 sudah gagal dua kali lewat jalur model. Membatasi sumbangan bukti
+menurunkan uang yang lolos kurang dari lima persen. Mencabut kemampuan
+pelaku menanyai skor bernilai sepertiga, tapi ia bukan tombol yang ada di
+dunia nyata.
+
+Dua dugaan baru diuji hari ini. Keduanya salah, dan yang ketiga muncul dari
+mencoba memahami kenapa.
+
+### Anggaran penandaan bukan pengikatnya
+
+Dugaannya begini. Penebak tarif sudah tidak melihat diagnosis sekunder sama
+sekali, jadi upcoding menaikkan tagihan tanpa menaikkan tebakan. Yang membuat
+pelaku tetap lolos bukan tebakan yang tertipu melainkan jarak antara selisih
+berkasnya dan ambang penandaan. Kalau benar, T6 ditentukan alpha, dan alpha
+ditentukan berapa banyak berkas yang sanggup dibaca manusia.
+
+Diukur, dan tidak. Menaikkan alpha lima kali menaikkan laju penandaan dari
+satu persen ke sembilan persen, dan dari tujuh puluh empat serangan yang
+mungkin ia cuma memindahkan dua ke kolom tertangkap. Uang yang lolos hampir
+tidak bergerak.
+
+### Menahan diri terlihat seperti lubang, dan itu tipuan ukuran data
+
+Pembongkaran per berkas memberi angka yang menggoda. Dari tujuh puluh empat
+serangan, lima puluh satu lolos bukan karena skornya rendah melainkan karena
+kelompok sebayanya kurang dari tiga faskes sehingga tidak ada ambang yang
+bisa dilewati.
+
+Jaring pengaman dipasang. Berkas semacam itu tunduk pada satu ambang tunggal
+yang jauh lebih ketat, sementara perbandingan dengan sebayanya tetap
+ditiadakan. T6 naik dari nol ke delapan puluh tujuh persen. Uang yang lolos
+turun tiga perempat.
+
+Pada data penuh seluruhnya menguap. Dengan seratus enam puluh ribu episode,
+kelompok sebaya jadi cukup besar, sehingga satu satunya yang masih menahan
+diri justru yang memang sengaja dikecualikan, yaitu daerah tertinggal.
+Jaringnya menggeser uang yang lolos kurang dari dua persen, dan satu satunya
+yang ikut tertandai berkas daerah tertinggal.
+
+Itu persis pertukaran yang skrip pengukurnya sendiri melarang. Jaringnya
+tetap ada di kode, mati, supaya kesimpulan ini bisa dibantah dengan data
+yang lebih besar dan bukan dengan pendapat.
+
+### Angka yang naik dua kali lipat tanpa satu baris pun menyentuh detektor
+
+Di tengah pengukuran itu T6 terbaca 0,55, sedangkan yang tercatat di
+repositori 0,256. Skripnya sama, benihnya sama, ukuran datanya sama.
+
+Pertama yang dicurigai versi pustaka. Sumber lama dijalankan dengan
+lingkungan hari ini dan memberi 0,256 persis, jadi bukan itu.
+
+Pembagian dua atas dua puluh satu commit menunjuk satu commit penataan gaya.
+Di dalamnya, satu berkas: pembangkit kecurangan. Ditukar berkas itu saja ke
+pohon lama, sidik dunianya langsung sama persis dengan yang baru.
+
+Barisnya satu:
+
+    if rec["rawat_inap"] and rng.random() < _peluang(kode, "M12"):
+        if los < 10:
+
+    if rec["rawat_inap"] and los < 10 and rng.random() < _peluang(kode, "M12"):
+
+Keputusan untuk berkas itu tidak berubah. Yang berubah berapa kali pengacak
+dipanggil, dan itu menggeser seluruh undian sesudahnya. Delapan ribu tujuh
+ratus lima puluh delapan episode jadi delapan ribu lima ratus delapan puluh
+dua, dan tarif totalnya bergeser tujuh persen.
+
+Jadi 0,256 dan 0,55 bukan dua keadaan detektor. Keduanya dua dunia.
+
+### Berapa lebar T6 kalau dunianya diganti
+
+Pertanyaan itu tidak pernah ditanyakan di proyek ini, dan seharusnya
+ditanyakan sejak percobaan pertama.
+
+Enam benih, ukuran data penuh, detektor yang sama:
+
+| benih | T6 |
+|---|---|
+| 7 | 0,550 |
+| 8 | 0,324 |
+| 9 | 0,330 |
+| 10 | 0,180 |
+| 11 | 0,399 |
+| 12 | 0,305 |
+
+Terkecil 0,180, tengah 0,327, terbesar 0,550, simpangan baku 0,122. Satu
+dari enam melewati batas 0,40.
+
+Angka 0,256 yang kami laporkan empat percobaan berturut turut ada di dalam
+sebaran itu. Begitu juga 0,55 yang sempat terbaca sebagai keberhasilan hari
+ini. Keduanya satu undian.
+
+**A5 tetap gagal.** Yang berubah bukan status targetnya melainkan kepercayaan
+kami pada cara menilainya. Target yang dinilai dari satu undian statistik
+yang simpangannya 0,12 tidak bisa dinyatakan tercapai atau gagal dengan satu
+angka, dan selama ini kami melakukan persis itu.
+
+### Ukuran yang goyah dan ukuran yang tenang
+
+Pada enam benih yang sama, uang yang diambil pelaku hati hati bergerak dari
+Rp 275 juta sampai Rp 475 juta, dengan ragam relatif 0,175. T6 ragamnya
+0,350, dua kali lipatnya.
+
+Sebabnya ada pada rumusnya. T6 dihitung dari keuntungan maksimum satu berkas,
+jadi ia bergantung pada satu klaim di seluruh himpunan uji. Uang yang diambil
+menjumlahkan ratusan berkas.
+
+Kalau target ketahanan ditulis ulang suatu hari, ia harus memakai ukuran yang
+menjumlahkan, bukan yang mengambil maksimum, dan harus dilaporkan sebagai
+sebaran atas beberapa dunia, bukan satu angka.
+
+### Penjaganya dipasang
+
+Sebuah penataan gaya menggeser angka ketahanan yang kami laporkan sampai dua
+kali lipat, dan tidak ada satu pun uji yang berbunyi. Itu lubang yang lebih
+besar daripada A5 sendiri.
+
+Sekarang ada uji yang memakukan sidik dunia pembangkit pada benih tetap:
+cacah episode, tarif total, cacah berkas curang, jumlah lama rawat, dan
+jumlah diagnosis sekunder. Ia tidak menilai apakah dunianya bagus. Ia
+memastikan tidak ada yang menggesernya tanpa sadar, dan kalau memang sengaja
+digeser, angkanya harus ikut diperbarui dalam commit yang sama sehingga
+terlihat di riwayat. Integrasi berkelanjutan menjalankannya sebelum uji lain.

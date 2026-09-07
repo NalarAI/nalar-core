@@ -1,0 +1,113 @@
+{
+  "pengaturan": {
+    "peserta": 20000,
+    "tahun": 3,
+    "benih": 7,
+    "klaim": 400,
+    "alpha": 0.02,
+    "jaring": "mati,0.02,0.005,0.001",
+    "keluar": "runs/jaring_pengaman.json"
+  },
+  "baris": [
+    {
+      "alpha_jaring": null,
+      "ambang_jaring_rp": null,
+      "T6": 0.5486,
+      "lolos_terburuk_rp": 384220500,
+      "laju_bersih_semua": 0.0091,
+      "laju_bersih_menahan_diri": 0.0,
+      "laju_bersih_dtpk": 0.0,
+      "laju_curang_menahan_diri": 0.0,
+      "n_bersih_menahan_diri": 1200,
+      "n_curang_menahan_diri": 47,
+      "n_bersih_dtpk": 1200,
+      "laju_bersih_per_kelas": {
+        "B": 0.0148,
+        "C": 0.0054,
+        "D": 0.0125,
+        "FKTP": 0.008
+      },
+      "n_bersih_per_kelas": {
+        "B": 4314,
+        "C": 2616,
+        "D": 4398,
+        "FKTP": 28632
+      }
+    },
+    {
+      "alpha_jaring": 0.02,
+      "ambang_jaring_rp": 121385,
+      "T6": 0.5486,
+      "lolos_terburuk_rp": 379598200,
+      "laju_bersih_semua": 0.0092,
+      "laju_bersih_menahan_diri": 0.0033,
+      "laju_bersih_dtpk": 0.0033,
+      "laju_curang_menahan_diri": 0.2128,
+      "n_bersih_menahan_diri": 1200,
+      "n_curang_menahan_diri": 47,
+      "n_bersih_dtpk": 1200,
+      "laju_bersih_per_kelas": {
+        "B": 0.0148,
+        "C": 0.0054,
+        "D": 0.0134,
+        "FKTP": 0.008
+      },
+      "n_bersih_per_kelas": {
+        "B": 4314,
+        "C": 2616,
+        "D": 4398,
+        "FKTP": 28632
+      }
+    },
+    {
+      "alpha_jaring": 0.005,
+      "ambang_jaring_rp": 1645355,
+      "T6": 0.5486,
+      "lolos_terburuk_rp": 381167300,
+      "laju_bersih_semua": 0.0091,
+      "laju_bersih_menahan_diri": 0.0,
+      "laju_bersih_dtpk": 0.0,
+      "laju_curang_menahan_diri": 0.0,
+      "n_bersih_menahan_diri": 1200,
+      "n_curang_menahan_diri": 47,
+      "n_bersih_dtpk": 1200,
+      "laju_bersih_per_kelas": {
+        "B": 0.0148,
+        "C": 0.0054,
+        "D": 0.0125,
+        "FKTP": 0.008
+      },
+      "n_bersih_per_kelas": {
+        "B": 4314,
+        "C": 2616,
+        "D": 4398,
+        "FKTP": 28632
+      }
+    },
+    {
+      "alpha_jaring": 0.001,
+      "ambang_jaring_rp": 8011858,
+      "T6": 0.5486,
+      "lolos_terburuk_rp": 384220500,
+      "laju_bersih_semua": 0.0091,
+      "laju_bersih_menahan_diri": 0.0,
+      "laju_bersih_dtpk": 0.0,
+      "laju_curang_menahan_diri": 0.0,
+      "n_bersih_menahan_diri": 1200,
+      "n_curang_menahan_diri": 47,
+      "n_bersih_dtpk": 1200,
+      "laju_bersih_per_kelas": {
+        "B": 0.0148,
+        "C": 0.0054,
+        "D": 0.0125,
+        "FKTP": 0.008
+      },
+      "n_bersih_per_kelas": {
+        "B": 4314,
+        "C": 2616,
+        "D": 4398,
+        "FKTP": 28632
+      }
+    }
+  ]
+}

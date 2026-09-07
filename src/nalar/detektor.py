@@ -57,6 +57,10 @@ class Detektor:
         self.kal = None
         self.ambang_tingkat: dict = {}
         self.ambang_umum = float("inf")
+        # Jaring pengaman untuk kelompok yang menahan diri. Mati secara
+        # bawaan, dan alasannya diukur bukan dikira. Lihat ambang_untuk.
+        self.alpha_jaring: float | None = None
+        self.ambang_jaring = float("inf")
         # Berapa contoh kalibrasi minimum sebelum sebuah kelompok boleh punya
         # ambangnya sendiri. Di bawah ini, kuantilnya terlalu berisik untuk
         # dijadikan dasar mempersoalkan faskis mana pun.
@@ -430,6 +434,15 @@ class Detektor:
                     else ambang_konformal(np.asarray(v), self.alpha)
                 )
         self.ambang_umum = ambang_konformal(s, self.alpha)
+        # Jaring pengaman dihitung dari seluruh klaim kalibrasi yang sudah
+        # disaring, sama seperti ambang umum, tapi pada alpha yang jauh lebih
+        # kecil. Ia bukan pengganti ambang kelompok. Ia batas terakhir untuk
+        # berkas yang kelompoknya tidak punya ambang sama sekali.
+        self.ambang_jaring = (
+            ambang_konformal(s, self.alpha_jaring)
+            if self.alpha_jaring is not None
+            else float("inf")
+        )
         self._terkalibrasi = True
         return self
 
@@ -440,16 +453,43 @@ class Detektor:
         tetap bisa terpilih lewat porsi sampel acak, jadi umpan baliknya tidak
         hilang, tapi tidak ada faskes yang dipersoalkan berdasarkan ambang
         yang dihitung dari data yang terlalu sedikit.
+
+        Menahan diri sempat dicurigai jadi lubang terbesarnya, dan curiga
+        itu ternyata salah. Kisahnya ditulis di sini karena ia contoh bagus
+        betapa jauh data kecil bisa menyesatkan.
+
+        Pada data peragaan kecil, tiga belas ribu episode, tujuh puluh lima
+        dari seratus tujuh berkas yang bisa diserang ada di kelompok yang
+        menahan diri, dan lima puluh satu serangan lolos dari situ. Jaring
+        pengaman menaikkan T6 dari nol ke delapan puluh tujuh persen di
+        sana. Angka yang menggoda.
+
+        Pada data penuh, seratus enam puluh ribu episode, seluruhnya
+        menguap. Kelompok sebaya jadi cukup besar, sehingga satu satunya
+        yang masih menahan diri justru yang memang sengaja dikecualikan,
+        yaitu daerah tertinggal. Jaringnya menggeser uang yang lolos kurang
+        dari dua persen, dan satu satunya yang ikut tertandai berkas dari
+        daerah tertinggal. Itu persis pertukaran yang kami tolak.
+
+        Jadi jaringnya ada, mati secara bawaan, dan tidak dinyalakan.
+        Mesinnya dibiarkan hidup supaya pengukurannya bisa diulang siapa pun
+        lewat scripts/jaring_pengaman.py, dan supaya kesimpulan ini bisa
+        dibantah dengan data yang lebih besar, bukan dengan pendapat.
+
+        Penanda menahan diri tetap menyala meski jaringnya menangkap. Yang
+        membaca berkas berhak tahu bahwa berkas ini tidak punya kelompok
+        sebaya yang cukup, dan bahwa yang menangkapnya batas terakhir, bukan
+        perbandingan dengan sebayanya.
         """
         amb, tahan = [], []
         for r in episodes:
             if self.kecualikan_dtpk and int(r["f_dtpk"]) == 1:
-                amb.append(float("inf"))
+                amb.append(self.ambang_jaring)
                 tahan.append(True)
                 continue
             tingkat = self.kunci_bertingkat(r)
             if tingkat and tingkat[0] in self.kunci_kurang_faskes:
-                amb.append(float("inf"))
+                amb.append(self.ambang_jaring)
                 tahan.append(True)
                 continue
             ketemu = None
@@ -458,7 +498,7 @@ class Detektor:
                     ketemu = self.ambang_tingkat[k]
                     break
             if ketemu is None:
-                amb.append(float("inf"))
+                amb.append(self.ambang_jaring)
                 tahan.append(True)
             else:
                 amb.append(ketemu)

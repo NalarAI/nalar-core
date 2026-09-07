@@ -1,0 +1,64 @@
+{
+  "pengaturan": {
+    "benih": "7,8,9,10,11,12",
+    "peserta": 20000,
+    "tahun": 3,
+    "keluar": "runs/sebaran_t6.json"
+  },
+  "baris": [
+    {
+      "benih": 7,
+      "n_episode": 160455,
+      "T6": 0.55,
+      "maks_serakah_rp": 35261200,
+      "maks_hati_hati_rp": 15877700,
+      "diambil_hati_hati_rp": 275311000,
+      "diambil_serakah_rp": 1936301300
+    },
+    {
+      "benih": 8,
+      "n_episode": 164589,
+      "T6": 0.324,
+      "maks_serakah_rp": 43128600,
+      "maks_hati_hati_rp": 29137800,
+      "diambil_hati_hati_rp": 475165100,
+      "diambil_serakah_rp": 2121280500
+    },
+    {
+      "benih": 9,
+      "n_episode": 162288,
+      "T6": 0.33,
+      "maks_serakah_rp": 40255200,
+      "maks_hati_hati_rp": 26960400,
+      "diambil_hati_hati_rp": 381522100,
+      "diambil_serakah_rp": 1496367300
+    },
+    {
+      "benih": 10,
+      "n_episode": 159125,
+      "T6": 0.18,
+      "maks_serakah_rp": 32874100,
+      "maks_hati_hati_rp": 26960400,
+      "diambil_hati_hati_rp": 441956800,
+      "diambil_serakah_rp": 1688763200
+    },
+    {
+      "benih": 11,
+      "n_episode": 164748,
+      "T6": 0.399,
+      "maks_serakah_rp": 43722500,
+      "maks_hati_hati_rp": 26263500,
+      "diambil_hati_hati_rp": 414817300,
+      "diambil_serakah_rp": 1489108200
+    },
+    {
+      "benih": 12,
+      "n_episode": 161978,
+      "T6": 0.305,
+      "maks_serakah_rp": 36351100,
+      "maks_hati_hati_rp": 25268900,
+      "diambil_hati_hati_rp": 378198500,
+      "diambil_serakah_rp": 1571558200
+    }
+  ]
+}

@@ -33,6 +33,12 @@ jobs:
       - name: periksa format
         run: ruff format --check src tests scripts
 
+      # Sidik dunia pembangkit. Sebuah penataan gaya pernah menggeser
+      # arus acaknya tanpa ada yang sadar, dan angka ketahanan yang kami
+      # laporkan ikut bergeser dua kali lipat.
+      - name: sidik dunia
+        run: python tests/test_dunia.py
+
       - name: uji inti
         run: python tests/test_inti.py
 

@@ -2,84 +2,84 @@
  "detektor": {
   "serakah": {
    "jenis_pelaku": "serakah",
-   "klaim_yang_bisa_diserang": 298,
-   "klaim_yang_diserang": 298,
-   "total_diambil_rp": 1793089000,
-   "rerata_per_klaim_rp": 6017077,
-   "maks_per_klaim_rp": 36227100,
-   "porsi_tertangkap": 0.7852,
-   "diambil_tanpa_tertangkap_rp": 385092940
+   "klaim_yang_bisa_diserang": 285,
+   "klaim_yang_diserang": 285,
+   "total_diambil_rp": 1936301300,
+   "rerata_per_klaim_rp": 6794040,
+   "maks_per_klaim_rp": 35261200,
+   "porsi_tertangkap": 0.6737,
+   "diambil_tanpa_tertangkap_rp": 631845687
   },
   "hati_hati": {
    "jenis_pelaku": "hati_hati",
-   "klaim_yang_bisa_diserang": 298,
-   "klaim_yang_diserang": 136,
-   "total_diambil_rp": 273071600,
-   "rerata_per_klaim_rp": 2007879,
-   "maks_per_klaim_rp": 26960400,
+   "klaim_yang_bisa_diserang": 285,
+   "klaim_yang_diserang": 146,
+   "total_diambil_rp": 275311000,
+   "rerata_per_klaim_rp": 1885692,
+   "maks_per_klaim_rp": 15877700,
    "porsi_tertangkap": 0.0,
-   "diambil_tanpa_tertangkap_rp": 273071600
+   "diambil_tanpa_tertangkap_rp": 275311000
   },
   "menyebar": {
    "jenis_pelaku": "menyebar",
-   "klaim_yang_bisa_diserang": 298,
-   "klaim_yang_diserang": 298,
-   "total_diambil_rp": 1268258300,
-   "rerata_per_klaim_rp": 4255900,
-   "maks_per_klaim_rp": 30579200,
-   "porsi_tertangkap": 0.5436,
-   "diambil_tanpa_tertangkap_rp": 578802446
+   "klaim_yang_bisa_diserang": 285,
+   "klaim_yang_diserang": 284,
+   "total_diambil_rp": 1325355600,
+   "rerata_per_klaim_rp": 4666745,
+   "maks_per_klaim_rp": 27238400,
+   "porsi_tertangkap": 0.4894,
+   "diambil_tanpa_tertangkap_rp": 676678035
   },
-  "_penurunan_keuntungan_maksimum": 0.256,
-  "_target_T6_turun_setengah": false
+  "_penurunan_keuntungan_maksimum": 0.55,
+  "_target_T6_turun_setengah": true
  },
  "mesin_aturan": {
   "serakah": {
    "jenis_pelaku": "serakah",
-   "klaim_yang_bisa_diserang": 298,
-   "klaim_yang_diserang": 298,
-   "total_diambil_rp": 1793089000,
-   "rerata_per_klaim_rp": 6017077,
-   "maks_per_klaim_rp": 36227100,
-   "porsi_tertangkap": 0.1342,
-   "diambil_tanpa_tertangkap_rp": 1552405913
+   "klaim_yang_bisa_diserang": 285,
+   "klaim_yang_diserang": 285,
+   "total_diambil_rp": 1936301300,
+   "rerata_per_klaim_rp": 6794040,
+   "maks_per_klaim_rp": 35261200,
+   "porsi_tertangkap": 0.2211,
+   "diambil_tanpa_tertangkap_rp": 1508276802
   },
   "hati_hati": {
    "jenis_pelaku": "hati_hati",
-   "klaim_yang_bisa_diserang": 298,
-   "klaim_yang_diserang": 260,
-   "total_diambil_rp": 1440079000,
-   "rerata_per_klaim_rp": 5538765,
-   "maks_per_klaim_rp": 36227100,
+   "klaim_yang_bisa_diserang": 285,
+   "klaim_yang_diserang": 225,
+   "total_diambil_rp": 1471474400,
+   "rerata_per_klaim_rp": 6539886,
+   "maks_per_klaim_rp": 32427500,
    "porsi_tertangkap": 0.0,
-   "diambil_tanpa_tertangkap_rp": 1440079000
+   "diambil_tanpa_tertangkap_rp": 1471474400
   },
   "menyebar": {
    "jenis_pelaku": "menyebar",
-   "klaim_yang_bisa_diserang": 298,
-   "klaim_yang_diserang": 298,
-   "total_diambil_rp": 1268258300,
-   "rerata_per_klaim_rp": 4255900,
-   "maks_per_klaim_rp": 30579200,
-   "porsi_tertangkap": 0.1275,
-   "diambil_tanpa_tertangkap_rp": 1106534087
+   "klaim_yang_bisa_diserang": 285,
+   "klaim_yang_diserang": 284,
+   "total_diambil_rp": 1325355600,
+   "rerata_per_klaim_rp": 4666745,
+   "maks_per_klaim_rp": 27238400,
+   "porsi_tertangkap": 0.2113,
+   "diambil_tanpa_tertangkap_rp": 1045350896
   },
-  "_penurunan_keuntungan_maksimum": 0.0,
+  "_penurunan_keuntungan_maksimum": 0.08,
   "_target_T6_turun_setengah": false
  },
  "penilaian_T6": {
-  "penurunan_keuntungan_maksimum_detektor": 0.256,
-  "penurunan_keuntungan_maksimum_mesin_aturan": 0.0,
+  "penurunan_keuntungan_maksimum_detektor": 0.55,
+  "penurunan_keuntungan_maksimum_mesin_aturan": 0.08,
   "batas": 0.5,
-  "lulus": false,
+  "lulus": true,
   "lebih_baik_dari_aturan": true
  },
  "menyebar_terlihat_profil": {
-  "faskes": "1:132",
-  "klaim_diserang": 28,
-  "peringkat_sebelum": 228,
-  "peringkat_sesudah": 228,
-  "dari_total_faskes": 238,
+  "faskes": "1:106",
+  "klaim_diserang": 26,
+  "peringkat_sebelum": 226,
+  "peringkat_sesudah": 226,
+  "dari_total_faskes": 241,
   "naik_ke_25_teratas": false
  }
 }
