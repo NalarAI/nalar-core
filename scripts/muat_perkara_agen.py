@@ -53,6 +53,11 @@ def utama() -> int:
     p.add_argument("--benih", type=int, default=7)
     p.add_argument("--model", default=os.environ.get("NALAR_MODEL", "nalar-qwen3-4b"))
     p.add_argument("--kirim", action="store_true", help="Tulis ke basis data.")
+    p.add_argument(
+        "--lewati",
+        action="store_true",
+        help="Lewati nomor yang sudah punya versi agen di basis data.",
+    )
     a = p.parse_args()
 
     penutur = PenuturSetempat(model=a.model)
