@@ -2092,7 +2092,7 @@ batas lulus 0,03. **A2 tercapai.**
 
 | Kode | Target | Hasil |
 |---|---|---|
-| A1 | Nol angka tak bersumber dari 500 berkas | **tercapai**, nol dari 40 berkas model sungguhan |
+| A1 | Nol angka tak bersumber dari 500 berkas | **sifatnya bertahan**, nol dari 120 berkas sekali jalan dan 194 berkas bersambung, lima ratus belum penuh di mesin ini |
 | A2 | Laju salah tuduh tidak naik | **tercapai**, 0,0137 |
 | A3 | Berkas perkara diterima verifikator tanpa koreksi | **tidak terukur**, butuh pembaca manusia |
 | A4 | Tiga siasat penghindaran baru yang bisa diulang | **tercapai**, lima |
@@ -2482,3 +2482,27 @@ jumlah diagnosis sekunder. Ia tidak menilai apakah dunianya bagus. Ia
 memastikan tidak ada yang menggesernya tanpa sadar, dan kalau memang sengaja
 digeser, angkanya harus ikut diperbarui dalam commit yang sama sehingga
 terlihat di riwayat. Integrasi berkelanjutan menjalankannya sebelum uji lain.
+
+### A1 dan langit langit mesin pengembangan
+
+Target A1 menyebut lima ratus berkas. Yang pernah selesai dalam satu jalan
+seratus dua puluh, dan seluruhnya bersih.
+
+Jalan lima ratus dicoba tiga kali dan dihentikan penjaga memori tiga kali.
+Sebabnya bukan pengukurannya melainkan mesin ini: model bahasanya menuntut
+dua setengah gigabita dan keadaan datanya harus hidup bersamaan, sedangkan
+yang bebas tinggal dua gigabita.
+
+Pengukurannya lalu dibuat menyambung. Hasil tiap berkas ditulis begitu
+selesai, dan jalan berikutnya melewati yang sudah ada. Hasilnya sama dengan
+sekali jalan, karena tiap berkas berdiri sendiri dan modelnya bersuhu nol.
+
+Yang terkumpul dengan cara itu seratus sembilan puluh empat berkas.
+Seluruhnya disusun agen, tidak satu pun mundur ke versi aturan, nol
+pelanggaran A1, nol cacat pemeriksaan dalam, Rp 49,67 per berkas.
+
+Angka lima ratus yang targetnya sebut belum pernah dijalankan penuh di mesin
+ini. Menuliskannya sebagai tercapai hanya karena dua ratus berkas pertama
+bersih akan jadi kebohongan yang paling mudah tidak ketahuan, jadi ia
+ditulis sebagai belum penuh. Yang dibutuhkan untuk menyelesaikannya cuma
+mesin dengan memori bebas empat gigabita, bukan perubahan kode.
