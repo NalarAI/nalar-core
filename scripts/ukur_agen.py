@@ -60,8 +60,13 @@ def baca_singgahan(jalur: str) -> dict:
     sekali jalan. Model bahasanya memakan dua setengah gigabita dan keadaan
     datanya harus hidup bersamaan, jadi penjaga memori menghentikan
     prosesnya di tengah jalan. Dijalankan berulang, tiap kali menyambung,
-    hasilnya sama saja dengan sekali jalan karena tiap berkas berdiri
-    sendiri dan modelnya bersuhu nol.
+    hasilnya tetap sah karena tiap berkas berdiri sendiri: alat yang
+    dipanggil, penjaga yang memeriksa, dan gerbang yang menilai sama
+    persis pada jalan keberapa pun.
+
+    Yang tidak boleh diklaim: bahwa naskahnya akan sama persis. Suhu nol
+    tidak membuat Ollama tetap. Berkas yang sama disusun dua kali memberi
+    kalimat yang berbeda, dengan angka yang sama.
     """
     if not jalur or not os.path.exists(jalur):
         return {}

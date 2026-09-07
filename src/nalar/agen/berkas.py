@@ -210,6 +210,9 @@ def jalankan(
     gerbang: Gerbang | None = None,
     dalam: bool = False,
     n_perbaikan: int = 1,
+    perkakas=None,  # (Jejak) -> Perkakas
+    dasar: dict | None = None,
+    menahan: bool | None = None,
 ) -> dict:
     """Berkas perkara untuk satu nomor, beserta jejak, biaya, dan keadaannya.
 
@@ -217,15 +220,28 @@ def jalankan(
     gerbang, bukan ketika melayani berkas sungguhan, karena harganya justru
     yang jadi alasan gerbangnya ada.
     """
-    dasar = susun(keadaan, id_berkas)
+    # Tiga hal bisa diberikan dari luar, dan ketiganya untuk satu keperluan:
+    # menjalankan agen ini tanpa keadaan data di dalam memori. Alat yang
+    # membaca basis data ada di alat_db.py, versi aturannya diambil dari
+    # tabel yang sudah menyimpannya, dan penanda menahan diri ikut dikirim
+    # karena ia tidak bisa dihitung ulang tanpa penebak.
+    #
+    # Yang tidak diberikan tetap dihitung seperti biasa, jadi jalur lama
+    # tidak berubah satu langkah pun.
+    dasar = dasar if dasar is not None else susun(keadaan, id_berkas)
     n_kata_dasar = len(dasar["teks"].split())
 
-    i = keadaan.indeks_dari_id(id_berkas)
-    menahan = bool(keadaan.tahan[i])
+    if menahan is None:
+        i = keadaan.indeks_dari_id(id_berkas)
+        menahan = bool(keadaan.tahan[i])
 
     penutur = penutur if penutur is not None else penutur_baku()
     jejak = Jejak(perkara=id_berkas)
-    p = Penyelia(Perkakas(keadaan, jejak), anggaran or Anggaran())
+    # Yang diterima pembuat perkakas, bukan perkakas jadi. Perkakas jadi
+    # membawa jejaknya sendiri, dan jejak itu bukan jejak yang dilaporkan
+    # hasil ini, sehingga rantai auditnya akan keluar kosong.
+    alat = perkakas(jejak) if perkakas is not None else Perkakas(keadaan, jejak)
+    p = Penyelia(alat, anggaran or Anggaran())
 
     hasil_alat: list[dict] = []
     hasil_per_alat: dict[str, dict] = {}

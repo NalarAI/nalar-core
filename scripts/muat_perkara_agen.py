@@ -77,8 +77,10 @@ def utama() -> int:
     urut = [K.id_klaim(int(i)) for i in K.urutan[: a.n]]
     if a.lewati:
         # Menyusun ulang berkas yang sudah punya versi agen memakan
-        # belasan menit tanpa mengubah apa pun, karena modelnya bersuhu
-        # nol dan hasilnya akan sama persis.
+        # belasan menit untuk mengganti naskah yang sudah benar dengan
+        # naskah lain yang sama benarnya. Suhu nol tidak membuat Ollama
+        # tetap, jadi yang didapat bukan berkas yang sama melainkan
+        # susunan kata yang berbeda dengan angka yang sama.
         url_, kunci_ = baca_env()
         jawab = Db(url_, kunci_)._panggil(
             "GET", "perkara?sumber=eq.agen&select=klaim_id"
