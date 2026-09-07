@@ -68,9 +68,17 @@ from nalar.agen import (  # noqa: E402
     susun_agen,
     tera,
 )
+from nalar.agen.alat_db import (  # noqa: E402
+    PerkakasBasisData,
+    SumberBasisData,
+)
+from nalar.agen.berkas import ANGKA_MINIMAL  # noqa: E402
 from nalar.agen.dalam import ikatan_salah, kumpulkan_fakta  # noqa: E402
 from nalar.agen.jejak import Jejak  # noqa: E402
-from nalar.agen.penutur import GalatPenutur  # noqa: E402
+from nalar.agen.penutur import (  # noqa: E402
+    GalatPenutur,
+    _panggilan_tertolak,
+)
 from nalar.agen.sanggah import petakan_bukti_model  # noqa: E402
 from nalar.api.keadaan import Keadaan  # noqa: E402
 from nalar.katalog import PEMERIKSAAN  # noqa: E402
@@ -659,6 +667,154 @@ cek(
 rata = sum(biaya) / max(1, len(biaya))
 cek("biaya rata rata per berkas di bawah Rp 500", rata < 500, f"Rp {rata:.2f}")
 print(f"         biaya rata rata Rp {rata:.2f} per berkas")
+
+
+print("\n9. Nama alat yang ditolak penyedia kembali jadi giliran biasa")
+# Isi penolakan di bawah disusun dari bagian bagian penolakan yang benar
+# benar diterima dari Groq pada 7 September 2026, bukan bentuk karangan.
+# Modelnya memanggil hitungan_pengandaian, dan nama itu tidak ada.
+#
+# Yang dijaga satu hal: satu huruf yang salah pada nama alat tidak boleh
+# membatalkan seluruh berkas. Penyelia sudah tahu cara menolak alat yang
+# tidak ada, jadi penolakan penyedia diterjemahkan balik supaya sampai ke
+# sana, dan model membetulkan namanya sendiri pada giliran berikutnya.
+TERTOLAK = json.dumps(
+    {
+        "error": {
+            "message": (
+                "Tool call validation failed: attempted to call tool "
+                "'hitungan_pengandaian' which was not in request.tools"
+            ),
+            "type": "invalid_request_error",
+            "code": "tool_use_failed",
+            "failed_generation": (
+                '{"name": "hitungan_pengandaian", "arguments": {"id": "K00000000"}}'
+            ),
+        }
+    }
+)
+POTONG = json.dumps(
+    {"error": {"code": "tool_use_failed", "failed_generation": '{"name": '}}
+)
+
+d = _panggilan_tertolak(TERTOLAK)
+cek(
+    "nama alat yang salah terbaca dari penolakan",
+    d == [{"nama": "hitungan_pengandaian", "argumen": {"id": "K00000000"}}],
+    str(d),
+)
+cek(
+    "penolakan karena sebab lain tidak ikut diterjemahkan",
+    _panggilan_tertolak(json.dumps({"error": {"code": "rate_limit_exceeded"}})) is None,
+)
+cek(
+    "badan yang bukan JSON tidak menjatuhkan penerjemahnya",
+    _panggilan_tertolak("Bad Request") is None,
+)
+cek(
+    "naskah yang terpotong tidak jadi panggilan setengah jadi",
+    _panggilan_tertolak(POTONG) is None,
+)
+
+# Terjemahan di atas baru ada gunanya kalau ujungnya memang menolak dengan
+# keterangan. Itu yang diperiksa di sini, pada penyelia yang sungguhan.
+pn = Penyelia(Perkakas(K, Jejak(perkara="uji-tertolak")), Anggaran())
+jawab = pn.panggil_lunak("hitungan_pengandaian", id=ID[0])
+cek(
+    "penyelia menolak alat yang tidak ada, dengan keterangan",
+    not jawab["berhasil"] and bool(jawab["tolakan"]),
+    str(jawab)[:90],
+)
+
+
+print("\n10. Berkas perkara yang tidak menyebut angka ditolak")
+
+
+class PenuturKosong(Penutur):
+    """Memanggil satu alat, lalu menulis kalimat tanpa satu angka pun.
+
+    Bukan naskah karangan. Ini persis yang terjadi pada berkas K00001283 di
+    situs yang sudah terpasang: modelnya gagal memanggil alat yang
+    menghitung, lalu menulis bahwa tiap besaran tidak tersedia. Berkas itu
+    lolos A1, lolos pemeriksaan dalam, dan terkirim.
+    """
+
+    nama = "kosong"
+
+    def hidup(self) -> bool:
+        return True
+
+    def balas(self, pesan, alat) -> Balasan:
+        sudah = any(p.get("role") == "tool" for p in pesan)
+        if not sudah:
+            nomor = re.search(r"K\d+", pesan[-1]["content"]).group(0)
+            return Balasan(
+                panggilan=[
+                    {"nama": "ambil_berkas", "argumen": {"id": nomor}, "id": "k1"}
+                ],
+                token_masuk=900,
+                token_keluar=40,
+            )
+        return Balasan(
+            teks=(
+                "Nilai yang diajukan tidak tersedia, nilai yang didukung bukti "
+                "tidak tersedia, selisih tidak tersedia. Bukti yang bila "
+                "dilampirkan menurunkan selisih tidak tersedia. Modus yang "
+                "paling dekat dengan bentuk selisih ini tidak tersedia."
+            ),
+            token_masuk=1200,
+            token_keluar=60,
+        )
+
+
+kosong = susun_agen(K, ID[0], penutur=PenuturKosong(), n_perbaikan=0)
+cek(
+    "berkas tanpa angka mundur ke versi aturan",
+    kosong["sumber"] == "aturan",
+    kosong["sumber"],
+)
+cek(
+    "sebabnya menyebut angka, bukan saringan",
+    "angka" in kosong["sebab_mundur"],
+    kosong["sebab_mundur"],
+)
+cek(
+    "yang keluar tetap berkas perkara yang menyebut besaran",
+    kosong["a1"]["n_angka_diperiksa"] >= ANGKA_MINIMAL,
+    str(kosong["a1"]["n_angka_diperiksa"]),
+)
+
+# Yang dijaga bukan cuma penolakannya. Berkas yang memang menyebut angka
+# harus tetap lewat, kalau tidak aturan baru ini menolak semuanya dan tidak
+# ada yang tahu.
+utuh = susun_agen(K, ID[0], penutur=PenuturPatuh())
+cek(
+    "berkas yang menyebut angka tetap lewat",
+    utuh["sumber"] == "agen",
+    utuh.get("sebab_mundur", ""),
+)
+
+# Alat yang tidak bisa dilayani jalur basis data tidak ditawarkan ke model.
+# Menawarkannya membuat model memanggilnya, dan giliran yang habis untuk satu
+# penolakan itu yang membuat berkas kosong di atas terjadi.
+pd = PerkakasBasisData(
+    SumberBasisData("http://tidak-dipakai", "x"), Jejak(perkara="uji")
+)
+nama_alat = [a["name"] for a in pd.skema()]
+cek(
+    "skor_ulang tidak ditawarkan ke model",
+    "skor_ulang" not in nama_alat,
+    str(nama_alat),
+)
+cek("alat yang menghitung tetap ditawarkan", "hitung_pengandaian" in nama_alat)
+# Tidak ditawarkan bukan berarti hilang. Yang memanggilnya langsung tetap
+# mendapat keterangan kenapa, bukan pesan "alat tidak dikenal" yang tidak
+# memberitahu apa apa.
+try:
+    pd.panggil("skor_ulang", id=ID[0], bukti_tambahan=["HB"])
+    cek("skor_ulang tetap menerangkan sebabnya", False, "justru menjawab")
+except Exception as e:  # noqa: BLE001
+    cek("skor_ulang tetap menerangkan sebabnya", "penebak tarif" in str(e), str(e)[:70])
 
 print(f"\n{lulus} lulus, {gagal} gagal")
 sys.exit(1 if gagal else 0)

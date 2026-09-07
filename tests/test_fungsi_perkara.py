@@ -124,5 +124,11 @@ cek(
 kelas = [s.name for s in pohon.body if isinstance(s, ast.ClassDef)]
 cek("penanganya bernama handler", "handler" in kelas, str(kelas))
 
+# Nomor berkas yang salah ketik bukan kesalahan peladen, dan basis data yang
+# mati bukan kesalahan pembacanya. Keduanya pernah dijawab lima ratus.
+cek("berkas yang tidak ada dijawab 404", "404" in isi)
+cek("basis data yang tidak menjawab dijawab 502", "502" in isi)
+cek("fungsi yang belum disetel dijawab 503", "503" in isi)
+
 print(f"\n{lulus} lulus, {gagal} gagal")
 sys.exit(1 if gagal else 0)

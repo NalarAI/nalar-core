@@ -163,6 +163,7 @@ from http.server import BaseHTTPRequestHandler
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+from _nalar.alat import GalatAlat  # noqa: E402
 from _nalar.alat_db import PerkakasBasisData, SumberBasisData  # noqa: E402
 from _nalar.berkas import jalankan  # noqa: E402
 from _nalar.gerbang import Gerbang  # noqa: E402
@@ -235,11 +236,32 @@ def _baris_jejak(jejak: Jejak) -> list:
     ]
 
 
-def susun_berkas(kid: str) -> dict:
+def susun_berkas(kid: str) -> tuple:
+    """Berkas perkara untuk satu nomor, beserta kode jawaban yang pantas.
+
+    Tiga kegagalan yang berbeda dibedakan di sini, karena yang membacanya
+    perlu tahu mana yang bisa ia perbaiki sendiri. Nomor berkas yang tidak
+    ada di peragaan bisa diperbaiki dengan mengetik nomor lain. Basis data
+    yang tidak menjawab tidak bisa diperbaiki pembacanya. Fungsi yang belum
+    disetel bukan urusan pembacanya sama sekali.
+
+    Semuanya pernah dijawab lima ratus, dan lima ratus berarti kesalahan
+    peladen. Nomor yang salah ketik bukan kesalahan peladen.
+    """
     if not (DB_URL and DB_KUNCI):
-        return {{"galat": "alamat basis data belum disetel pada fungsi ini"}}
+        return 503, {{"galat": "alamat basis data belum disetel pada fungsi ini"}}
 
     sumber = SumberBasisData(DB_URL, DB_KUNCI)
+    # Diperiksa lebih dulu, bukan ditunggu sampai alatnya menolak di tengah
+    # lingkaran. Penolakan di tengah lingkaran sudah terlanjur memakai
+    # giliran model, dan giliran itu dibayar dari jatah yang terbatas.
+    try:
+        if not sumber.satu(
+            f"berkas?id=eq.{{urllib.parse.quote(kid)}}&select=id"
+        ):
+            return 404, {{"galat": f"berkas {{kid}} tidak ada pada peragaan ini"}}
+    except GalatAlat as e:
+        return 502, {{"galat": str(e)}}
     penutur = PenuturSetempat(
         alamat=ALAMAT,
         model=MODEL,
@@ -291,7 +313,7 @@ def susun_berkas(kid: str) -> dict:
             "n_kalibrasi": t["n_kalibrasi"],
             "diukur_pada": t["diukur_pada"],
         }}
-    return keluar
+    return 200, keluar
 
 
 class handler(BaseHTTPRequestHandler):
@@ -317,7 +339,8 @@ class handler(BaseHTTPRequestHandler):
             salah = {{"galat": "nomor berkas tidak berbentuk K00000000"}}
             return self._jawab(422, salah)
         try:
-            self._jawab(200, susun_berkas(kid))
+            kode, badan = susun_berkas(kid)
+            self._jawab(kode, badan)
         except Exception as e:  # noqa: BLE001
             self._jawab(500, {{"galat": f"{{type(e).__name__}}: {{e}}"}})
 

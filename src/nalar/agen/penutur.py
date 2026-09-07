@@ -103,7 +103,14 @@ class PenuturTiruan(Penutur):
         return True
 
 
-def _sebab(e: urllib.error.HTTPError) -> str:
+def _isi_galat(e: urllib.error.HTTPError) -> str:
+    """Isi penolakan penyedia, dibaca sekali karena badannya sekali pakai."""
+    with contextlib.suppress(OSError):
+        return e.read().decode("utf-8", "replace").strip()
+    return ""
+
+
+def _sebab(e: urllib.error.HTTPError, isi: str) -> str:
     """Keterangan penolakan beserta isinya, bukan cuma nomornya.
 
     Penyedia model menolak dengan nomor yang sama untuk sebab yang jauh
@@ -115,10 +122,56 @@ def _sebab(e: urllib.error.HTTPError) -> str:
     Isinya dipotong, karena yang berguna kalimat pertamanya dan yang
     berikutnya cuma memanjangkan catatan.
     """
-    isi = ""
-    with contextlib.suppress(OSError):
-        isi = e.read().decode("utf-8", "replace")[:300].strip()
-    return f"peladen model tidak menjawab: {e}{', ' + isi if isi else ''}"
+    potong = isi[:300].strip()
+    return f"peladen model tidak menjawab: {e}{', ' + potong if potong else ''}"
+
+
+def _panggilan_tertolak(isi: str) -> list[dict] | None:
+    """Panggilan alat yang ditolak penyedia sebelum sampai ke penyelia.
+
+    Sebagian penyedia memeriksa nama alat di pihak mereka. Nama yang tidak
+    ada membuat seluruh giliran ditolak, jadi penyelia di sini tidak pernah
+    melihatnya. Padahal penyelia sudah tahu cara menanganinya: alat yang
+    tidak ada dikembalikan sebagai keterangan, dan model membetulkan
+    namanya pada giliran berikutnya.
+
+    Tanpa terjemahan ini, satu huruf yang salah pada nama alat membatalkan
+    seluruh berkas dan yang keluar versi aturan. Itu terlalu mahal untuk
+    kesalahan yang model sendiri bisa perbaiki kalau diberi tahu.
+
+    Yang hilang dari terjemahan ini cuma hitungan tokennya, karena penyedia
+    tidak melaporkannya pada giliran yang ditolak. Biaya giliran itu jadi
+    tercatat nol, dan laporan biaya sedikit lebih rendah dari yang benar.
+    """
+    try:
+        d = json.loads(isi)
+    except (ValueError, json.JSONDecodeError):
+        return None
+    galat = d.get("error") if isinstance(d, dict) else None
+    if not isinstance(galat, dict) or galat.get("code") != "tool_use_failed":
+        return None
+    naskah = galat.get("failed_generation")
+    if not isinstance(naskah, str):
+        return None
+    try:
+        g = json.loads(naskah)
+    except (ValueError, json.JSONDecodeError):
+        return None
+    daftar = g if isinstance(g, list) else [g]
+    keluar = []
+    for c in daftar:
+        if not isinstance(c, dict) or not isinstance(c.get("name"), str):
+            continue
+        arg = c.get("arguments")
+        if isinstance(arg, str):
+            try:
+                arg = json.loads(arg)
+            except (ValueError, json.JSONDecodeError):
+                arg = {}
+        keluar.append(
+            {"nama": c["name"], "argumen": arg if isinstance(arg, dict) else {}}
+        )
+    return keluar or None
 
 
 class PenuturSetempat(Penutur):
@@ -211,8 +264,15 @@ class PenuturSetempat(Penutur):
                     jawab = json.loads(r.read().decode("utf-8"))
                 break
             except urllib.error.HTTPError as e:
+                isi = _isi_galat(e)
+                # Nama alat yang tidak ada bukan alasan membatalkan berkas.
+                # Ia dikembalikan sebagai giliran biasa, dan penyelia yang
+                # menolaknya dengan keterangan seperti penolakan alat lain.
+                tertolak = _panggilan_tertolak(isi) if e.code == 400 else None
+                if tertolak:
+                    return Balasan(panggilan=tertolak)
                 if e.code != 429 or percobaan == self.n_coba - 1:
-                    raise GalatPenutur(_sebab(e)) from None
+                    raise GalatPenutur(_sebab(e, isi)) from None
                 tunggu = e.headers.get("Retry-After")
                 try:
                     jeda = min(float(tunggu), 20.0) if tunggu else 0.0

@@ -2697,3 +2697,87 @@ puluh sembilan uji, dan satu pemeriksaan enam agen.
 
 Sesudah keduanya diperbaiki, model awan dan model setempat sama sama 24 dari
 24 dengan ingatan dan ketepatan penuh.
+
+### Agen kedua hidup di situs, dan tiga hal yang cuma kelihatan sesudah dipasang
+
+Agen Berkas sekarang ikut bekerja saat itu juga di situs publik. Yang
+menghalanginya selama ini bukan modelnya melainkan alatnya. Alat agen
+membaca seluruh episode di dalam memori, dan proses sebesar itu tidak muat
+di fungsi tanpa peladen.
+
+Yang dikerjakan memindahkan sumber angkanya, bukan menulis ulang alatnya.
+Empat dari lima alat sekarang membaca tabel. Yang kelima menuntut penebak
+tarif terlatih, dan ia menolak dengan keterangan. Jawaban keempatnya sudah
+diadu medan demi medan dengan jawaban versi memori, karena satu medan yang
+berbeda mengubah apa yang dilihat model dan membuat angka yang sudah diukur
+pada lima ratus berkas tidak berlaku lagi.
+
+Lapisan agennya disalin apa adanya ke sebelah fungsinya, dan yang diubah
+cuma bentuk impornya. Ujinya menghasilkan ulang lalu membandingkan bita demi
+bita, memeriksa rantai impornya tertutup, dan memastikan tidak ada pustaka
+berat yang menyelinap ikut. Ketiganya gagal dengan cara yang berbeda, dan
+tidak ada satu pun yang bisa menangkap ketiganya.
+
+**Jatah gratisnya diukur, dan ia mengikat.** Groq memberi seribu permintaan
+per hari. Yang lebih mengikat delapan ribu token per menit, sedangkan satu
+berkas perkara memakai sekitar tujuh ribu.
+
+Artinya kira kira satu berkas per menit. Pengunjung kedua pada menit yang
+sama mendapat berkas versi aturan, dan halamannya menyebut sebabnya. Itu
+bukan kegagalan yang disembunyikan, melainkan batas yang ditulis apa adanya.
+
+**Nama alat yang salah satu huruf membatalkan seluruh berkas.** Penyedianya
+memeriksa nama alat di pihak mereka. Model memanggil hitungan_pengandaian,
+nama yang tidak ada, dan seluruh gilirannya ditolak dengan empat ratus.
+
+Penyelia di sini sudah tahu cara menanganinya sejak awal. Alat yang tidak
+ada dikembalikan sebagai keterangan, dan model membetulkan namanya pada
+giliran berikutnya. Penolakan itu tidak pernah sampai ke sana. Sekarang ia
+diterjemahkan balik jadi giliran biasa, supaya penjaga yang sudah ada
+mengerjakan tugas yang memang tugasnya.
+
+Yang membuatnya ketahuan bukan uji melainkan isi penolakannya. Sebelumnya
+yang tercatat cuma nomornya, dan empat ratus bisa berarti alat salah bentuk,
+pesan salah urutan, atau model tidak ada. Nomor saja tidak bisa dibedakan
+siapa pun.
+
+**Berkas perkara tanpa satu pun angka lolos semua pemeriksaan.** Ini yang
+paling mahal dari ketiganya, dan ia cuma kelihatan dengan membuka halamannya
+sebagai pengunjung.
+
+Pada berkas K00001283, model memanggil alat yang pasti ditolak jalur ini.
+Gilirannya habis untuk satu penolakan, lalu ia menulis bahwa nilai yang
+diajukan tidak tersedia, nilai yang didukung bukti tidak tersedia, dan
+selisihnya tidak tersedia. Alat yang menghitung tidak pernah ia panggil.
+
+Berkas itu lolos A1, karena tidak ada angka yang bisa tidak bersumber. Ia
+lolos pemeriksaan dalam, karena tidak ada ikatan yang bisa keliru. Ia lolos
+pemeriksaan bagian, karena tiap kata wajib memang disebut. Tiap penjaga
+bekerja persis seperti seharusnya, dan yang keluar tetap dokumen yang tidak
+berisi apa apa.
+
+Dua hal diperbaiki. Alat yang tidak bisa dilayani berhenti ditawarkan ke
+model, karena alat yang ditawarkan tapi pasti ditolak menyesatkan, bukan
+sekadar sia sia. Dan berkas yang menyebut kurang dari tiga angka sekarang
+ditolak, dengan ambang yang sama persis dengan yang sudah dipakai menghitung
+keyakinan.
+
+Pelajaran yang lebih umum dari ketiganya sama. Penjaga di sini dibangun
+untuk menangkap yang salah, dan tidak satu pun dibangun untuk menangkap yang
+kosong. Kalimat yang tidak menyebut apa apa tidak punya apa apa yang bisa
+dituduh.
+
+**Gerbangnya belum berlaku untuk model awan.** Ambang layak kirim ditera
+pada dua ratus lima puluh berkas susunan model setempat, dan model yang
+berbeda memberi sebaran yang berbeda.
+
+Maka berkas dari model awan keluar tanpa keadaan, dan fungsinya menyebut
+gerbangnya kosong. Itu jawaban yang benar, bukan pekerjaan yang belum
+selesai. Menerakan ulang menuntut ratusan berkas, dan pada jatah per menit
+di atas itu berarti berjam jam serta hampir seluruh jatah harian.
+
+Yang perlu dicatat tentang harganya. Ambang hasil tera pada model setempat
+angkanya nol, karena tidak ada satu pun cacat pada separuh kalibrasinya.
+Gerbang dengan ambang nol meluluskan semuanya. Jadi jarak antara gerbang
+kosong dan gerbang tertera, pada keadaan sekarang, tidak mengubah satu
+berkas pun.

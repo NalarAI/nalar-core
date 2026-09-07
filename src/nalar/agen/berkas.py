@@ -78,6 +78,13 @@ dalam bahasa Indonesia, dengan bagian berikut dan urutan ini:
 Tulis ringkas. Jangan menambah kalimat penutup yang tidak berisi keterangan."""
 
 
+# Angka paling sedikit yang harus disebut berkas perkara susunan agen.
+#
+# Sama dengan angka yang dipakai skor_keyakinan menghukum berkas tipis, dan
+# memang harus sama. Dua ambang untuk satu hal yang sama akan berbeda
+# pendapat suatu hari, dan yang berbeda pendapat diam diam paling mahal.
+ANGKA_MINIMAL = 3
+
 # Isian yang seharusnya berdiri sesudah tiap sebutan. Diambil dari tabel
 # yang sama yang dipakai memeriksanya, jadi keterangan cacat dan pemeriksaan
 # cacat tidak bisa berbeda pendapat.
@@ -371,6 +378,21 @@ def jalankan(
                 jenis = sorted({c["jenis"] for c in saring["cacat"]})
                 sebab_mundur = f"berkas susunan agen jatuh di saringan: {jenis}"
                 cepat = {**cepat, "cacat": saring["cacat"]}
+            elif cepat["a1"]["n_angka_diperiksa"] < ANGKA_MINIMAL:
+                # Berkas perkara tanpa angka bukan berkas perkara, dan tidak
+                # ada satu pun pemeriksaan di atas yang bisa menangkapnya.
+                # A1 lulus justru karena tidak ada angka yang bisa salah, dan
+                # pemeriksaan dalam lulus karena tidak ada ikatan yang bisa
+                # keliru. Yang menangkapnya harus aturan tersendiri.
+                #
+                # Ini pernah terjadi dan sempat terkirim. Modelnya gagal
+                # memanggil alat yang menghitung, lalu menulis kalimat yang
+                # menyebut tiap besaran sebagai tidak tersedia. Kalimat
+                # seperti itu tidak bisa dibantah faskes, dan yang tidak bisa
+                # dibantah tidak layak dikirim.
+                n = cepat["a1"]["n_angka_diperiksa"]
+                sebab_mundur = f"berkas susunan agen cuma menyebut {n} angka"
+
     elif not sebab_mundur:
         sebab_mundur = "agen berhenti tanpa menulis apa pun"
 

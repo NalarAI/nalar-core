@@ -71,9 +71,26 @@ class SumberBasisData:
 class PerkakasBasisData(Perkakas):
     """Perkakas yang sama, dengan empat alat dialihkan ke basis data."""
 
+    # Alat yang pasti ditolak jalur ini tidak ditawarkan ke model. Ia tetap
+    # ada dan tetap menolak dengan keterangan, karena yang memanggilnya
+    # langsung berhak tahu sebabnya. Yang berubah cuma daftar yang dilihat
+    # model.
+    #
+    # Sebabnya diukur, bukan dikira. Pada berkas K00001283 di situs yang
+    # sudah terpasang, model memanggil skor_ulang, penolakannya memakan satu
+    # giliran, lalu model menulis berkas yang seluruh angkanya "tidak
+    # tersedia" karena hitung_pengandaian tidak pernah ia panggil. Alat yang
+    # ditawarkan tapi tidak bisa dilayani menyesatkan, bukan sekadar sia sia.
+    TAK_DITAWARKAN = ("skor_ulang",)
+
     def __init__(self, sumber: SumberBasisData, jejak):
         self.sumber = sumber
         super().__init__(None, jejak)
+
+    def skema(self) -> list[dict]:
+        return [
+            a.skema() for n, a in self.daftar.items() if n not in self.TAK_DITAWARKAN
+        ]
 
     # -- alat yang dialihkan ------------------------------------------------
 
