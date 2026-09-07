@@ -2096,7 +2096,8 @@ batas lulus 0,03. **A2 tercapai.**
 | A2 | Laju salah tuduh tidak naik | **tercapai**, 0,0137 |
 | A3 | Berkas perkara diterima verifikator tanpa koreksi | **tidak terukur**, butuh pembaca manusia |
 | A4 | Tiga siasat penghindaran baru yang bisa diulang | **tercapai**, lima |
-| A5 | T6 naik dari 25,6 ke 40 persen | **gagal**, dan ukurannya goyah: 0,18 sampai 0,55 pada enam benih |
+| A5 | T6 naik dari 25,6 ke 40 persen | **gagal**, tengahnya 0,208 pada enam benih di luar sampel |
+| A5b | penyusutan uang, ambang didaftarkan lebih dulu | **terlampaui**, tengah 0,745 dan terkecil 0,571 |
 | A6 | Berkas yang berubah putusan dilaporkan dalam satu hari kerja | **tercapai**, 0,24 detik |
 | A7 | Biaya token di bawah Rp 500 per berkas | **tercapai**, Rp 49,77 pada 500 berkas |
 
@@ -2610,3 +2611,44 @@ menemukannya. Bukan uji, lagi lagi.
 Barisnya dihapus, parameternya disamakan, dan penjaganya sekarang menanyakan
 lebih dulu apakah nomor yang disusun ada di tabel peragaan. Kalau tidak,
 skripnya berhenti tanpa menulis apa pun.
+
+### A5 versi baru, ambang didaftarkan lebih dulu lalu diuji di luar sampel
+
+Ambangnya ditulis ke rencana dan disimpan ke riwayat pukul 17.54, dan angka
+pertamanya baru muncul sesudah itu. Urutan itu yang membuat hasilnya berarti,
+dan commit-nya bisa diperiksa siapa pun.
+
+Yang didaftarkan: nilai tengah penyusutan uang sekurangnya 0,50 pada enam
+benih, dengan yang terkecil sekurangnya 0,40. Angka 0,50 bukan angka baru,
+ia batas "turun setengah" yang sudah ditulis rencana ini sejak awal untuk
+A5. Yang berganti penaksirnya.
+
+Benihnya tiga belas sampai delapan belas, dan keenamnya belum pernah dipakai
+di proyek ini. Garis dasar yang sudah ada diukur pada tujuh sampai dua belas.
+
+Hasilnya: terkecil 0,571, tengah 0,745, terbesar 0,830, simpangan baku
+0,088. Kedua ambangnya terlampaui.
+
+Pada enam dunia yang sama, T6 lama memberi tengah 0,208 dan terkecil nol,
+dengan dua dari enam melewati 0,40. Ragam relatifnya 0,799 melawan 0,121
+pada penaksir baru. Itu memperkuat temuan sebelumnya, bukan membantahnya.
+
+### Apa yang boleh dan tidak boleh disimpulkan dari situ
+
+Boleh: pengawasan ini menyusutkan uang yang bisa diambil pelaku yang sabar
+sampai sekitar tiga perempat dari yang diambil pelaku yang nekat, dan
+angkanya bertahan pada enam dunia yang tidak dipakai memilih ambangnya.
+
+Tidak boleh: menyebut A5 tercapai. Target itu berbunyi T6 naik ke empat
+puluh persen, dan T6 pada enam dunia ini tengahnya dua puluh persen. Ia
+tetap gagal, dan barisnya di papan skor tetap gagal.
+
+Yang perlu ditulis terang terangan tentang batas pendaftaran ini. Ia
+menutup satu celah, yaitu menggeser ambang sesudah melihat hasil. Ia tidak
+menutup celah yang lain, yaitu memilih ukuran sesudah tahu ukuran lama tidak
+menolong. Ukurannya kami pilih sendiri, sesudah tahu T6 goyah, dan garis
+dasarnya sudah kami lihat sebelum ambangnya ditetapkan.
+
+Jadi yang berdiri di sini satu ukuran yang lebih layak dipercaya, beserta
+angkanya di luar sampel. Sebutan target baru saya tahan sampai ada pihak
+yang tidak ikut mengukur yang menuliskannya.
