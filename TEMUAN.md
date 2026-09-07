@@ -2541,3 +2541,39 @@ target yang gagal dengan ukuran baru yang kebetulan lulus adalah memeriksa
 pekerjaan sendiri. Yang boleh dilakukan cuma mencatatnya sebagai garis dasar
 hari ini, supaya target ketahanan berikutnya ditulis di atas penaksir yang
 bisa dipercaya, dengan ambang yang ditetapkan sebelum diukur.
+
+### Keenam agen dijalankan sekali jalan, dan yang ketiga jatuh
+
+Tiap agen punya ujinya sendiri dan tiap uji lulus. Yang tidak pernah ada
+satu jalan yang menjalankan keenamnya pada keadaan yang sama dengan model
+bahasa yang benar benar menyala. Uji memakai penutur bernaskah, dan penutur
+bernaskah membuktikan penjaganya benar tanpa membuktikan modelnya patuh.
+
+Jalan pertama meloloskan keenamnya, dan itu justru tandanya pemeriksaannya
+terlalu longgar. Agen Sanggah dinyatakan lulus karena ada kode yang terbaca,
+padahal suratnya menyebut dua pemeriksaan yang dilampirkan dan agennya cuma
+menemukan satu.
+
+Diperketat jadi menuntut keduanya, agennya gagal. Sebabnya ketemu di
+keluaran mentah model. Ia memilih trombosit dengan benar, lalu mengutip
+suratnya sebagai "hemoglobin dan tromb-than". Kata karangan itu tidak ada di
+surat, jadi penjaga kutipan membuang kodenya.
+
+Penjaganya benar. Yang hilang bacaan yang benar, bukan karangan.
+
+### Model memilih, katalog membuktikan
+
+Perbaikannya menambah jalan kedua yang tidak lebih longgar. Kalau kutipan
+model tidak berakar di surat, kodenya masih bisa masuk asalkan nama katalog
+pemeriksaan itu memang ada di surat. Yang berganti pembuktinya, dari kutipan
+model ke nama katalog. Yang memilih kodenya tetap model.
+
+Pembagian itu yang membuatnya tetap aman. Surat percobaannya menyebut
+kreatinin justru untuk bilang pemeriksaan itu tidak dikerjakan. Pencocokan
+kata sendirian memetakannya, model menolaknya, dan karena yang memilih tetap
+model, kreatinin tetap tidak masuk meski namanya ada di surat.
+
+Sesudah perbaikan, tolok ukur dua puluh empat surat tetap sempurna pada
+ingatan dan ketepatan, dan kode yang dibuang penjaga kutipan turun jadi nol.
+Alasan yang tercetak menyebut kutipan model tidak terbaca, supaya
+verifikator tahu mana yang dibuktikan kutipan dan mana yang dibuktikan nama.

@@ -82,20 +82,28 @@ def petakan_bukti(surat: str, kode_sudah_ada: set[str] | None = None) -> list[di
     for kode, (nama, *_) in PEMERIKSAAN.items():
         if kode in ada:
             continue
-        alasan = ""
-        for s in SEBUTAN.get(kode, ()):
-            if re.search(rf"\b{re.escape(s)}\b", teks):
-                alasan = f"surat menyebut {s}"
-                break
-        if not alasan:
-            kata = [k for k in _bersih(nama).split() if k and k not in UMUM]
-            if kata and all(re.search(rf"\b{re.escape(k)}\b", teks) for k in kata):
-                alasan = f"surat menyebut {nama.lower()}"
-        if not alasan and re.search(rf"\b{kode.lower()}\b", teks):
-            alasan = f"surat menyebut kode {kode}"
+        alasan = alasan_kata(kode, nama, teks)
         if alasan:
             keluar.append({"kode": kode, "nama": nama, "alasan": alasan})
     return keluar
+
+
+def alasan_kata(kode: str, nama: str, teks: str) -> str:
+    """Alasan berbasis kata untuk satu kode, atau kosong kalau tidak ada.
+
+    Dipisahkan supaya jalur model bisa memakainya juga. Di sana ia bukan
+    pencari melainkan pembanding: yang memilih kodenya tetap model, dan ini
+    yang memastikan suratnya memang menyebutnya.
+    """
+    for sebut in SEBUTAN.get(kode, ()):
+        if re.search(rf"\b{re.escape(sebut)}\b", teks):
+            return f"surat menyebut {sebut}"
+    kata = [k for k in _bersih(nama).split() if k and k not in UMUM]
+    if kata and all(re.search(rf"\b{re.escape(k)}\b", teks) for k in kata):
+        return f"surat menyebut {nama.lower()}"
+    if re.search(rf"\b{kode.lower()}\b", teks):
+        return f"surat menyebut kode {kode}"
+    return ""
 
 
 ARAHAN_SURAT = """Kamu membaca surat balasan dari fasilitas kesehatan kepada
@@ -243,17 +251,25 @@ def petakan_bukti_model(
             continue
         if kode in ada or kode in sudah_disebut:
             continue
+        alasan = f'surat menyebut "{kutipan}"'
         if not berakar(kutipan, kata_surat):
-            dibuang.append({"kode": kode, "sebab": "kutipannya tidak ada di surat"})
-            continue
+            # Kutipan yang rusak bukan berarti bacaannya salah. Model 4B
+            # pernah memilih TROMB dengan benar lalu mengutipnya sebagai
+            # "tromb-than", dan penjaga membuang kodenya. Yang hilang di
+            # situ bacaan yang benar, bukan karangan.
+            #
+            # Maka ada jalan kedua, dan ia tidak lebih longgar. Kodenya
+            # tetap harus dicocokkan ke surat, cuma pencocoknya berganti
+            # dari kutipan model ke nama katalog. Yang memilih kodenya tetap
+            # model, jadi surat yang menyebut sebuah pemeriksaan justru
+            # untuk bilang ia tidak dikerjakan tetap tidak terpetakan.
+            kata = alasan_kata(kode, PEMERIKSAAN[kode][0], " ".join(kata_surat))
+            if not kata:
+                dibuang.append({"kode": kode, "sebab": "kutipannya tidak ada di surat"})
+                continue
+            alasan = kata + ", kutipan model tidak terbaca"
         sudah_disebut.add(kode)
-        keluar.append(
-            {
-                "kode": kode,
-                "nama": PEMERIKSAAN[kode][0],
-                "alasan": f'surat menyebut "{kutipan}"',
-            }
-        )
+        keluar.append({"kode": kode, "nama": PEMERIKSAAN[kode][0], "alasan": alasan})
     return keluar, dibuang
 
 
