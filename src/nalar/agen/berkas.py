@@ -30,7 +30,7 @@ from __future__ import annotations
 import json
 
 from .alat import Perkakas
-from .dalam import kumpulkan_fakta, periksa_cepat, periksa_dalam
+from .dalam import IKATAN, kumpulkan_fakta, periksa_cepat, periksa_dalam
 from .gerbang import Gerbang, skor_keyakinan
 from .isian import isi_lubang, susun_isian
 from .jejak import Jejak
@@ -51,7 +51,9 @@ Aturan yang tidak boleh dilanggar:
 2. Jangan mengarang kode pemeriksaan, kelompok tarif, atau nomor peraturan.
 3. Kalau alat menolak, tulis apa adanya bahwa keterangan itu tidak tersedia.
 
-Isian yang tersedia:
+Isian yang tersedia. Tiap nama medan pada balasan alat boleh dipakai apa
+adanya, jadi kalau balasan alat menulis "selisih_rp": "{selisih_rp}", kamu
+tinggal menyalin {selisih_rp} ke dalam kalimatmu.
 
   {berkas} {faskes} {cbg} {kelas_rawat} {lama_rawat}
   {diajukan} {didukung} {selisih}
@@ -71,8 +73,81 @@ dalam bahasa Indonesia, dengan bagian berikut dan urutan ini:
 - Nilai yang diajukan, nilai yang didukung bukti, dan selisihnya.
 - Bukti yang bila dilampirkan menurunkan selisih, memakai {bukti_menolong}.
 - Modus yang paling dekat dengan bentuk selisih ini, memakai {modus}.
+  Minta paling banyak tiga entri, dan sebut yang paling dekat saja.
 
 Tulis ringkas. Jangan menambah kalimat penutup yang tidak berisi keterangan."""
+
+
+# Isian yang seharusnya berdiri sesudah tiap sebutan. Diambil dari tabel
+# yang sama yang dipakai memeriksanya, jadi keterangan cacat dan pemeriksaan
+# cacat tidak bisa berbeda pendapat.
+_ISIAN_BENAR = {frasa: medan[0] for frasa, medan in IKATAN}
+
+# Medan yang benar benar punya nama isian sendiri. Yang di luar daftar ini
+# muncul di dalam daftar butir, dan menampilkan namanya di sana akan
+# mengundang model menulis {ubah_selisih_rp}, isian yang tidak pernah ada.
+MEDAN_ISIAN = {
+    "tarif_ditagihkan_rp",
+    "tarif_didukung_bukti_rp",
+    "barang_ditagihkan_rp",
+    "barang_wajar_rp",
+    "total_diajukan_rp",
+    "total_didukung_bukti_rp",
+    "selisih_tarif_rp",
+    "selisih_barang_rp",
+    "selisih_rp",
+    "selisih_mentah_rp",
+    "tagihan_barang_rp",
+    "tarif_rp",
+}
+
+
+def sebut_cacat(cacat: list[dict]) -> str:
+    """Ubah daftar cacat jadi kalimat yang bisa ditindaklanjuti model.
+
+    Menyodorkan bentuk mentahnya tidak menolong. Model 4B membaca
+    {"jenis": "ikatan", "nama": "selisih", "disebut": 489690.0} lalu menulis
+    ulang seluruh berkas dari awal, bukan memperbaiki yang satu itu. Yang
+    menolong kalimat yang menyebut apa yang salah dan apa yang seharusnya
+    ditulis sebagai gantinya.
+    """
+    baris = []
+    for c in cacat[:6]:
+        j = c.get("jenis")
+        if j == "a1":
+            baris.append(
+                "Kamu mengetik angka sendiri: "
+                + ", ".join(
+                    f"{x:,.0f}".replace(",", ".") for x in c.get("angka", [])[:4]
+                )
+                + ". Jangan ketik angka. Pakai nama isian di dalam kurung kurawal."
+            )
+        elif j == "ikatan":
+            benar = _ISIAN_BENAR.get(c["nama"])
+            baris.append(
+                f"Sesudah kata '{c['nama']}' kamu menulis angka, dan angka itu "
+                "bukan miliknya." + (f" Ganti dengan {{{benar}}}." if benar else "")
+            )
+        elif j == "arah":
+            baris.append(
+                f"Kode {c['kode']} kamu daftarkan sebagai penurun selisih, "
+                "padahal ia menaikkan. Buang dari daftar itu."
+            )
+        elif j == "bagian":
+            baris.append(f"Bagian '{c['nama']}' belum ada di berkas perkara.")
+        elif j == "kutipan":
+            baris.append(
+                f"Kamu mengutip {c['sebut']} padahal alat tidak pernah "
+                "mengembalikannya. Buang kutipan itu."
+            )
+        elif j == "kode":
+            baris.append(f"Kode {c['kode']} tidak ada pada hasil alat mana pun. Buang.")
+        elif j == "banding":
+            baris.append(
+                f"Perbandingan '{c['kata']}' pada kalimat ini urutannya terbalik: "
+                f"{c['kalimat']}"
+            )
+    return "\n".join(f"- {b}" for b in baris)
 
 
 def _pesan_alat(nama: str, nomor: str, hasil) -> dict:
@@ -87,8 +162,44 @@ def _pesan_alat(nama: str, nomor: str, hasil) -> dict:
         "role": "tool",
         "name": nama,
         "tool_call_id": nomor,
-        "content": json.dumps(hasil, ensure_ascii=False, default=str),
+        "content": json.dumps(_tanpa_rupiah(hasil), ensure_ascii=False, default=str),
     }
+
+
+def _tanpa_rupiah(hasil):
+    """Ganti tiap besaran rupiah dengan nama isiannya sebelum model melihatnya.
+
+    Selama angkanya berdiri di dalam balasan alat, model akan menyalinnya,
+    dan penjaga A1 memang mengizinkannya karena angka itu berasal dari alat.
+    Yang tidak diizinkan siapa pun terjadi sesudahnya: angka yang sah itu
+    dilekatkan pada nama yang salah, dan sebelas dari empat belas berkas
+    susunan agen jatuh persis di situ.
+
+    Maka angkanya tidak ditunjukkan sama sekali. Yang ditunjukkan namanya,
+    di tempat angkanya, jadi menyalin yang terlihat justru menghasilkan
+    kalimat yang benar. Besaran per butir bukti dibiarkan apa adanya, karena
+    dari situ model memilih bukti mana yang pantas disebut.
+    """
+    if isinstance(hasil, list):
+        return [_tanpa_rupiah(x) for x in hasil]
+    if not isinstance(hasil, dict):
+        return hasil
+    keluar = {}
+    for k, v in hasil.items():
+        besaran = k.endswith("_rp") and isinstance(v, (int, float))
+        if besaran and not isinstance(v, bool):
+            # Besaran per butir tidak punya nama isian sendiri, dan memang
+            # tidak perlu punya. Yang dipakai menyebutnya {bukti_menolong},
+            # dan yang ditinggalkan di sini cuma arahnya, karena dari arah
+            # itulah model memilih butir mana yang pantas disebut.
+            keluar[k] = f"{{{k}}}" if k in MEDAN_ISIAN else _arah(v)
+        else:
+            keluar[k] = _tanpa_rupiah(v)
+    return keluar
+
+
+def _arah(v) -> str:
+    return "menurunkan selisih" if v > 0 else "menaikkan selisih"
 
 
 def jalankan(
@@ -98,6 +209,7 @@ def jalankan(
     anggaran: Anggaran | None = None,
     gerbang: Gerbang | None = None,
     dalam: bool = False,
+    n_perbaikan: int = 1,
 ) -> dict:
     """Berkas perkara untuk satu nomor, beserta jejak, biaya, dan keadaannya.
 
@@ -119,11 +231,13 @@ def jalankan(
     hasil_per_alat: dict[str, dict] = {}
     teks = ""
     sebab_mundur = ""
+    n_diperbaiki = 0
+    pesan: list[dict] = []
 
     if not penutur.hidup():
         sebab_mundur = "tidak ada model bahasa yang menyala"
     else:
-        pesan = [
+        pesan[:] = [
             {"role": "system", "content": ARAHAN},
             {
                 "role": "user",
@@ -180,6 +294,50 @@ def jalankan(
     fakta = kumpulkan_fakta(hasil_alat)
     cepat = {"lulus": False, "cacat": [], "a1": {}}
 
+    # Satu kesempatan memperbaiki, dan cuma satu. Model yang tidak bisa
+    # memperbaiki dengan cacatnya disebutkan tidak akan bisa pada kesempatan
+    # ketiga, dan tiap kesempatan tambahan berharga satu giliran penuh.
+    #
+    # Yang diberikan bukan bentuk mentah cacatnya melainkan kalimat yang
+    # menyebut apa yang salah, karena bentuk mentah membuat model menulis
+    # ulang seluruh berkas alih alih memperbaiki satu tempat.
+    if teks and not sebab_mundur and n_perbaikan > 0:
+        for _ in range(n_perbaikan):
+            tersedia = susun_isian(hasil_per_alat)
+            jadi, hilang = isi_lubang(teks, tersedia)
+            if hilang:
+                masalah = (
+                    "Isian yang kamu pakai tidak ada: "
+                    + ", ".join(sorted(set(hilang)))
+                    + ". Yang ada cuma ini, pakai salah satunya: "
+                    + " ".join("{" + n + "}" for n in sorted(tersedia))
+                )
+            else:
+                h = periksa_dalam(jadi, jejak, fakta, hasil_alat)
+                if h["lulus"]:
+                    break
+                masalah = sebut_cacat(h["cacat"])
+            try:
+                pesan.append({"role": "assistant", "content": teks})
+                pesan.append(
+                    {
+                        "role": "user",
+                        "content": (
+                            "Berkas perkaranya belum bisa dikirim. Yang salah:\n"
+                            + masalah
+                            + "\n\nTulis ulang berkas perkaranya dengan itu "
+                            "diperbaiki. Jangan ubah yang lain."
+                        ),
+                    }
+                )
+                b = penutur.balas(pesan, p.perkakas.skema())
+                p.catat_balasan(b)
+                if b.teks:
+                    teks = b.teks
+                    n_diperbaiki += 1
+            except (RantaiDiputus, GalatPenutur):
+                break
+
     if teks and not sebab_mundur:
         # Angkanya dipasang di sini, bukan diketik model. Alasannya panjang
         # dan ada di isian.py: percobaan pertama dengan model sungguhan
@@ -188,9 +346,15 @@ def jalankan(
         if hilang:
             sebab_mundur = f"isian yang tidak ada dipakai agen: {sorted(set(hilang))}"
         else:
+            # Kedua pemeriksaan jalan di sini, bukan cuma yang cepat. Yang
+            # dalam berharga satu milidetik, dan tanpa ia sebelas dari empat
+            # belas berkas lolos membawa angka yang sah pada nama yang salah.
             cepat = periksa_cepat(teks, jejak, fakta)
-            if not cepat["lulus"]:
-                sebab_mundur = "berkas susunan agen jatuh di saringan"
+            saring = periksa_dalam(teks, jejak, fakta, hasil_alat)
+            if not saring["lulus"]:
+                jenis = sorted({c["jenis"] for c in saring["cacat"]})
+                sebab_mundur = f"berkas susunan agen jatuh di saringan: {jenis}"
+                cepat = {**cepat, "cacat": saring["cacat"]}
     elif not sebab_mundur:
         sebab_mundur = "agen berhenti tanpa menulis apa pun"
 
@@ -201,6 +365,7 @@ def jalankan(
             "sumber": "aturan",
             "sebab_mundur": sebab_mundur,
             "cacat": cepat["cacat"],
+            "n_diperbaiki": n_diperbaiki,
             "keadaan": "layak_kirim",
             "skor": 1.0,
             "jejak": dasar["jejak"],
@@ -222,6 +387,7 @@ def jalankan(
         "sumber": "agen",
         "sebab_mundur": "",
         "cacat": [],
+        "n_diperbaiki": n_diperbaiki,
         "keadaan": gerbang.putuskan(skor) if gerbang else "belum_ada_gerbang",
         "skor": round(skor, 4),
         "jejak": jejak,

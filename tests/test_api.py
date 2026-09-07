@@ -50,6 +50,7 @@ from nalar.api import keadaan as _k  # noqa: E402
 _k.KEADAAN.__init__(n_peserta=1200, tahun=2, seed=7, n_fktp=60, n_fkrtl=20)
 
 from nalar.api.main import app  # noqa: E402
+from nalar.katalog import PEMERIKSAAN  # noqa: E402
 
 print("\n1. Peladen menyala dan menyiapkan modelnya")
 with TestClient(app) as c:
@@ -196,6 +197,58 @@ with TestClient(app) as c:
             pk2["teks"] == pk["teks"],
         )
         cek("sumbernya disebut apa adanya", pk["sumber"] in ("aturan", "agen"))
+
+        # Sanggahan. Ini satu satunya jalur yang menerima kiriman faskes,
+        # jadi ia yang paling gampang dipakai memancing keluar apa yang
+        # tidak boleh dilihat faskes.
+        sg = c.post(
+            f"/klaim/{kid}/sanggah",
+            json={
+                "isi": (
+                    "Bersama ini kami lampirkan hasil pemeriksaan hemoglobin "
+                    "dan trombosit atas nama pasien tersebut."
+                )
+            },
+        )
+        cek("sanggahan dijawab peladen", sg.status_code == 200, str(sg.status_code))
+        sj = sg.json()
+        cek("caranya disebut apa adanya", sj["cara"] in ("kata", "model"), sj["cara"])
+        cek(
+            "tiap pemetaan menyertakan alasan yang bisa dibantah",
+            all(b["alasan"] for b in sj["dipetakan"]),
+            str(sj["dipetakan"][:2]),
+        )
+        cek(
+            "kode yang dipetakan seluruhnya ada di katalog",
+            all(b["kode"] in PEMERIKSAAN for b in sj["dipetakan"]),
+            str([b["kode"] for b in sj["dipetakan"]]),
+        )
+        cek(
+            "kata curang tidak muncul di jawaban sanggahan",
+            not any(k in str(sj).lower() for k in ("curang", "fraud", "kecurangan")),
+        )
+        cek(
+            "berkas perkara tidak ikut di jawaban sanggahan",
+            "teks" not in sj and "modus" not in str(sj).lower(),
+            str(sorted(sj)),
+        )
+        cek(
+            "surat yang tidak menyebut pemeriksaan tetap dijawab",
+            c.post(
+                f"/klaim/{kid}/sanggah",
+                json={"isi": "Kami keberatan atas hasil verifikasi ini."},
+            ).json()["dipetakan"]
+            == [],
+        )
+        cek(
+            "surat kosong ditolak, bukan diterima diam diam",
+            c.post(f"/klaim/{kid}/sanggah", json={"isi": ""}).status_code == 422,
+        )
+        cek(
+            "sanggahan klaim yang tidak ada menjawab 404",
+            c.post("/klaim/K99999999/sanggah", json={"isi": "hemoglobin"}).status_code
+            == 404,
+        )
         cek(
             "berkas perkara klaim yang tidak ada menjawab 404",
             c.get("/klaim/KTIDAKADA/perkara").status_code == 404,

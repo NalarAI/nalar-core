@@ -297,3 +297,39 @@ class Ringkas(BaseModel):
         description="Kalimat yang wajib ikut setiap kali angka rupiah "
         "dikutip, karena rupiah bergeser antar benih acak."
     )
+
+
+class Surat(BaseModel):
+    """Lampiran keterangan dari faskes, dalam bentuk kalimat biasa."""
+
+    isi: str = Field(
+        min_length=1,
+        max_length=8000,
+        description="Isi surat atau catatan yang dikirim faskes.",
+    )
+
+
+class BuktiTerbaca(BaseModel):
+    kode: str
+    nama: str
+    alasan: str
+
+
+class Sanggahan(BaseModel):
+    """Yang boleh dilihat faskes atas suratnya sendiri.
+
+    Yang tidak ada di sini berkas perkara dan daftar modus. Faskes berhak
+    tahu pemeriksaan mana yang terbaca dan berapa selisihnya berubah, dan
+    tidak berhak tahu dugaan apa yang sedang diperiksa atas dirinya.
+    """
+
+    id: str
+    cara: str = Field(
+        description="model kalau dibaca model bahasa, kata kalau pencocokan kata."
+    )
+    dipetakan: list[BuktiTerbaca]
+    sudah_ada: list[str]
+    selisih_semula_rp: int | None = None
+    selisih_sesudah_rp: int | None = None
+    turun_rp: int | None = None
+    keterangan: str = ""

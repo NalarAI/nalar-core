@@ -19,16 +19,23 @@ akan melewati batasnya tanpa ada yang tahu pemasangan mana. Yang dipakai di
 sini batas selang kepercayaan, yang berlaku pada pemasangan yang ini.
 Harganya ambang yang lebih ketat, dan harga itu memang pantas dibayar.
 
-Kenapa gerbangnya perlu ditera, bukan cukup disaring. Yang bisa diperiksa
-saat berkasnya jalan hanya yang murah: angkanya berasal dari alat, rantainya
-utuh, bagiannya lengkap, arah daftar buktinya benar. Itu disaring keras,
-tanpa statistik, dan berkas yang jatuh langsung diganti versi aturan.
+Kenapa gerbangnya perlu ditera, bukan cukup disaring.
 
-Yang tidak bisa diperiksa saat itu yang mahal: tiap nama pada kalimat
-dibongkar dan ditanyakan ulang ke fakta alat, tiap kutipan peraturan
-dilacak, tiap perbandingan diuji urutannya. Pemeriksaan itu dijalankan pada
-himpunan kalibrasi, dan keyakinan yang murah dipakai memperkirakan hasilnya
-pada berkas yang belum dilihat. Itu yang membuat gerbang ini berarti.
+Versi pertama menjawab: karena pemeriksaan yang teliti terlalu mahal untuk
+tiap berkas. Jawaban itu salah, dan salahnya ketahuan sesudah diukur.
+Pemeriksaan terteliti yang kami punya berharga satu milidetik per berkas,
+jadi ia sekarang jalan pada semuanya, dan kelas cacat yang dulu diserahkan
+ke gerbang ini disaring habis sebelum sampai ke sini.
+
+Jawaban yang benar lebih sempit dan lebih jujur. Ada cacat yang tidak bisa
+diperiksa mesin berapa pun murahnya: apakah modus yang dipilih masuk akal
+bagi berkas ini, apakah kalimatnya terbaca oleh orang klaim, apakah yang
+ditekankan memang yang penting. Tidak ada regex untuk itu.
+
+Gerbang ini menjaga yang tersisa itu. Keyakinan yang murah dipakai
+memperkirakan berapa besar peluang sebuah berkas membawa cacat yang cuma
+manusia bisa lihat, dan berkas yang peluangnya terlalu besar dikirim ke meja
+manusia alih alih ke faskes.
 
 Jaminannya berlaku selama berkas baru berasal dari sebaran yang sama dengan
 himpunan kalibrasi. Ketika tarif berubah, teranya harus diulang, dan itu

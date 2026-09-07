@@ -2129,3 +2129,196 @@ nol itu jawaban yang benar.
 Panelnya tetap tampil ketika nol, dan justru itu isinya yang paling berguna:
 seratus empat faskes diuji, tujuh lolos tanpa koreksi, nol tersisa sesudahnya.
 Tanpa kalimat itu, tabel di bawahnya terbaca seperti tujuh temuan.
+
+## Lapisan agen yang berkasnya benar benar disusun model, 7 September 2026
+
+Tahap satu sampai empat memasang lima agen. Satu pertanyaan tidak pernah
+dijawabnya: apakah model berbobot terbuka yang muat di dalam pusat data
+sanggup menyusun berkas perkaranya sendiri, atau ia cuma terlihat berhasil
+karena versi aturannya selalu siap menggantikan.
+
+Jawaban pertamanya tidak enak dibaca. Dari empat puluh berkas, model
+menyusun empat belas, dan sebelas di antaranya melekatkan angka yang sah
+pada nama yang salah. Sisanya mundur tanpa ada yang tahu kenapa.
+
+Sekarang seratus dua puluh berkas disusun agen seluruhnya, dan tidak satu
+pun membawa cacat. Yang berubah bukan modelnya. Yang berubah empat cacat
+kami sendiri, dan tiga di antaranya ada pada pemeriksanya.
+
+### Menyebut sesuatu mahal tanpa pernah menimbangnya
+
+Pemeriksaan berkas dibagi dua sejak awal. Yang cepat jalan tiap berkas. Yang
+teliti disebut terlalu mahal untuk itu, jadi ia disimpan untuk himpunan
+kalibrasi saja, dan seluruh gerbang layak kirim dibangun di atas kalimat
+itu.
+
+Kalimat itu tidak pernah ditimbang. Sesudah ditimbang, yang teliti berharga
+satu milidetik per berkas, sedangkan menyusun berkasnya sendiri memakan dua
+ratus enam puluh empat milidetik dan satu giliran model bahasa sekitar
+delapan ribu.
+
+Empat persepuluh persen. Itu harga pemeriksaan yang selama ini kami sebut
+mahal. Sekarang keduanya jalan pada tiap berkas, dan kelas cacat yang dulu
+lolos ke keluaran disaring sebelum keluar.
+
+Gerbangnya tetap ada dengan alasan yang sudah diganti. Ada cacat yang tidak
+bisa diperiksa mesin berapa pun murahnya, dan gerbang itu yang menjaganya.
+Apakah modus yang dipilih masuk akal bagi berkas ini. Apakah kalimatnya
+terbaca oleh orang klaim. Tidak ada pola pencarian untuk keduanya.
+
+### Model menyalin apa yang dilihatnya
+
+Dua belas berkas memakai nama isian yang tidak ada. Nama yang dipakainya
+selalu nama medan pada balasan alat, seperti total_diajukan_rp, padahal
+arahan menuliskan nama pendek seperti diajukan.
+
+Dilihat dari sisi model, itu masuk akal. Nama pendek cuma ada di arahan,
+jauh di awal percakapan, sedangkan nama medan berdiri di dalam balasan alat
+beberapa baris sebelum ia menulis, dengan angkanya menempel di sebelahnya.
+
+Melarangnya tidak akan menolong. Yang menolong membuat yang disalinnya
+benar. Tiap medan tunggal yang dikembalikan alat sekarang jadi nama isian
+juga, jadi menyalin yang terlihat menghasilkan kalimat yang sah.
+
+### Angka yang tidak ada di depan mata tidak bisa disalahtempatkan
+
+Penjaga A1 mengizinkan angka yang berasal dari alat, dan izin itu benar.
+Yang tidak diizinkan siapa pun terjadi sesudahnya. Angka sah itu dilekatkan
+pada nama yang salah, dan di situlah sebelas berkas tadi jatuh.
+
+Maka rupiah dihapus dari balasan alat sebelum model melihatnya, dan di
+tempat angkanya sekarang berdiri nama isiannya. Menyalin yang terlihat
+justru menghasilkan kalimat yang benar. Mengarang angka sekarang menuntut
+mengarang sesuatu yang tidak ada satu pun contohnya di layar.
+
+Besaran per butir bukti diganti arahnya saja, naik atau turun. Model tetap
+bisa memilih butir mana yang pantas disebut, tanpa satu digit pun yang bisa
+disalahtempatkan.
+
+### Pemeriksa yang menuduh berkas yang benar
+
+Dua tuduhan palsu ditemukan pada berkas susunan model, bukan pada uji.
+
+Yang pertama titik dua. Pencarian besaran menyeberanginya, jadi kalimat
+"bukti yang menurunkan selisih: HB Rp 489.690" dibaca seolah selisihnya Rp
+489.690. Yang kedua kode. Angka di dalam M02 terbaca sebagai besaran
+bernilai dua.
+
+Membuang seluruh titik dua sempat jadi perbaikannya, dan itu salah juga,
+karena "Diajukan: Rp 20.107.500" memakai titik dua dan bentuk itu justru
+yang paling lazim di berkas klaim. Yang membedakan keduanya bukan tanda
+bacanya. Yang membedakan apa yang berdiri sesudahnya.
+
+Sekarang yang boleh berdiri di antara sebutan dan angkanya didaftar satu
+satu. Kata sambung dan satuan boleh, dan apa pun yang lain menghentikan
+pembacaan, sehingga sebuah kode atau kata benda baru memutus ikatannya.
+
+Empat berkas yang dituduh cacat ternyata benar seluruhnya.
+
+### Angka yang keluar sesudah keempatnya diperbaiki
+
+Model nalar-qwen3-4b, jendela dua belas ribu token, suhu nol, jalan di satu
+mesin biasa tanpa kartu grafis pusat data.
+
+Seluruh berkas disusun agen. Nol angka tak bersumber, nol cacat pemeriksaan
+dalam, Rp 49,77 per berkas. Ongkos periksa manual satu berkas Rp 750 ribu.
+
+Lingkaran perbaikan yang dipasang di tengah jalan tidak pernah terpakai, dan
+itu hasil yang benar. Ia cuma menyala ketika naskah pertama jatuh, dan
+naskah pertama tidak jatuh lagi.
+
+### Gerbang yang menolak menjanjikan apa pun
+
+Pada empat puluh berkas, gerbang layak kirim menahan seluruhnya. Tidak satu
+pun boleh dikirim, padahal tidak satu pun bercacat.
+
+Itu jawaban yang benar atas pertanyaan yang salah. Separuh berkas dipakai
+menera, dan dua puluh berkas bersih tidak cukup untuk menjanjikan laju cacat
+lima persen dengan keyakinan sembilan puluh lima persen. Seandainya laju
+sebenarnya memang lima persen, peluang melihat nol cacat dari dua puluh
+berkas masih tiga puluh enam persen. Terlalu besar untuk disebut bukti.
+
+Batas bawahnya bisa dihitung, dan hasilnya lima puluh sembilan berkas bersih
+berturut turut. Enam puluh masuk kalibrasi sekarang, jadi janjinya berdiri.
+Ambangnya turun ke nol, dan seluruh berkas penilaian layak kirim tanpa satu
+cacat pun di antaranya.
+
+Yang perlu diingat dari sini bukan angkanya. Gerbang ini menolak berjanji
+ketika buktinya kurang, dan penolakan itu terlihat persis seperti sistem
+yang macet.
+
+### Agen Sanggah, dan janji yang ditagih
+
+Berkas sanggah.py sejak tahap dua menuliskan satu janji. Pencocokan kata
+jadi garis dasarnya, model bahasa dipasang di atasnya, dan kalau model tidak
+menang ia dicabut. Janji itu tidak pernah ditagih sampai sekarang.
+
+Dua puluh empat surat ditulis lebih dulu, sebelum kedua cara dijalankan.
+Bentuknya meniru surat balasan rumah sakit. Ada yang menyebut nama katalog
+persis, ada yang memakai sebutan sehari hari, dan ada yang menyebut sebuah
+pemeriksaan justru untuk bilang ia tidak dikerjakan.
+
+Pencocokan kata benar pada dua puluh surat.
+
+Empat yang salah punya dua sebab. Nama katalog yang berekor, seperti
+urinalisis leukosit esterase, menuntut seluruh ekornya ada di surat, jadi
+surat yang menulis urinalisis saja terlewat. Dan surat yang bilang
+pemeriksaan trombosit tidak dilakukan tetap dipetakan jadi trombosit.
+
+Model bahasa benar pada seluruhnya. Ingatan dan ketepatannya penuh, melawan
+0,946 pada keduanya di pencocokan kata. Harganya kurang dari dua detik per
+surat.
+
+### Penjaga yang membuang jawaban yang benar
+
+Angka di atas bukan angka percobaan pertama, dan bedanya perlu ditulis.
+
+Percobaan pertama memberi model ketepatan penuh tapi ingatan 0,865, lebih
+rendah daripada pencocokan kata. Lima pemetaan dibuang penjaga kutipan.
+Sesudah dilihat satu satu, kelimanya benar.
+
+Sebabnya selalu sama. Surat menulis "kami lampirkan hasil prokalsitonin dan
+laktat", model mengutip "kami lampirkan hasil laktat", dan penjaga menuntut
+kutipan yang utuh huruf demi huruf. Penyingkatan yang wajar dihukum sebagai
+karangan.
+
+Penjaganya sekarang menuntut tiap kata pada kutipan ada di surat, bukan
+kutipannya utuh. Model yang memetakan kreatinin pada surat yang tidak pernah
+menyebutnya tetap harus mengarang kata itu, dan kata karangan tetap tidak
+akan ketemu.
+
+Ada yang tidak dibuktikan penjaga ini, dan batasnya perlu ditulis terang
+terangan. Ikatan antara kodenya dan suratnya tidak diperiksa, sehingga
+kutipan yang seluruhnya kata umum bisa menemani kode apa pun. Yang
+menahannya dua hal lain. Alasannya ikut tercetak supaya bisa dibantah, dan
+yang menghitung ulang selisihnya penebak tarif, bukan agen.
+
+Penjaganya diperbaiki sesudah hasil pertama terlihat. Suratnya tidak.
+Seluruhnya ditulis sekali dan tidak disunting sesudahnya, dan melonggarkan
+penjaga tidak bisa menolong model menemukan kode yang tidak disebutnya
+sendiri.
+
+Dua puluh empat surat tulisan tangan bukan bukti yang besar. Yang bisa
+dikatakan dari situ satu kalimat saja. Pada bentuk surat yang kami tulis,
+model membaca lebih baik daripada pencocokan kata, dan bedanya ada pada
+penyangkalan dan nama berekor.
+
+### Sanggahan sampai ke portal
+
+Agen Sanggah sebelumnya hidup di dalam kode dan uji saja. Tidak ada satu
+layar pun yang memanggilnya, jadi rumah sakit yang mengirim salinan hasil
+laboratorium tetap kalah karena bentuk kirimannya salah, persis keadaan yang
+agen ini dibuat untuk mengakhirinya.
+
+Sekarang portal faskes punya tombol di bawah kotak keterangan. Kalimat biasa
+yang ditulis rumah sakit dibaca, pemeriksaan yang disebutnya dicentang
+sendiri, dan alasan tiap pemetaan ikut tampil supaya bisa dibantah.
+
+Tanpa peladen menyala, pembacaannya jatuh ke pencocokan nama di peramban.
+Nama yang dicocokkan cuma yang memang sudah dikirim peladen untuk berkas
+itu, jadi katalognya tidak disalin ke peramban dan tidak bisa menyimpang
+darinya.
+
+Yang dilihat faskes tetap dijaga sempit: pemeriksaan yang terbaca beserta
+alasannya, lalu selisih barunya. Berkas perkara dan daftar modus tidak ikut,
+dan ada uji yang menjatuhkan peladen kalau salah satunya bocor ke sana.

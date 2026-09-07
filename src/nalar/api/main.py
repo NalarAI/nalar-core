@@ -16,7 +16,8 @@ import numpy as np
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from ..agen import awasi_pola, susun
+from ..agen import awasi_pola, baca_sanggahan, susun
+from ..agen.penutur import Penutur, penutur_baku
 from ..pembulatan import bulat_berkas
 from ..profil import peringkat_faskes, perubahan_faskes, profil_faskes
 from .keadaan import KEADAAN, PERINGATAN_RUPIAH
@@ -24,6 +25,7 @@ from .skema import (
     Antrean,
     BarisAntrean,
     BarisProfil,
+    BuktiTerbaca,
     Jejak,
     Keadilan,
     KelompokKeadilan,
@@ -35,8 +37,26 @@ from .skema import (
     PerkaraPola,
     ProfilGanda,
     Ringkas,
+    Sanggahan,
+    Surat,
     TitikPerubahan,
 )
+
+_PENUTUR: Penutur | None = None
+
+
+def _penutur() -> Penutur:
+    """Penutur dipasang saat pertama dibutuhkan, bukan saat peladen menyala.
+
+    Menyiapkannya di awal berarti tiap penyalaan peladen menunggu tiga
+    detik percobaan sambungan ke model yang pada pemasangan awan memang
+    tidak ada. Model yang mati juga bukan galat: pencocokan kata berdiri
+    sendiri tanpa satu bobot pun terpasang.
+    """
+    global _PENUTUR
+    if _PENUTUR is None:
+        _PENUTUR = penutur_baku()
+    return _PENUTUR
 
 
 @asynccontextmanager
@@ -332,6 +352,42 @@ def perkara(kid: str) -> Perkara:
             sidik_akhir=r["sidik_akhir"],
             a1_lulus=bool(p["a1"]["lulus"]),
         ),
+    )
+
+
+@app.post(
+    "/klaim/{kid}/sanggah",
+    response_model=Sanggahan,
+    summary="Membaca lampiran keterangan dari faskes",
+)
+def sanggah(kid: str, surat: Surat) -> Sanggahan:
+    """Ubah surat balasan faskes jadi kode pemeriksaan, lalu hitung ulang.
+
+    Yang menghitung ulang penebak tarif, bukan agen. Agen berhenti sesudah
+    memetakan, dan batas itu yang membuat selisih barunya masih bisa
+    dipercaya: agen yang boleh menjanjikan penurunan adalah agen yang bisa
+    dibujuk menjanjikan penurunan.
+
+    Tanpa model bahasa menyala, yang bekerja pencocokan kata. Faskes tetap
+    dilayani, dan medan cara memberi tahu mana yang dipakai.
+    """
+    _pastikan_siap()
+    try:
+        KEADAAN.indeks_dari_id(kid)
+    except KeyError:
+        raise HTTPException(404, f"klaim {kid} tidak ada") from None
+
+    h = baca_sanggahan(KEADAAN, kid, surat.isi, penutur=_penutur())
+    hasil = h["hasil"] or {}
+    return Sanggahan(
+        id=kid,
+        cara=h["cara"],
+        dipetakan=[BuktiTerbaca(**b) for b in h["dipetakan"]],
+        sudah_ada=h["sudah_ada"],
+        selisih_semula_rp=hasil.get("selisih_semula_rp"),
+        selisih_sesudah_rp=hasil.get("selisih_sesudah_rp"),
+        turun_rp=hasil.get("turun_rp"),
+        keterangan=h["keterangan"],
     )
 
 

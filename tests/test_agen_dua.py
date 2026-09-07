@@ -70,6 +70,8 @@ from nalar.agen import (  # noqa: E402
 )
 from nalar.agen.dalam import ikatan_salah, kumpulkan_fakta  # noqa: E402
 from nalar.agen.jejak import Jejak  # noqa: E402
+from nalar.agen.penutur import GalatPenutur  # noqa: E402
+from nalar.agen.sanggah import petakan_bukti_model  # noqa: E402
 from nalar.api.keadaan import Keadaan  # noqa: E402
 from nalar.katalog import PEMERIKSAAN  # noqa: E402
 
@@ -135,25 +137,30 @@ class PenuturPatuh(Penutur):
 
     def tulis(self, h) -> str:
         b, g, a = h["ambil_berkas"], h["hitung_pengandaian"], h["cari_aturan"]
-        diajukan, didukung = g["total_diajukan_rp"], g["total_didukung_bukti_rp"]
+        # Nama isian, bukan angka. Balasan alat memang tidak lagi membawa
+        # rupiah, jadi penutur ini menulis persis seperti model sungguhan.
+        diajukan, didukung = "{total_diajukan_rp}", "{total_didukung_bukti_rp}"
         if self.rusak == "tukar":
             diajukan, didukung = didukung, diajukan
         if self.rusak == "karang":
-            diajukan = diajukan + 777
-        menolong = [x for x in g["bukti"] if x["ubah_selisih_rp"] > 0]
+            diajukan = "Rp 987.654.321"
+        # Balasan alat cuma membawa arahnya, bukan besarannya, jadi penutur
+        # ini memilih butir dengan cara yang sama seperti model sungguhan.
+        menolong = [
+            x for x in g["bukti"] if x["ubah_selisih_rp"] == "menurunkan selisih"
+        ]
         if self.rusak == "arah":
             menolong = g["bukti"]
         baris = [
             f"Berkas {b['id']} pada {b['faskes']}, kelompok tarif "
             f"{b['kelompok_tarif']}, lama rawat {b['lama_rawat']} hari.",
             "",
-            f"Diajukan {rupiah(diajukan)}, didukung bukti {rupiah(didukung)}, "
-            f"selisih {rupiah(g['selisih_rp'])}.",
+            f"Diajukan {diajukan}, didukung bukti {didukung}, selisih {{selisih_rp}}.",
             "",
             "Bukti yang bila dilampirkan menurunkan selisih:",
         ]
         for x in menolong:
-            baris.append(f"  {x['kode']}, turun {rupiah(abs(x['ubah_selisih_rp']))}")
+            baris.append(f"  {x['kode']}, {x['ubah_selisih_rp']}")
         if not menolong:
             baris.append("  tidak ada butir tunggal yang menurunkan selisih.")
         baris.append("")
@@ -315,15 +322,20 @@ print("\n5. Angka benar pada nama yang salah")
 pt = PenuturPatuh()
 pt.rusak = "tukar"
 tukar = susun_agen(K, ID[0], penutur=pt, dalam=True)
+# Dua nilai yang tertukar lolos penjaga A1 seluruhnya, karena keduanya
+# memang keluar dari alat. Dulu ia lolos ke keluaran dan baru tertangkap
+# pemeriksaan dalam yang cuma jalan saat kalibrasi. Sekarang yang dalam ikut
+# jalan tiap berkas, jadi ia tertangkap sebelum keluar.
 cek(
-    "nilai diajukan dan didukung bukti yang tertukar lolos penjaga A1",
-    tukar["sumber"] == "agen",
+    "nilai yang tertukar tidak lagi lolos ke keluaran",
+    tukar["sumber"] == "aturan",
     tukar["sebab_mundur"],
 )
 cek(
-    "tapi tertangkap pemeriksaan dalam",
-    any(c["jenis"] == "ikatan" for c in tukar["dalam"]["cacat"]),
-    str(tukar["dalam"]["cacat"][:2]),
+    "yang menangkapnya pemeriksaan ikatan, bukan penjaga angka",
+    any(c["jenis"] == "ikatan" for c in tukar["cacat"])
+    and not any(c["jenis"] == "a1" for c in tukar["cacat"]),
+    str(tukar["cacat"][:2]),
 )
 
 dasar = susun(K, ID[1])
@@ -346,6 +358,34 @@ cek(
 cek(
     "nama yang diikuti angkanya sendiri tidak dituduh",
     ikatan_salah("Selisih Rp 1.000.000 pada berkas ini.", f) == [],
+)
+
+
+# Pemeriksa yang menuduh berkas benar lebih berbahaya daripada pemeriksa
+# yang meloloskan berkas cacat, karena yang salah menuduh berhenti dibaca.
+# Keempat kalimat di bawah diambil dari berkas susunan model sungguhan, dan
+# dua di antaranya sempat dituduh cacat padahal benar.
+FAKTA_UJI = {
+    "nilai": {"total_diajukan_rp": {20107500.0}, "selisih_rp": {6371692.0}},
+    "daftar": {},
+}
+
+cek(
+    "titik dua di depan besarannya tetap terbaca",
+    ikatan_salah("Diajukan: Rp 20.107.500.", FAKTA_UJI) == [],
+)
+cek(
+    "titik dua yang membuka daftar tidak dibaca sebagai besaran",
+    ikatan_salah("Bukti yang menurunkan selisih: HB Rp 489.690.", FAKTA_UJI) == [],
+)
+cek(
+    "angka di dalam kode bukan besaran",
+    ikatan_salah("Modus terdekat dengan selisih ini: M02.", FAKTA_UJI) == [],
+)
+cek(
+    "besaran yang memang salah tetap tertangkap",
+    [c["jenis"] for c in ikatan_salah("Diajukan: Rp 999.000.", FAKTA_UJI)]
+    == ["ikatan"],
 )
 
 
@@ -515,6 +555,88 @@ cek(
     "surat yang tidak dikenali tetap dijawab apa adanya",
     kosong["hasil"] is None and "tidak" in kosong["keterangan"].lower(),
     kosong["keterangan"][:60],
+)
+
+
+# Jalur model bahasanya diuji dengan penutur bernaskah, jadi yang diuji
+# penjaganya bukan modelnya. Penjaga di sini satu kalimat: kode boleh masuk
+# kalau potongan kalimat yang disebut model benar benar ada di surat.
+
+
+def _catat(butir):
+    return Balasan(
+        panggilan=[
+            {"nama": "catat_pemeriksaan", "argumen": {"pemeriksaan": butir}, "id": "s1"}
+        ],
+        token_masuk=700,
+        token_keluar=40,
+    )
+
+
+surat_lab = (
+    "Bersama ini kami lampirkan hasil pemeriksaan hemoglobin pasien "
+    "dengan nilai 8,2 g/dL."
+)
+
+peta, buang = petakan_bukti_model(
+    surat_lab,
+    PenuturTiruan(
+        [_catat([{"kode": "HB", "kutipan": "hasil pemeriksaan hemoglobin"}])]
+    ),
+)
+cek(
+    "kutipan yang ada di surat diterima",
+    [b["kode"] for b in peta] == ["HB"] and not buang,
+    str(peta),
+)
+cek("alasannya memuat kutipannya", "hemoglobin" in peta[0]["alasan"])
+
+peta, buang = petakan_bukti_model(
+    surat_lab,
+    PenuturTiruan([_catat([{"kode": "KREA", "kutipan": "hasil kreatinin terlampir"}])]),
+)
+cek(
+    "kutipan yang tidak ada di surat membuang kodenya",
+    peta == [] and buang and buang[0]["kode"] == "KREA",
+    str(buang),
+)
+
+peta, buang = petakan_bukti_model(
+    surat_lab,
+    PenuturTiruan([_catat([{"kode": "XYZ", "kutipan": "hemoglobin"}])]),
+)
+cek(
+    "kode di luar katalog dibuang",
+    peta == [] and buang and buang[0]["sebab"] == "kode di luar katalog",
+    str(buang),
+)
+
+peta, _ = petakan_bukti_model(
+    surat_lab,
+    PenuturTiruan([_catat([{"kode": "HB", "kutipan": "hemoglobin"}])]),
+    {"HB"},
+)
+cek("kode yang sudah ada pada berkas tidak dipetakan ulang model", peta == [])
+
+
+class PenuturBisu(Penutur):
+    """Model yang menyala tapi tidak pernah menjawab."""
+
+    nama = "bisu"
+
+    def hidup(self) -> bool:
+        return True
+
+    def balas(self, pesan, alat) -> Balasan:
+        raise GalatPenutur("peladen model tidak menjawab")
+
+
+s_bisu = baca_sanggahan(K, ID[0], surat, penutur=PenuturBisu())
+cek(
+    "model yang tidak menjawab jatuh ke pencocokan kata",
+    s_bisu["cara"] == "kata"
+    and s_bisu["dipetakan"] == petakan_bukti(surat, set(s_bisu["sudah_ada"])),
+    str(s_bisu["cara"]),
 )
 
 

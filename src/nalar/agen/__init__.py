@@ -28,7 +28,7 @@ from .periksa import angka_tak_bersumber, periksa_a1
 from .perkara import susun
 from .pola import jalankan as awasi_pola
 from .sanggah import jalankan as baca_sanggahan
-from .sanggah import petakan_bukti
+from .sanggah import petakan_bukti, petakan_bukti_model
 from .terbitan import jalankan as tanggapi_terbitan
 
 __all__ = [
@@ -54,6 +54,7 @@ __all__ = [
     "periksa_cepat",
     "periksa_dalam",
     "petakan_bukti",
+    "petakan_bukti_model",
     "skor_keyakinan",
     "susun",
     "susun_agen",

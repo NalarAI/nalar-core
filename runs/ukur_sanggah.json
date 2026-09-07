@@ -1,0 +1,22 @@
+{
+  "model": "nalar-qwen3-4b",
+  "kata": {
+    "ingatan": 0.9459,
+    "ketepatan": 0.9459,
+    "surat_utuh": 20,
+    "n_surat": 24,
+    "ditemukan": 37,
+    "seharusnya": 37
+  },
+  "model_bahasa": {
+    "ingatan": 1.0,
+    "ketepatan": 1.0,
+    "surat_utuh": 24,
+    "n_surat": 24,
+    "ditemukan": 37,
+    "seharusnya": 37
+  },
+  "dibuang_penjaga": 0,
+  "detik": 42.9,
+  "detik_per_surat": 1.79
+}

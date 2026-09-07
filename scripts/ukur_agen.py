@@ -53,7 +53,9 @@ from nalar.agen import Gerbang, PenuturSetempat, susun_agen, tera  # noqa: E402
 from nalar.api.keadaan import Keadaan  # noqa: E402
 
 
-def ukur(n: int, model: str, alamat: str | None, delta: float) -> dict:
+def ukur(
+    n: int, model: str, alamat: str | None, delta: float, perbaikan: int = 1
+) -> dict:
     penutur = PenuturSetempat(alamat=alamat, model=model)
     if not penutur.hidup():
         print(f"Peladen model tidak menyala di {penutur.alamat}.")
@@ -71,7 +73,7 @@ def ukur(n: int, model: str, alamat: str | None, delta: float) -> dict:
     t0 = time.time()
     for k, id_berkas in enumerate(urut, 1):
         mulai = time.time()
-        h = susun_agen(K, id_berkas, penutur=penutur, dalam=True)
+        h = susun_agen(K, id_berkas, penutur=penutur, dalam=True, n_perbaikan=perbaikan)
         detik = time.time() - mulai
         d = h.get("dalam") or {"lulus": True, "cacat": []}
         baris.append(
@@ -91,6 +93,7 @@ def ukur(n: int, model: str, alamat: str | None, delta: float) -> dict:
                 "token_masuk": h["penyelia"]["token_masuk"],
                 "token_keluar": h["penyelia"]["token_keluar"],
                 "panggilan_alat": h["penyelia"]["panggilan_alat"],
+                "n_diperbaiki": h.get("n_diperbaiki", 0),
                 "detik": round(detik, 2),
                 "n_kata": len(h["teks"].split()),
             }
@@ -125,6 +128,8 @@ def laporkan(hasil: dict) -> None:
     print(f"\nA1  angka tak bersumber pada berkas susunan agen : {n_a1}")
     print(f"    berkas yang disusun agen                     : {len(agen)}/{n}")
     print(f"    berkas yang mundur ke versi aturan           : {len(mundur)}/{n}")
+    diperbaiki = sum(1 for b in baris if b.get("n_diperbaiki"))
+    print(f"    berkas yang sempat diperbaiki sekali          : {diperbaiki}/{n}")
 
     sebab: dict[str, int] = {}
     for b in mundur:
@@ -186,10 +191,11 @@ def main() -> None:
     p.add_argument("--model", default=os.environ.get("NALAR_MODEL", "nalar-qwen3-4b"))
     p.add_argument("--alamat", default=os.environ.get("NALAR_MODEL_URL"))
     p.add_argument("--delta", type=float, default=0.05)
+    p.add_argument("--perbaikan", type=int, default=1)
     p.add_argument("--keluar", default="runs/ukur_agen.json")
     a = p.parse_args()
 
-    hasil = ukur(a.n, a.model, a.alamat, a.delta)
+    hasil = ukur(a.n, a.model, a.alamat, a.delta, a.perbaikan)
     laporkan(hasil)
 
     os.makedirs(os.path.dirname(a.keluar) or ".", exist_ok=True)

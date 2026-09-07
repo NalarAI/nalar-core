@@ -12,17 +12,29 @@ sebagai pengurang, padahal pada satu berkas nyata empat dari lima butir
 justru menaikkan. Angkanya sah, arahnya terbalik, dan tidak ada penjaga
 angka yang bisa menangkapnya.
 
-Maka ada dua lapis pemeriksaan, dan pembagiannya sengaja.
+Keduanya dijalankan pada tiap berkas, sebelum apa pun dikirim.
 
-Yang cepat dijalankan tiap berkas, sebelum apa pun dikirim: A1, keutuhan
-rantai, kelengkapan bagian, dan arah daftar bukti. Kalau ada yang jatuh,
-yang keluar berkas perkara versi aturan.
+Versi pertama tidak begitu. Yang dalam disebut terlalu mahal untuk tiap
+berkas dan disimpan untuk himpunan kalibrasi saja, dan gerbang layak kirim
+dibangun di atas alasan itu. Alasannya tidak pernah diukur.
 
-Yang dalam terlalu mahal untuk tiap berkas, dan dijalankan pada himpunan
-kalibrasi. Ia membongkar tiap pernyataan jadi pasangan nama dan nilai, lalu
-menanyakannya ulang ke fakta yang dikembalikan alat. Hasilnya yang dipakai
-menera gerbang layak kirim, dan itu sebabnya gerbangnya berarti: ia menjaga
-sesuatu yang tidak bisa diperiksa saat berkasnya jalan.
+Sesudah diukur: pemeriksaan cepat 0,44 milidetik per berkas, pemeriksaan
+dalam 1,05 milidetik. Menyusun satu berkas perkara memakan 264 milidetik,
+dan satu giliran model bahasa sekitar delapan ribu. Jadi yang dalam berharga
+empat persepuluh persen dari menyusunnya, dan seperdelapan ribu dari satu
+giliran model.
+
+Menyebut sesuatu mahal tanpa menimbangnya adalah cara paling nyaman
+membiarkan cacat lewat, dan cacat yang lewat karenanya bukan cacat kecil:
+sebelas dari empat belas berkas susunan agen melekatkan angka yang sah pada
+nama yang salah. Sekarang keduanya jalan bersama, dan berkas yang jatuh di
+salah satunya diganti versi aturan.
+
+Gerbang layak kirim tetap ada, dan alasannya berubah jadi yang sebenarnya.
+Bukan karena pemeriksaannya mahal, melainkan karena ada cacat yang tidak
+bisa diperiksa mesin sama sekali: apakah modus yang dipilih masuk akal,
+apakah kalimatnya terbaca oleh orang klaim. Itu yang ditera, dan itu yang
+menahan berkas ragu ke meja manusia.
 """
 
 from __future__ import annotations
@@ -76,7 +88,32 @@ _TURUN = ("lebih kecil", "lebih rendah", "di bawah", "kurang dari")
 # menuduh berkas perkara yang sebenarnya benar. Pemeriksa yang menuduh lebih
 # berbahaya daripada pemeriksa yang meloloskan, karena yang salah menuduh
 # berhenti dibaca sama sekali.
-SESUDAH = re.compile(r"[^\d\n.]{0,40}?(?:Rp\s*)?(\d[\d.]*(?:,\d+)?)")
+#
+# Dua tuduhan palsu memang terjadi, dan keduanya ditemukan pada berkas
+# susunan model sungguhan, bukan pada uji. Titik dua membuat pencarian
+# menyeberang ke daftar di belakangnya, sehingga kalimat "menurunkan
+# selisih: HB Rp 489.690" dibaca seolah selisihnya Rp 489.690. Dan angka di
+# dalam kode, seperti M02, terbaca sebagai besaran bernilai dua.
+#
+# Membuang titik dua saja tidak cukup, dan sempat salah begitu. "Diajukan:
+# Rp 20.107.500" juga memakai titik dua, dan menolak seluruh titik dua
+# berarti berhenti memeriksa bentuk penulisan yang paling lazim di berkas
+# klaim. Yang membedakan keduanya bukan tanda bacanya melainkan apa yang
+# berdiri sesudahnya.
+#
+# Maka yang boleh berdiri di antara sebutan dan angkanya didaftar satu satu.
+# Kata sambung dan satuan boleh, apa pun yang lain menghentikan pembacaan.
+# Angka yang menempel pada huruf atau tanda hubung juga tidak dianggap
+# besaran, karena M02 bukan angka dua.
+# Yang boleh berdiri di antara sebutan dan besarannya, dan cuma ini.
+# Daftar putih, bukan jarak sekian huruf: yang tidak terdaftar
+# menghentikan pembacaan, sehingga sebuah kode atau kata benda baru
+# memutus ikatannya.
+_PENGISI = (
+    r"(?:\s+|:|,|nya|sebesar|senilai|sejumlah|sebanyak|nilai|total"
+    r"|adalah|yaitu|ialah|Rp\.?)"
+)
+SESUDAH = re.compile(rf"(?:{_PENGISI}){{0,10}}(?<![A-Za-z0-9-])(\d[\d.]*(?:,\d+)?)")
 
 
 def _besaran(teks: str, mulai: int) -> float | None:
@@ -276,10 +313,10 @@ def periksa_cepat(teks: str, jejak: Jejak, fakta: dict) -> dict:
 
 
 def periksa_dalam(teks: str, jejak: Jejak, fakta: dict, hasil: list[dict]) -> dict:
-    """Pemeriksaan lengkap, terlalu mahal untuk tiap berkas.
+    """Pemeriksaan lengkap. Dijalankan pada tiap berkas, bukan pada sampel.
 
-    Dipakai pada himpunan kalibrasi. Cacat yang ditemukannya yang jadi
-    kerugian yang ditera gerbang layak kirim.
+    Diukur 1,05 milidetik per berkas, melawan 264 milidetik untuk menyusunnya
+    dan sekitar delapan ribu untuk satu giliran model bahasa.
     """
     cepat = periksa_cepat(teks, jejak, fakta)
     cacat = list(cepat["cacat"])

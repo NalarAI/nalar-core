@@ -55,10 +55,21 @@ def _bukti_menolong(g: dict) -> str:
 
 
 def _modus(a: dict) -> str:
-    return "; ".join(
-        f"{e['kode']} {e['judul']}, jangkauan NALAR {e['jangkauan']}"
-        for e in a.get("entri", [])
-    )
+    """Daftar modus, dan sejauh mana NALAR menjangkau tiap modus.
+
+    Entri dasar hukum tidak punya jangkauan, dan dulu nilai kosongnya ikut
+    tercetak apa adanya sehingga sebuah surat ke rumah sakit memuat kalimat
+    "jangkauan NALAR None". Yang tidak punya jangkauan sekarang disebut apa
+    adanya, sebagai dasar hukum.
+    """
+    bagian = []
+    for e in a.get("entri", []):
+        j = e.get("jangkauan")
+        bagian.append(
+            f"{e['kode']} {e['judul']}, "
+            + (f"jangkauan NALAR {j}" if j else "dasar hukum")
+        )
+    return "; ".join(bagian)
 
 
 def susun_isian(hasil: dict[str, dict]) -> dict[str, str]:
@@ -111,7 +122,36 @@ def susun_isian(hasil: dict[str, dict]) -> dict[str, str]:
     if a:
         isi["modus"] = _modus(a)
 
+    _medan_alat(isi, hasil)
     return isi
+
+
+# Urutan ini menentukan siapa yang menang ketika dua alat mengembalikan nama
+# yang sama. Yang menghitung menang atas yang mengambil, karena empat besaran
+# di dalamnya sudah dibulatkan bersama sehingga selisihnya bisa dikurangkan.
+URUT_ALAT = ("hitung_pengandaian", "cari_tarif", "ambil_berkas", "skor_ulang")
+
+
+def _medan_alat(isi: dict[str, str], hasil: dict[str, dict]) -> None:
+    """Tiap medan tunggal yang dikembalikan alat jadi nama isian juga.
+
+    Ini bukan kenyamanan, ini perbaikan atas cacat yang terukur. Nama pendek
+    seperti {diajukan} cuma ada di arahan, sedangkan nama panjang seperti
+    total_diajukan_rp berdiri di dalam balasan alat, tepat di depan mata
+    model, dengan angkanya menempel. Model 4B menyalin yang dilihatnya, dan
+    yang dilihatnya nama medan. Maka dari empat puluh berkas, dua belas
+    memakai nama isian yang tidak ada dan semuanya nama medan alat.
+
+    Melarangnya tidak menolong. Yang menolong membuat yang disalinnya benar.
+    """
+    for nama_alat in URUT_ALAT:
+        h = hasil.get(nama_alat)
+        if not h:
+            continue
+        for k, v in h.items():
+            if k in isi or isinstance(v, (bool, list, dict)):
+                continue
+            isi[k] = rupiah(v) if k.endswith("_rp") else str(v)
 
 
 def isi_lubang(teks: str, isi: dict[str, str]) -> tuple[str, list[str]]:

@@ -165,7 +165,13 @@ class Perkakas:
         }
 
     def _cari_aturan(self, pertanyaan: str, atas: int = 3) -> dict:
-        hasil = pustaka_aturan.cari(pertanyaan, atas=atas)
+        # Dijepit tiga, dan penjepitnya di sini bukan cuma di skema. Model
+        # yang meminta sepuluh mendapat berkas perkara yang mendaftar
+        # sepuluh modus sekaligus, termasuk yang jangkauannya belum ada, dan
+        # surat seperti itu tidak lagi menunjuk satu dugaan melainkan
+        # menuduh borongan. Rumah sakit yang menerimanya tidak punya satu
+        # hal pun yang bisa dijawab.
+        hasil = pustaka_aturan.cari(pertanyaan, atas=max(1, min(int(atas), 3)))
         if not hasil:
             raise GalatAlat("tidak ada aturan yang cocok dengan pertanyaan itu")
         return {"pertanyaan": pertanyaan, "entri": hasil}
@@ -262,7 +268,12 @@ class Perkakas:
                 ),
                 parameter={
                     "pertanyaan": {"type": "string"},
-                    "atas": {"type": "integer", "minimum": 1, "maximum": 10},
+                    "atas": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 3,
+                        "description": "Cacah entri, paling banyak tiga.",
+                    },
                 },
                 wajib=("pertanyaan",),
                 jalankan=self._cari_aturan,
