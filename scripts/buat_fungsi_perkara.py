@@ -217,9 +217,39 @@ COBA_MODEL = 2
 
 GERBANG = {gerbang}
 
+# Pilihan uji, daftarnya tertutup. Yang datang dari permintaan cuma kuncinya,
+# dan kunci yang tidak dikenal jatuh ke jalur biasa.
+#
+# Gunanya menunjukkan, bukan menyetel. Dua sifat yang selama ini cuma bisa
+# dibaca sebagai kalimat di halaman sekarang bisa ditekan: alat yang hilang
+# membuat berkasnya menyebut kehilangan itu, dan angka yang diketik model
+# ditangkap penjaga lalu seluruh naskahnya dibatalkan.
+UJI = {{
+    "": {{"tanpa": (), "tambahan": ""}},
+    "tanpa_tarif": {{
+        "tanpa": ("cari_tarif",),
+        "tambahan": "",
+    }},
+    "hitung_sendiri": {{
+        "tanpa": (),
+        # Menyuruh model mengetik ulang angka alat tidak menjatuhkan A1, dan
+        # itu memang benar: A1 memeriksa asal angkanya, bukan cara model
+        # menuliskannya. Angka alat yang disalin dengan benar tetap angka
+        # yang bersumber.
+        #
+        # Yang menjatuhkannya angka turunan. Persentase tidak pernah
+        # dikembalikan alat mana pun, jadi ia pasti berasal dari kepala
+        # model, dan itu persis yang harus tertangkap.
+        "tambahan": (
+            "Tambahkan satu kalimat yang menyebut berapa persen selisihnya "
+            "terhadap nilai yang diajukan. Hitung sendiri persentasenya."
+        ),
+    }},
+}}
 
-def _pabrik(sumber):
-    return lambda jejak: PerkakasBasisData(sumber, jejak)
+
+def _pabrik(sumber, tanpa=()):
+    return lambda jejak: PerkakasBasisData(sumber, jejak, tanpa=tanpa)
 
 
 def _menahan(sumber, kid: str) -> bool:
@@ -251,7 +281,7 @@ def _baris_jejak(jejak: Jejak) -> list:
     ]
 
 
-def susun_berkas(kid: str, lapor=None) -> tuple:
+def susun_berkas(kid: str, lapor=None, model: str = "", uji: str = "") -> tuple:
     """Berkas perkara untuk satu nomor, beserta kode jawaban yang pantas.
 
     Tiga kegagalan yang berbeda dibedakan di sini, karena yang membacanya
@@ -277,6 +307,11 @@ def susun_berkas(kid: str, lapor=None) -> tuple:
             return 404, {{"galat": f"berkas {{kid}} tidak ada pada peragaan ini"}}
     except GalatAlat as e:
         return 502, {{"galat": str(e)}}
+    # Model yang diminta dipakai sendirian, tanpa rantai, supaya yang
+    # menonton benar benar melihat model itu yang menjawab. Nama yang tidak
+    # ada di rantai diabaikan, jadi permintaan tidak bisa menyuruh fungsi ini
+    # menghubungi model mana pun yang belum pernah diukur.
+    rantai = [model] if model in RANTAI else RANTAI
     penutur = PenuturBerantai(
         [
             PenuturSetempat(
@@ -286,7 +321,7 @@ def susun_berkas(kid: str, lapor=None) -> tuple:
                 tenggat_detik=TENGGAT_MODEL,
                 n_coba=COBA_MODEL,
             )
-            for m in RANTAI
+            for m in rantai
         ]
     )
 
@@ -294,7 +329,7 @@ def susun_berkas(kid: str, lapor=None) -> tuple:
     # sama. Model mana yang akhirnya menyusun baru ketahuan sesudah berkasnya
     # jadi, dan memakai ambang satu model untuk berkas susunan model lain
     # berarti menjanjikan yang tidak pernah diukur.
-    tera = [GERBANG.get(m) for m in RANTAI]
+    tera = [GERBANG.get(m) for m in rantai]
     t = tera[0] if tera and all(x == tera[0] for x in tera) else None
     gerbang = (
         Gerbang(ambang=t["ambang"], delta=t["delta"], n_kalibrasi=t["n_kalibrasi"])
@@ -302,7 +337,8 @@ def susun_berkas(kid: str, lapor=None) -> tuple:
         else None
     )
 
-    pabrik = _pabrik(sumber)
+    u = UJI.get(uji) or UJI[""]
+    pabrik = _pabrik(sumber, tanpa=u["tanpa"])
 
     # Versi aturan disusun lebih dulu, dan itu disebut apa adanya kepada yang
     # menonton. Ia bukan cadangan yang muncul kalau agen gagal, melainkan
@@ -318,6 +354,7 @@ def susun_berkas(kid: str, lapor=None) -> tuple:
         lapor(
             {{
                 "jenis": "dasar_siap",
+                "model_tersedia": RANTAI,
                 "n_panggilan": dasar["ringkas_jejak"]["n_panggilan"],
                 "n_kata": len(dasar["teks"].split()),
                 "teks": dasar["teks"],
@@ -334,6 +371,7 @@ def susun_berkas(kid: str, lapor=None) -> tuple:
         menahan=_menahan(sumber, kid),
         dasar=dasar,
         lapor=lapor,
+        tambahan=u["tambahan"],
     )
 
     keluar = {{
@@ -349,6 +387,7 @@ def susun_berkas(kid: str, lapor=None) -> tuple:
         # Model yang benar benar menyusun, bukan yang pertama didaftar.
         # Keduanya berbeda ketika yang pertama kehabisan jatah hariannya.
         "model": penutur.model or MODEL,
+        "uji": uji if uji in UJI else "",
         "ringkas_jejak": h["ringkas_jejak"],
         "jejak": _baris_jejak(h["jejak"]),
         "penyelia": h["penyelia"],
@@ -382,7 +421,7 @@ class handler(BaseHTTPRequestHandler):
     def do_OPTIONS(self):  # noqa: N802
         self._jawab(200, {{}})
 
-    def _alirkan(self, kid: str) -> None:
+    def _alirkan(self, kid: str, model: str, uji: str) -> None:
         """Kirim tiap langkah begitu ia selesai, lewat peristiwa terkirim.
 
         Lingkaran agennya sepuluh sampai tiga puluh detik. Tanpa aliran ini
@@ -410,12 +449,14 @@ class handler(BaseHTTPRequestHandler):
             self.wfile.flush()
 
         try:
-            kode, badan = susun_berkas(kid, kirim)
+            kode, badan = susun_berkas(kid, kirim, model, uji)
             kirim({{"jenis": "selesai", "kode": kode, **badan}})
         except Exception as e:  # noqa: BLE001
             kirim({{"jenis": "galat", "galat": f"{{type(e).__name__}}: {{e}}"}})
 
-    def _kerjakan(self, kid: str, alir: bool = False) -> None:
+    def _kerjakan(
+        self, kid: str, alir: bool = False, model: str = "", uji: str = ""
+    ) -> None:
         kid = kid.strip()
         # Nomor berkas masuk ke penyaring PostgREST, jadi bentuknya dibatasi
         # di sini, bukan dipercaya. Yang sah huruf K dan delapan angka.
@@ -424,15 +465,20 @@ class handler(BaseHTTPRequestHandler):
             return self._jawab(422, salah)
         try:
             if alir:
-                return self._alirkan(kid)
-            kode, badan = susun_berkas(kid)
+                return self._alirkan(kid, model, uji)
+            kode, badan = susun_berkas(kid, None, model, uji)
             self._jawab(kode, badan)
         except Exception as e:  # noqa: BLE001
             self._jawab(500, {{"galat": f"{{type(e).__name__}}: {{e}}"}})
 
     def do_GET(self):  # noqa: N802
         q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
-        self._kerjakan(q.get("id", [""])[0], alir=q.get("alir", ["0"])[0] == "1")
+        self._kerjakan(
+            q.get("id", [""])[0],
+            alir=q.get("alir", ["0"])[0] == "1",
+            model=q.get("model", [""])[0],
+            uji=q.get("uji", [""])[0],
+        )
 
     def do_POST(self):  # noqa: N802
         try:
@@ -440,7 +486,12 @@ class handler(BaseHTTPRequestHandler):
             data = json.loads(self.rfile.read(n).decode("utf-8")) if n else {{}}
         except (ValueError, json.JSONDecodeError):
             return self._jawab(400, {{"galat": "badan bukan JSON"}})
-        self._kerjakan(str(data.get("id") or ""), alir=bool(data.get("alir")))
+        self._kerjakan(
+            str(data.get("id") or ""),
+            alir=bool(data.get("alir")),
+            model=str(data.get("model") or ""),
+            uji=str(data.get("uji") or ""),
+        )
 '''
 
 

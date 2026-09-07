@@ -83,14 +83,18 @@ class PerkakasBasisData(Perkakas):
     # ditawarkan tapi tidak bisa dilayani menyesatkan, bukan sekadar sia sia.
     TAK_DITAWARKAN = ("skor_ulang",)
 
-    def __init__(self, sumber: SumberBasisData, jejak):
+    def __init__(self, sumber: SumberBasisData, jejak, tanpa=()):
         self.sumber = sumber
+        # Alat yang dicabut pemanggil, di luar yang memang tidak bisa
+        # dilayani jalur ini. Dipakai menunjukkan apa yang terjadi ketika
+        # satu sumber hilang: berkasnya menyebut kehilangan itu, bukan
+        # menambalnya dengan tebakan.
+        self.tanpa = tuple(tanpa)
         super().__init__(None, jejak)
 
     def skema(self) -> list[dict]:
-        return [
-            a.skema() for n, a in self.daftar.items() if n not in self.TAK_DITAWARKAN
-        ]
+        buang = set(self.TAK_DITAWARKAN) | set(self.tanpa)
+        return [a.skema() for n, a in self.daftar.items() if n not in buang]
 
     # -- alat yang dialihkan ------------------------------------------------
 

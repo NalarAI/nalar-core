@@ -230,6 +230,7 @@ def jalankan(
     dasar: dict | None = None,
     menahan: bool | None = None,
     lapor=None,  # (dict) -> None, dipanggil tiap langkah selesai
+    tambahan: str = "",
 ) -> dict:
     """Berkas perkara untuk satu nomor, beserta jejak, biaya, dan keadaannya.
 
@@ -283,6 +284,7 @@ def jalankan(
             "rp": p.anggaran.rp,
         },
         alat_tersedia=[a["name"] for a in p.perkakas.skema()],
+        tambahan=tambahan,
     )
 
     hasil_alat: list[dict] = []
@@ -296,7 +298,10 @@ def jalankan(
         sebab_mundur = "tidak ada model bahasa yang menyala"
     else:
         pesan[:] = [
-            {"role": "system", "content": ARAHAN},
+            {
+                "role": "system",
+                "content": ARAHAN + ("\n\n" + tambahan if tambahan else ""),
+            },
             {
                 "role": "user",
                 "content": f"Susun berkas perkara untuk nomor berkas {id_berkas}.",
