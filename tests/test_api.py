@@ -225,6 +225,24 @@ with TestClient(app) as c:
             },
         )
         cek("sanggahan dijawab peladen", sg.status_code == 200, str(sg.status_code))
+
+        # Peramban menanyakan izin lebih dulu sebelum mengirim POST dari
+        # asal yang berbeda. Izin itu sempat dijawab 400, dan tombol baca
+        # di portal mati tanpa satu pesan salah pun, sementara seluruh uji
+        # di berkas ini tetap hijau.
+        pre = c.options(
+            f"/klaim/{kid}/sanggah",
+            headers={
+                "Origin": "http://localhost:5173",
+                "Access-Control-Request-Method": "POST",
+                "Access-Control-Request-Headers": "content-type",
+            },
+        )
+        cek(
+            "peramban diizinkan mengirim sanggahan dari asal lain",
+            pre.status_code == 200,
+            str(pre.status_code),
+        )
         sj = sg.json()
         cek("caranya disebut apa adanya", sj["cara"] in ("kata", "model"), sj["cara"])
         cek(

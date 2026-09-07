@@ -277,15 +277,21 @@ def jalankan(
     # yang gagal menjawab tidak menghentikan sanggahan, karena garis
     # dasarnya tetap berdiri sendiri tanpa satu bobot pun terpasang.
     cara, dibuang = "kata", []
-    peta = []
+    semua = []
     if penutur is not None and penutur.hidup():
         try:
-            peta, dibuang = petakan_bukti_model(surat, penutur, sudah)
+            semua, dibuang = petakan_bukti_model(surat, penutur)
             cara = "model"
         except GalatPenutur:
             cara = "kata"
     if cara == "kata":
-        peta = petakan_bukti(surat, sudah)
+        semua = petakan_bukti(surat)
+
+    # Pemeriksaan yang sudah ada di berkas dipisah, bukan dibuang. Faskes yang
+    # menulis "hemoglobin terlampir" dan tidak melihat hemoglobin disebut sama
+    # sekali akan mengira suratnya tidak terbaca, lalu menulisnya lagi.
+    peta = [b for b in semua if b["kode"] not in sudah]
+    sudah_terbaca = [b for b in semua if b["kode"] in sudah]
     kode = [b["kode"] for b in peta]
 
     if not kode:
@@ -294,6 +300,7 @@ def jalankan(
             "dipetakan": [],
             "cara": cara,
             "dibuang": dibuang,
+            "sudah_terbaca": sudah_terbaca,
             "sudah_ada": sorted(sudah),
             "hasil": None,
             "keterangan": (
@@ -315,6 +322,7 @@ def jalankan(
         "dipetakan": peta,
         "cara": cara,
         "dibuang": dibuang,
+        "sudah_terbaca": sudah_terbaca,
         "sudah_ada": sorted(sudah),
         "hasil": hasil,
         "keterangan": tolak,

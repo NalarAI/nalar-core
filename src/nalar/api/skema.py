@@ -328,6 +328,10 @@ class Sanggahan(BaseModel):
         description="model kalau dibaca model bahasa, kata kalau pencocokan kata."
     )
     dipetakan: list[BuktiTerbaca]
+    sudah_terbaca: list[BuktiTerbaca] = Field(
+        default_factory=list,
+        description="Terbaca pada surat, tapi memang sudah tercatat di berkas.",
+    )
     sudah_ada: list[str]
     selisih_semula_rp: int | None = None
     selisih_sesudah_rp: int | None = None

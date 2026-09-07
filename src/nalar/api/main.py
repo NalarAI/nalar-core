@@ -89,10 +89,14 @@ app = FastAPI(
 
 # Website peraga dilayani dari asal yang berbeda. Untuk peragaan ini dibuka
 # lebar, dan itu harus diperketat sebelum menyentuh data sungguhan.
+#
+# POST ikut dibuka sejak ada jalur sanggahan, dan OPTIONS bersamanya.
+# Tanpa OPTIONS peramban menanyakan izin lebih dulu, jawabannya 400,
+# dan tombol bacanya mati tanpa satu pesan salah pun di layar.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_methods=["GET"],
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -391,6 +395,7 @@ def sanggah(kid: str, surat: Surat) -> Sanggahan:
         id=kid,
         cara=h["cara"],
         dipetakan=[BuktiTerbaca(**b) for b in h["dipetakan"]],
+        sudah_terbaca=[BuktiTerbaca(**b) for b in h["sudah_terbaca"]],
         sudah_ada=h["sudah_ada"],
         selisih_semula_rp=hasil.get("selisih_semula_rp"),
         selisih_sesudah_rp=hasil.get("selisih_sesudah_rp"),

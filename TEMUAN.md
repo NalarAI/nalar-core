@@ -2322,3 +2322,37 @@ darinya.
 Yang dilihat faskes tetap dijaga sempit: pemeriksaan yang terbaca beserta
 alasannya, lalu selisih barunya. Berkas perkara dan daftar modus tidak ikut,
 dan ada uji yang menjatuhkan peladen kalau salah satunya bocor ke sana.
+
+### Uji yang hijau seluruhnya, dan tombol yang mati
+
+Jalur sanggahan diuji sembilan kali lewat peladen dan lulus sembilan kali.
+Di portal, tombolnya tetap mati.
+
+Sebabnya izin lintas asal. Peramban menanyakan izin lebih dulu sebelum
+mengirim kiriman ke asal yang berbeda, dan peladen menolaknya karena yang
+diizinkan cuma pengambilan. Uji memanggil peladen dari dalam, jadi ia tidak
+pernah menanyakan izin, jadi ia tidak pernah melihat penolakannya.
+
+Yang menemukannya bukan uji. Yang menemukannya membuka halaman itu sebagai
+penggunanya. Sekarang ada uji yang menanyakan izin persis seperti peramban,
+dan uji itu yang akan menjatuhkan peladen kalau izinnya dicabut lagi.
+
+### Kalimat yang berbohong tentang apa yang terjadi
+
+Surat percobaannya menyebut tiga pemeriksaan. Hemoglobin dan trombosit
+dilampirkan, kreatinin disebut justru untuk bilang ia tidak dikerjakan.
+
+Tiap lapisan memperlakukannya dengan benar. Model menolak kreatinin.
+Hemoglobin memang sudah tercatat pada berkas itu, jadi peladen
+mengeluarkannya dari daftar yang perlu dicentang. Trombosit terbaca, tapi
+melampirkannya justru menaikkan selisih berkas itu, jadi portal memang tidak
+punya kotak centang untuknya.
+
+Layarnya merangkum ketiganya jadi satu kalimat. Tidak ada pemeriksaan yang
+dikenali dari keterangan ini. Itu bukan ringkasan, itu kebalikan dari yang
+terjadi, dan rumah sakit yang membacanya akan menulis suratnya lagi.
+
+Sekarang ketiganya disebut terpisah. Yang dicentang, yang memang sudah
+tercatat, dan yang terbaca tapi tidak menurunkan selisih berkas ini. Peladen
+juga berhenti membuang pemeriksaan yang sudah ada di berkas, dan mulai
+menyebutnya.
