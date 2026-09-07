@@ -39,6 +39,11 @@ jobs:
       - name: sidik dunia
         run: python tests/test_dunia.py
 
+      # Fungsi tanpa peladen di nalar-web dihasilkan dari sumber di sini.
+      # Ujinya dilewati kalau nalar-web tidak ada di sebelah repositori.
+      - name: fungsi tanpa peladen
+        run: python tests/test_fungsi.py
+
       - name: uji inti
         run: python tests/test_inti.py
 

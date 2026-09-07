@@ -205,6 +205,25 @@ def berakar(kutipan: str, kata_surat: set[str]) -> bool:
     return any(k not in UMUM for k in kata)
 
 
+def mirip_nama(kutipan: str, kata_surat: set[str], kode: str) -> bool:
+    """Kata tak dikenal pada kutipan mirip nama pemeriksaan itu sendiri.
+
+    Ini yang membedakan nama yang rusak dari kalimat yang dikarang. Model
+    yang mengetik "tromb-than" untuk trombosit meninggalkan potongan yang
+    mengawali namanya. Model yang mengarang "hasil kreatinin terlampir"
+    meninggalkan kata "terlampir", dan kata itu tidak mengawali nama apa pun
+    pada kodenya.
+    """
+    sebut = [PEMERIKSAAN[kode][0].lower(), kode.lower(), *SEBUTAN.get(kode, ())]
+    awalan = {_bersih(x).replace(" ", "")[:4] for x in sebut if len(_bersih(x)) >= 4}
+    for k in _bersih(kutipan).split():
+        if k in kata_surat or len(k) < 4:
+            continue
+        if any(k.startswith(a) or a.startswith(k[:4]) for a in awalan if a):
+            return True
+    return False
+
+
 def petakan_bukti_model(
     surat: str,
     penutur: Penutur,
@@ -258,13 +277,18 @@ def petakan_bukti_model(
             # "tromb-than", dan penjaga membuang kodenya. Yang hilang di
             # situ bacaan yang benar, bukan karangan.
             #
-            # Maka ada jalan kedua, dan ia tidak lebih longgar. Kodenya
-            # tetap harus dicocokkan ke surat, cuma pencocoknya berganti
-            # dari kutipan model ke nama katalog. Yang memilih kodenya tetap
-            # model, jadi surat yang menyebut sebuah pemeriksaan justru
-            # untuk bilang ia tidak dikerjakan tetap tidak terpetakan.
+            # Maka ada jalan kedua, dan jalan itu sempit. Yang diselamatkan
+            # cuma kutipan yang kata tak dikenalnya memang mirip nama
+            # pemeriksaan itu sendiri, dan nama itu harus ada di surat.
+            #
+            # Versi pertama jalan kedua ini lebih longgar: cukup nama
+            # katalognya muncul di surat, kutipannya boleh karangan penuh.
+            # Uji fungsi tanpa peladen yang menangkapnya, dengan kutipan
+            # "hasil kreatinin terlampir" pada surat yang justru menyatakan
+            # kreatinin tidak dikerjakan. Yang menyelamatkannya waktu itu
+            # kata "kreatinin" di dalam penyangkalannya sendiri.
             kata = alasan_kata(kode, PEMERIKSAAN[kode][0], " ".join(kata_surat))
-            if not kata:
+            if not (kata and mirip_nama(kutipan, kata_surat, kode)):
                 dibuang.append({"kode": kode, "sebab": "kutipannya tidak ada di surat"})
                 continue
             alasan = kata + ", kutipan model tidak terbaca"
