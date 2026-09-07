@@ -70,7 +70,22 @@ def utama() -> int:
     )
     K.bangun(alpha=0.02)
     urut = [K.id_klaim(int(i)) for i in K.urutan[: a.n]]
+    if a.lewati:
+        # Menyusun ulang berkas yang sudah punya versi agen memakan
+        # belasan menit tanpa mengubah apa pun, karena modelnya bersuhu
+        # nol dan hasilnya akan sama persis.
+        url_, kunci_ = baca_env()
+        jawab = Db(url_, kunci_)._panggil(
+            "GET", "perkara?sumber=eq.agen&select=klaim_id"
+        )
+        sudah = {r["klaim_id"] for r in json.loads(jawab.decode())}
+        semula = len(urut)
+        urut = [k for k in urut if k not in sudah]
+        print(f"{semula - len(urut)} berkas sudah punya versi agen, dilewati.")
     print(f"{len(urut)} berkas, urut dari selisih terbesar.\n")
+    if not urut:
+        print("Tidak ada yang perlu disusun.")
+        return 0
 
     baris, n_agen = [], 0
     t0 = time.time()
