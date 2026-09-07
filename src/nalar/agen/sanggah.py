@@ -200,8 +200,12 @@ def berakar(kutipan: str, kata_surat: set[str]) -> bool:
     penebak tarif, bukan agen.
     """
     kata = [k for k in _bersih(kutipan).split() if k]
-    if len(kata) < 2 or not all(k in kata_surat for k in kata):
+    if not kata or not all(k in kata_surat for k in kata):
         return False
+    # Satu kata cukup asal kata itu berarti. Syarat dua kata yang
+    # dipakai semula sewenang wenang, dan ia membuang kutipan "HbA1c"
+    # yang justru bukti terkuat yang bisa ada. Yang menjaga di sini
+    # syarat berikutnya, bukan panjangnya.
     return any(k not in UMUM for k in kata)
 
 

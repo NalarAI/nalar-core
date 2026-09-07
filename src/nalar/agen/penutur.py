@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import json
 import os
+import time
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
@@ -166,13 +167,32 @@ class PenuturSetempat(Penutur):
             },
             method="POST",
         )
-        try:
-            with urllib.request.urlopen(permintaan, timeout=self.tenggat) as r:
-                jawab = json.loads(r.read().decode("utf-8"))
-        except (urllib.error.URLError, OSError, TimeoutError) as e:
-            raise GalatPenutur(f"peladen model tidak menjawab: {e}") from None
-        except json.JSONDecodeError:
-            raise GalatPenutur("jawaban peladen bukan JSON") from None
+        # Penyedia awan membatasi laju, dan batasnya kena bahkan pada
+        # pemakaian sepi karena yang dihitung token per menit bukan
+        # permintaan per menit. Tanpa percobaan ulang, pengunjung kedua
+        # yang menekan tombol pada menit yang sama mendapat kegagalan.
+        #
+        # Yang ditunggu diambil dari kepala Retry-After kalau ada, karena
+        # menebak sendiri berarti menunggu terlalu lama atau terlalu
+        # sebentar, dan yang terlalu sebentar kena lagi.
+        for percobaan in range(3):
+            try:
+                with urllib.request.urlopen(permintaan, timeout=self.tenggat) as r:
+                    jawab = json.loads(r.read().decode("utf-8"))
+                break
+            except urllib.error.HTTPError as e:
+                if e.code != 429 or percobaan == 2:
+                    raise GalatPenutur(f"peladen model tidak menjawab: {e}") from None
+                tunggu = e.headers.get("Retry-After")
+                try:
+                    jeda = min(float(tunggu), 20.0) if tunggu else 0.0
+                except ValueError:
+                    jeda = 0.0
+                time.sleep(jeda or 2.0 * (percobaan + 1))
+            except (urllib.error.URLError, OSError, TimeoutError) as e:
+                raise GalatPenutur(f"peladen model tidak menjawab: {e}") from None
+            except json.JSONDecodeError:
+                raise GalatPenutur("jawaban peladen bukan JSON") from None
 
         try:
             pesan_balik = jawab["choices"][0]["message"]

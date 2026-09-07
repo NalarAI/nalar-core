@@ -69,11 +69,15 @@ import urllib.request
 from http.server import BaseHTTPRequestHandler
 
 # Bawaannya Groq, karena ia gratis tanpa kartu dan seluruh modelnya
-# mendukung pemanggilan alat. Modelnya sekeluarga dengan model setempat yang
-# dipakai mengukur, jadi perilakunya paling dekat dengan angka yang sudah ada.
-# Penyedia lain cukup diganti lewat peubah lingkungan, tanpa menyentuh kode.
+# mendukung pemanggilan alat. Penyedia lain cukup diganti lewat peubah
+# lingkungan, tanpa menyentuh kode.
+#
+# Modelnya dipilih dengan mengukur, bukan dengan menebak. Qwen di sana
+# berpikir dulu sebelum menjawab, dan itu tiga kali lebih lambat sekaligus
+# lebih sering kehilangan pemeriksaan kedua pada satu surat. gpt-oss-120b
+# menjawab di bawah satu detik dan benar pada dua puluh empat surat.
 ALAMAT = os.environ.get("NALAR_MODEL_URL", "https://api.groq.com/openai/v1")
-MODEL = os.environ.get("NALAR_MODEL", "qwen/qwen3.6-27b")
+MODEL = os.environ.get("NALAR_MODEL", "openai/gpt-oss-120b")
 KUNCI = os.environ.get("NALAR_MODEL_KEY", "")
 TENGGAT = float(os.environ.get("NALAR_MODEL_TENGGAT", "25"))
 '''

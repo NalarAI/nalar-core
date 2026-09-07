@@ -1,5 +1,5 @@
 {
-  "model": "nalar-qwen3-4b",
+  "model": "openai/gpt-oss-120b",
   "kata": {
     "ingatan": 0.9459,
     "ketepatan": 0.9459,
@@ -17,6 +17,6 @@
     "seharusnya": 37
   },
   "dibuang_penjaga": 0,
-  "detik": 40.0,
-  "detik_per_surat": 1.67
+  "detik": 54.0,
+  "detik_per_surat": 2.25
 }
