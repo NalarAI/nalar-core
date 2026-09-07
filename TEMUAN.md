@@ -2092,16 +2092,21 @@ batas lulus 0,03. **A2 tercapai.**
 
 | Kode | Target | Hasil |
 |---|---|---|
-| A1 | Nol angka tak bersumber dari 500 berkas | **sifatnya bertahan**, nol dari 120 berkas sekali jalan dan 194 berkas bersambung, lima ratus belum penuh di mesin ini |
+| A1 | Nol angka tak bersumber dari 500 berkas | **tercapai**, nol dari 500 berkas, seluruhnya disusun agen |
 | A2 | Laju salah tuduh tidak naik | **tercapai**, 0,0137 |
 | A3 | Berkas perkara diterima verifikator tanpa koreksi | **tidak terukur**, butuh pembaca manusia |
 | A4 | Tiga siasat penghindaran baru yang bisa diulang | **tercapai**, lima |
 | A5 | T6 naik dari 25,6 ke 40 persen | **gagal**, dan ukurannya goyah: 0,18 sampai 0,55 pada enam benih |
 | A6 | Berkas yang berubah putusan dilaporkan dalam satu hari kerja | **tercapai**, 0,24 detik |
-| A7 | Biaya token di bawah Rp 500 per berkas | **tercapai**, Rp 51 |
+| A7 | Biaya token di bawah Rp 500 per berkas | **tercapai**, Rp 49,77 pada 500 berkas |
 
-Lima tercapai, satu gagal, satu tidak terukur. A3 menuntut verifikator
-sungguhan membaca berkas perkara sungguhan, dan itu tidak ada di lomba ini.
+Lima tercapai, satu gagal, satu tidak terukur. Papan skor ini pernah
+berbunyi begitu dengan A1 di kolom tercapai atas empat puluh berkas, dan
+sekarang A1 berdiri atas lima ratus seperti yang targetnya minta, jadi
+angkanya tetap lima tapi pijakannya berbeda.
+
+A3 menuntut verifikator sungguhan membaca berkas perkara sungguhan, dan itu
+tidak ada di lomba ini.
 Menggantinya dengan ukuran buatan lalu menyebutnya tercapai akan jadi
 kebohongan yang paling mudah tidak ketahuan, jadi ia ditulis tidak terukur.
 
@@ -2497,15 +2502,21 @@ Pengukurannya lalu dibuat menyambung. Hasil tiap berkas ditulis begitu
 selesai, dan jalan berikutnya melewati yang sudah ada. Hasilnya sama dengan
 sekali jalan, karena tiap berkas berdiri sendiri dan modelnya bersuhu nol.
 
-Yang terkumpul dengan cara itu seratus sembilan puluh empat berkas.
-Seluruhnya disusun agen, tidak satu pun mundur ke versi aturan, nol
-pelanggaran A1, nol cacat pemeriksaan dalam, Rp 49,67 per berkas.
+Sesudah beberapa jendela ditutup, lima ratusnya selesai. Empat jalan
+bersambung, satu jalan terakhir menyelesaikan tiga ratus dua sisanya.
 
-Angka lima ratus yang targetnya sebut belum pernah dijalankan penuh di mesin
-ini. Menuliskannya sebagai tercapai hanya karena dua ratus berkas pertama
-bersih akan jadi kebohongan yang paling mudah tidak ketahuan, jadi ia
-ditulis sebagai belum penuh. Yang dibutuhkan untuk menyelesaikannya cuma
-mesin dengan memori bebas empat gigabita, bukan perubahan kode.
+Lima ratus dari lima ratus berkas disusun agen. Nol yang mundur ke versi
+aturan, nol angka tak bersumber, nol cacat pemeriksaan dalam. Rp 49,77 per
+berkas, 317 token keluaran, 13,1 detik per berkas.
+
+Gerbang layak kirim ditera pada dua ratus lima puluh berkas dan meloloskan
+seluruh dua ratus lima puluh berkas penilaian, tidak satu pun bercacat.
+Dengan cacah kalibrasi sebesar itu janjinya berdiri jauh di atas batas
+lima puluh sembilan yang dituntut Clopper-Pearson.
+
+**A1 tercapai pada ukurannya sendiri.** Yang menahannya selama beberapa jam
+memori mesin, bukan kode, dan itu tercatat di sini supaya jelas bahwa yang
+diperbaiki cara menjalankannya, bukan cara mengukurnya.
 
 ### Alasannya benar, penaksirnya yang tidak
 
