@@ -53,8 +53,39 @@ from nalar.agen import Gerbang, PenuturSetempat, susun_agen, tera  # noqa: E402
 from nalar.api.keadaan import Keadaan  # noqa: E402
 
 
+def baca_singgahan(jalur: str) -> dict:
+    """Baris yang sudah pernah diukur, dibaca dari berkas sambung.
+
+    Mesin pengembangan ini tidak sanggup menyelesaikan lima ratus berkas
+    sekali jalan. Model bahasanya memakan dua setengah gigabita dan keadaan
+    datanya harus hidup bersamaan, jadi penjaga memori menghentikan
+    prosesnya di tengah jalan. Dijalankan berulang, tiap kali menyambung,
+    hasilnya sama saja dengan sekali jalan karena tiap berkas berdiri
+    sendiri dan modelnya bersuhu nol.
+    """
+    if not jalur or not os.path.exists(jalur):
+        return {}
+    punya = {}
+    with open(jalur, encoding="utf-8") as f:
+        for baris in f:
+            baris = baris.strip()
+            if not baris:
+                continue
+            try:
+                b = json.loads(baris)
+            except json.JSONDecodeError:
+                continue
+            punya[b["id"]] = b
+    return punya
+
+
 def ukur(
-    n: int, model: str, alamat: str | None, delta: float, perbaikan: int = 1
+    n: int,
+    model: str,
+    alamat: str | None,
+    delta: float,
+    perbaikan: int = 1,
+    sambung: str = "",
 ) -> dict:
     penutur = PenuturSetempat(alamat=alamat, model=model)
     if not penutur.hidup():
@@ -69,9 +100,15 @@ def ukur(
     urut = [K.id_klaim(int(i)) for i in K.urutan[:n]]
     print(f"{len(urut)} berkas, urut dari selisih terbesar.\n")
 
+    punya = baca_singgahan(sambung)
+    if punya:
+        print(f"{len(punya)} berkas sudah terukur pada jalan sebelumnya, dilewati.\n")
     baris = []
     t0 = time.time()
     for k, id_berkas in enumerate(urut, 1):
+        if id_berkas in punya:
+            baris.append(punya[id_berkas])
+            continue
         mulai = time.time()
         h = susun_agen(K, id_berkas, penutur=penutur, dalam=True, n_perbaikan=perbaikan)
         detik = time.time() - mulai
@@ -98,6 +135,9 @@ def ukur(
                 "n_kata": len(h["teks"].split()),
             }
         )
+        if sambung:
+            with open(sambung, "a", encoding="utf-8") as f:
+                f.write(json.dumps(baris[-1], ensure_ascii=False, default=str) + "\n")
         tanda = "agen  " if h["sumber"] == "agen" else "aturan"
         catatan = "bersih" if not d["cacat"] else f"{len(d['cacat'])} cacat"
         print(
@@ -193,9 +233,14 @@ def main() -> None:
     p.add_argument("--delta", type=float, default=0.05)
     p.add_argument("--perbaikan", type=int, default=1)
     p.add_argument("--keluar", default="runs/ukur_agen.json")
+    p.add_argument(
+        "--sambung",
+        default="",
+        help="Berkas jsonl tempat hasil per berkas ditulis dan disambung.",
+    )
     a = p.parse_args()
 
-    hasil = ukur(a.n, a.model, a.alamat, a.delta, a.perbaikan)
+    hasil = ukur(a.n, a.model, a.alamat, a.delta, a.perbaikan, a.sambung)
     laporkan(hasil)
 
     os.makedirs(os.path.dirname(a.keluar) or ".", exist_ok=True)

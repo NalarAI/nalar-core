@@ -24,3 +24,6 @@ rahasia/
 
 # tangkapan layar kerja, tidak untuk dikirim
 artefak/
+
+# Berkas sambung pengukuran agen, bukan hasil.
+runs/*.jsonl
