@@ -126,6 +126,18 @@ def _sebab(e: urllib.error.HTTPError, isi: str) -> str:
     return f"peladen model tidak menjawab: {e}{', ' + potong if potong else ''}"
 
 
+def _harian(isi: str) -> bool:
+    """Penolakan ini karena jatah harian, bukan karena ramai semenit.
+
+    Penyedia memakai nomor yang sama untuk keduanya, dan bedanya cuma ada di
+    isi pesannya. Yang membedakan bukan kerapian: yang ramai semenit pulih
+    dalam hitungan detik dan pantas ditunggu, yang habis harian pulih dalam
+    hitungan jam dan menunggunya membuang seluruh anggaran waktu.
+    """
+    r = isi.lower()
+    return "tokens per day" in r or "(tpd)" in r
+
+
 def _panggilan_tertolak(isi: str) -> list[dict] | None:
     """Panggilan alat yang ditolak penyedia sebelum sampai ke penyelia.
 
@@ -217,6 +229,18 @@ class PenuturSetempat(Penutur):
         self.n_coba = max(1, int(n_coba))
 
     def hidup(self) -> bool:
+        # Penyedia awan tidak perlu ditanya. Kuncinya ada berarti alamatnya
+        # penyedia, dan penyedia tidak mati diam diam seperti peladen di
+        # mesin sendiri. Menanyakannya memakan satu permintaan dari jatah
+        # harian untuk tiap berkas, dan tanyanya bisa gagal karena
+        # pemanggilan dingin yang lambat, bukan karena modelnya mati.
+        #
+        # Kunci yang salah tetap ketahuan, cuma satu langkah lebih lambat:
+        # permintaan sungguhannya ditolak, dan penolakannya masuk sebab
+        # mundur dengan keterangan dari penyedianya sendiri. Itu keterangan
+        # yang lebih berguna daripada "tidak ada model yang menyala".
+        if self.kunci:
+            return True
         try:
             permintaan = urllib.request.Request(
                 f"{self.alamat}/models",
@@ -271,7 +295,13 @@ class PenuturSetempat(Penutur):
                 tertolak = _panggilan_tertolak(isi) if e.code == 400 else None
                 if tertolak:
                     return Balasan(panggilan=tertolak)
-                if e.code != 429 or percobaan == self.n_coba - 1:
+                # Menunggu menolong untuk batas per menit, dan tidak pernah
+                # menolong untuk jatah harian. Jatah harian pulih dalam
+                # hitungan jam, sedangkan yang menunggu di sini fungsi yang
+                # punya batas waktu satu menit. Yang benar pindah ke model
+                # berikutnya pada rantai, dan itu terjadi kalau kita menyerah
+                # sekarang juga.
+                if e.code != 429 or _harian(isi) or percobaan == self.n_coba - 1:
                     raise GalatPenutur(_sebab(e, isi)) from None
                 tunggu = e.headers.get("Retry-After")
                 try:
@@ -311,6 +341,62 @@ class PenuturSetempat(Penutur):
             token_masuk=int(pakai.get("prompt_tokens") or 0),
             token_keluar=int(pakai.get("completion_tokens") or 0),
         )
+
+
+class PenuturBerantai(Penutur):
+    """Beberapa penutur, dicoba berurutan sampai ada yang menjawab.
+
+    Alasannya jatah, bukan mutu. Penyedia gratis membatasi token per hari
+    untuk tiap model, dan batas itu yang paling dulu kena. Dua ratus ribu
+    token sehari, sedangkan satu berkas perkara memakai sekitar enam ribu,
+    jadi yang muat kira kira tiga puluh berkas sehari. Model kedua punya
+    jatahnya sendiri, dan merangkainya menambah jatah itu tanpa membayar.
+
+    Batas ini tidak kelihatan dari kepala jawaban. x-ratelimit hanya
+    menyebut permintaan per hari dan token per menit, sedangkan yang
+    mengikat token per hari. Ia baru ketahuan dari isi penolakannya, dan
+    isi penolakan itu baru ikut tercatat sesudah kami menambahkannya.
+
+    Urutannya urutan mutu, bukan urutan jatah. Yang pertama yang terbaik
+    menurut pengukuran, dan yang berikutnya dipakai cuma ketika yang
+    pertama kehabisan. Berkas susunan model mana pun tetap melewati penjaga
+    yang sama, jadi yang lolos tetap yang lolos.
+
+    Yang menjawab diingat. Giliran berikutnya mulai dari dia, supaya tidak
+    ada permintaan yang terbuang menanyai penutur yang sudah diketahui
+    kehabisan.
+    """
+
+    nama = "berantai"
+
+    def __init__(self, daftar: list[Penutur]):
+        self.daftar = [p for p in daftar if p is not None]
+        self.mulai = 0
+
+    @property
+    def model(self) -> str:
+        """Nama model yang terakhir menjawab, bukan yang pertama didaftar."""
+        if not self.daftar:
+            return ""
+        return getattr(self.daftar[self.mulai], "model", "")
+
+    def hidup(self) -> bool:
+        return any(p.hidup() for p in self.daftar)
+
+    def balas(self, pesan: list[dict], alat: list[dict]) -> Balasan:
+        if not self.daftar:
+            raise GalatPenutur("rantai penutur kosong")
+        galat = None
+        n = len(self.daftar)
+        for k in range(n):
+            i = (self.mulai + k) % n
+            try:
+                b = self.daftar[i].balas(pesan, alat)
+                self.mulai = i
+                return b
+            except GalatPenutur as e:
+                galat = e
+        raise galat
 
 
 def penutur_baku() -> Penutur:

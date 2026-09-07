@@ -168,12 +168,24 @@ from _nalar.alat_db import PerkakasBasisData, SumberBasisData  # noqa: E402
 from _nalar.berkas import jalankan  # noqa: E402
 from _nalar.gerbang import Gerbang  # noqa: E402
 from _nalar.jejak import Jejak  # noqa: E402
-from _nalar.penutur import PenuturSetempat  # noqa: E402
+from _nalar.penutur import PenuturBerantai, PenuturSetempat  # noqa: E402
 from _nalar.penyelia import Anggaran  # noqa: E402
 
 ALAMAT = os.environ.get("NALAR_MODEL_URL") or "https://api.groq.com/openai/v1"
-MODEL = os.environ.get("NALAR_MODEL") or "openai/gpt-oss-120b"
 KUNCI = os.environ.get("NALAR_MODEL_KEY", "")
+
+# Rantai model, dipisah koma, urut dari yang terbaik menurut pengukuran.
+# Yang berikutnya dipakai cuma ketika yang sebelumnya kehabisan jatah
+# hariannya, dan tiap model punya jatahnya sendiri.
+RANTAI = [
+    m.strip()
+    for m in (
+        os.environ.get("NALAR_MODEL")
+        or "openai/gpt-oss-120b,openai/gpt-oss-20b,qwen/qwen3.8-27b"
+    ).split(",")
+    if m.strip()
+]
+MODEL = RANTAI[0] if RANTAI else ""
 
 # Peubah situs dipakai kalau yang khusus peladen tidak ada. Situsnya sudah
 # punya keduanya, jadi fungsi ini hidup tanpa penyetelan tambahan, dan ia
@@ -189,16 +201,18 @@ ALPHA = 0.02
 # waktu keras, dan lingkaran yang terpotong di tengah tidak mengembalikan apa
 # apa. Yang dipilih anggaran yang selesai lebih dulu daripada batas itu, jadi
 # yang keluar tetap berkas perkara, meski berkas perkara versi aturan.
-ANGGARAN = Anggaran(giliran=6, panggilan=10, rp=500.0, detik=38.0)
+ANGGARAN = Anggaran(giliran=6, panggilan=10, rp=500.0, detik=45.0)
 TENGGAT_MODEL = 18.0
 
-# Satu percobaan, tanpa pengulangan. Penyedia awan menolak permintaan yang
-# melampaui laju, dan pengulangan berarti menunggu sampai setengah menit.
-# Di sini menunggu selama itu lebih buruk daripada mundur ke versi aturan,
-# karena yang menunggu orang yang sedang menatap layar. Yang mundur tetap
-# mendapat berkas perkara utuh, cuma disusun aturan bukan model, dan
-# jawabannya menyebutkan itu.
-COBA_MODEL = 1
+# Dua percobaan, dan jedanya diambil dari kepala Retry-After penyedianya
+# bukan ditebak.
+#
+# Sekali menunggu menolong ketika yang kena batas per menit. Ia tidak
+# menolong sama sekali ketika yang habis jatah harian, dan yang habis jatah
+# harian pindah ke model berikutnya pada rantai, bukan menunggu. Menunggu
+# tiga kali tidak pernah menolong, karena anggaran waktu fungsinya keburu
+# habis lebih dulu, dan yang habis anggarannya tetap mendapat versi aturan.
+COBA_MODEL = 2
 
 GERBANG = {gerbang}
 
@@ -262,15 +276,25 @@ def susun_berkas(kid: str) -> tuple:
             return 404, {{"galat": f"berkas {{kid}} tidak ada pada peragaan ini"}}
     except GalatAlat as e:
         return 502, {{"galat": str(e)}}
-    penutur = PenuturSetempat(
-        alamat=ALAMAT,
-        model=MODEL,
-        kunci=KUNCI,
-        tenggat_detik=TENGGAT_MODEL,
-        n_coba=COBA_MODEL,
+    penutur = PenuturBerantai(
+        [
+            PenuturSetempat(
+                alamat=ALAMAT,
+                model=m,
+                kunci=KUNCI,
+                tenggat_detik=TENGGAT_MODEL,
+                n_coba=COBA_MODEL,
+            )
+            for m in RANTAI
+        ]
     )
 
-    t = GERBANG.get(MODEL)
+    # Gerbang dipakai cuma kalau seluruh model pada rantai punya ambang yang
+    # sama. Model mana yang akhirnya menyusun baru ketahuan sesudah berkasnya
+    # jadi, dan memakai ambang satu model untuk berkas susunan model lain
+    # berarti menjanjikan yang tidak pernah diukur.
+    tera = [GERBANG.get(m) for m in RANTAI]
+    t = tera[0] if tera and all(x == tera[0] for x in tera) else None
     gerbang = (
         Gerbang(ambang=t["ambang"], delta=t["delta"], n_kalibrasi=t["n_kalibrasi"])
         if t
@@ -297,7 +321,9 @@ def susun_berkas(kid: str) -> tuple:
         "a1": h["a1"],
         "skor": h["skor"],
         "keadaan": h["keadaan"],
-        "model": MODEL,
+        # Model yang benar benar menyusun, bukan yang pertama didaftar.
+        # Keduanya berbeda ketika yang pertama kehabisan jatah hariannya.
+        "model": penutur.model or MODEL,
         "ringkas_jejak": h["ringkas_jejak"],
         "jejak": _baris_jejak(h["jejak"]),
         "penyelia": h["penyelia"],

@@ -2718,13 +2718,26 @@ bita, memeriksa rantai impornya tertutup, dan memastikan tidak ada pustaka
 berat yang menyelinap ikut. Ketiganya gagal dengan cara yang berbeda, dan
 tidak ada satu pun yang bisa menangkap ketiganya.
 
-**Jatah gratisnya diukur, dan ia mengikat.** Groq memberi seribu permintaan
-per hari. Yang lebih mengikat delapan ribu token per menit, sedangkan satu
-berkas perkara memakai sekitar tujuh ribu.
+**Jatah gratisnya diukur, dan batas yang mengikat bukan yang kelihatan.**
+Kepala jawaban menyebut dua angka, seribu permintaan per hari dan delapan
+ribu token per menit. Saya sempat menulis bahwa yang kedua yang mengikat.
+Itu salah, dan salahnya baru ketahuan sesudah jatahnya benar benar habis.
 
-Artinya kira kira satu berkas per menit. Pengunjung kedua pada menit yang
-sama mendapat berkas versi aturan, dan halamannya menyebut sebabnya. Itu
-bukan kegagalan yang disembunyikan, melainkan batas yang ditulis apa adanya.
+Yang mengikat dua ratus ribu token per hari, dan angka itu tidak ada di
+kepala jawaban sama sekali. Ia cuma muncul di isi penolakan, dan isi
+penolakan itu baru ikut tercatat sesudah kami menambahkannya pagi tadi.
+Tanpa penambahan itu, yang terlihat cuma empat ratus dua puluh sembilan
+berulang ulang tanpa sebab.
+
+Satu berkas perkara memakai sekitar enam ribu token, jadi yang muat kira
+kira tiga puluh berkas sehari. Pengukuran hari ini sendiri yang
+menghabiskannya, dan angka satu dari dua belas serta nol dari sepuluh yang
+saya dapat sesudah itu mengukur jatah yang kosong, bukan mengukur agennya.
+
+Jalan keluarnya bukan menunggu. Tiap model punya jatah hariannya sendiri,
+jadi penuturnya sekarang merangkai beberapa model dan pindah ke berikutnya
+ketika yang sebelumnya kehabisan. Urutannya urutan mutu, dan berkas susunan
+model mana pun tetap melewati penjaga yang sama.
 
 **Nama alat yang salah satu huruf membatalkan seluruh berkas.** Penyedianya
 memeriksa nama alat di pihak mereka. Model memanggil hitungan_pengandaian,

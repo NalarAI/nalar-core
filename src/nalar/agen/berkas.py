@@ -50,6 +50,10 @@ Aturan yang tidak boleh dilanggar:
    pernah perlu menjumlahkan, mengurangkan, atau membulatkan apa pun.
 2. Jangan mengarang kode pemeriksaan, kelompok tarif, atau nomor peraturan.
 3. Kalau alat menolak, tulis apa adanya bahwa keterangan itu tidak tersedia.
+4. Berkas perkara harus menyebut besarannya. Nilai yang diajukan, nilai yang
+   didukung bukti, dan selisihnya wajib ada, memakai isiannya. Berkas yang
+   tidak menyebut satu besaran pun akan ditolak, karena berkas seperti itu
+   tidak bisa dibantah faskes.
 
 Isian yang tersedia. Tiap nama medan pada balasan alat boleh dipakai apa
 adanya, jadi kalau balasan alat menulis "selisih_rp": "{selisih_rp}", kamu
@@ -65,6 +69,11 @@ Contoh satu kalimat yang benar:
 
   Berkas {berkas} pada {faskes} diajukan {diajukan}, didukung bukti
   {didukung}, selisih {selisih}.
+
+Panggil sekaligus semua alat yang argumennya sudah kamu punya, dalam satu
+giliran yang sama. ambil_berkas, hitung_pengandaian, dan cari_aturan cuma
+butuh nomor berkas, jadi ketiganya bisa berangkat bersama. cari_tarif butuh
+keterangan dari ambil_berkas, jadi ia menyusul sesudahnya.
 
 Panggil alat sampai kamu punya cukup keterangan, lalu tulis berkas perkara
 dalam bahasa Indonesia, dengan bagian berikut dan urutan ini:

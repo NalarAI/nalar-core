@@ -57,6 +57,7 @@ from nalar.agen import (  # noqa: E402
     Balasan,
     Gerbang,
     Penutur,
+    PenuturBerantai,
     PenuturTiruan,
     Penyelia,
     Perkakas,
@@ -815,6 +816,57 @@ try:
     cek("skor_ulang tetap menerangkan sebabnya", False, "justru menjawab")
 except Exception as e:  # noqa: BLE001
     cek("skor_ulang tetap menerangkan sebabnya", "penebak tarif" in str(e), str(e)[:70])
+
+
+print("\n11. Rantai penutur memakai jatah model berikutnya, bukan menyerah")
+
+
+class PenuturHabis(Penutur):
+    """Selalu menolak, seperti model yang jatah hariannya sudah terpakai."""
+
+    nama = "habis"
+    model = "yang-habis"
+
+    def __init__(self):
+        self.n = 0
+
+    def hidup(self) -> bool:
+        return True
+
+    def balas(self, pesan, alat) -> Balasan:
+        self.n += 1
+        raise GalatPenutur("jatah harian habis")
+
+
+habis = PenuturHabis()
+rantai = PenuturBerantai([habis, PenuturPatuh()])
+hasil_rantai = susun_agen(K, ID[0], penutur=rantai)
+cek(
+    "berkas tetap disusun agen meski model pertama habis",
+    hasil_rantai["sumber"] == "agen",
+    hasil_rantai.get("sebab_mundur", ""),
+)
+cek(
+    "model yang dilaporkan yang benar benar menjawab",
+    rantai.model != "yang-habis",
+    rantai.model,
+)
+# Yang mahal bukan penolakannya melainkan mengulanginya. Tiap giliran yang
+# menanyai model yang sudah diketahui kehabisan memakan satu permintaan dari
+# jatah harian, dan jatah itu yang sedang dihemat.
+cek(
+    "model yang sudah habis tidak ditanyai tiap giliran",
+    habis.n == 1,
+    f"ditanyai {habis.n} kali",
+)
+
+semua = PenuturBerantai([PenuturHabis(), PenuturHabis()])
+hasil_semua = susun_agen(K, ID[0], penutur=semua)
+cek(
+    "kalau semuanya habis, yang keluar versi aturan dengan sebabnya",
+    hasil_semua["sumber"] == "aturan" and "habis" in hasil_semua["sebab_mundur"],
+    hasil_semua["sebab_mundur"],
+)
 
 print(f"\n{lulus} lulus, {gagal} gagal")
 sys.exit(1 if gagal else 0)

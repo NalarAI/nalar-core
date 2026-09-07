@@ -1,0 +1,91 @@
+{
+  "alamat": "https://nalar-six.vercel.app",
+  "n": 12,
+  "n_agen": 1,
+  "baris": [
+    {
+      "id": "K00000000",
+      "sumber": "aturan",
+      "detik": 10.461720705032349,
+      "sebab": "model bahasa tidak menjawab: peladen model tidak menjawab: HTTP Error 429: Too Many Requests, {\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m1y3mhsfegfr0q380dmfh7mj` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 5680, Requested 2725. Please try again in 3.0375s. Need more tokens? Upgrade to Dev Tier today at https://con",
+      "a1": true
+    },
+    {
+      "id": "K00000136",
+      "sumber": "aturan",
+      "detik": 8.478789329528809,
+      "sebab": "agen berhenti tanpa menulis apa pun",
+      "a1": true
+    },
+    {
+      "id": "K00000143",
+      "sumber": "aturan",
+      "detik": 7.8065080642700195,
+      "sebab": "berkas susunan agen cuma menyebut 0 angka",
+      "a1": true
+    },
+    {
+      "id": "K00000362",
+      "sumber": "aturan",
+      "detik": 7.391219854354858,
+      "sebab": "tidak ada model bahasa yang menyala",
+      "a1": true
+    },
+    {
+      "id": "K00000365",
+      "sumber": "aturan",
+      "detik": 9.029819965362549,
+      "sebab": "model bahasa tidak menjawab: peladen model tidak menjawab: HTTP Error 429: Too Many Requests, {\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m1y3mhsfegfr0q380dmfh7mj` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 7140, Requested 1912. Please try again in 7.89s. Need more tokens? Upgrade to Dev Tier today at https://conso",
+      "a1": true
+    },
+    {
+      "id": "K00000366",
+      "sumber": "aturan",
+      "detik": 11.77718734741211,
+      "sebab": "berkas susunan agen cuma menyebut 2 angka",
+      "a1": true
+    },
+    {
+      "id": "K00001067",
+      "sumber": "agen",
+      "detik": 10.37813401222229,
+      "sebab": "",
+      "a1": true
+    },
+    {
+      "id": "K00001283",
+      "sumber": "aturan",
+      "detik": 14.068151473999023,
+      "sebab": "isian yang tidak ada dipakai agen: ['bukti_menolong', 'diajukan', 'didukung', 'modus', 'selisih']",
+      "a1": true
+    },
+    {
+      "id": "K00001286",
+      "sumber": "aturan",
+      "detik": 3.383918523788452,
+      "sebab": "model bahasa tidak menjawab: peladen model tidak menjawab: HTTP Error 429: Too Many Requests, {\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m1y3mhsfegfr0q380dmfh7mj` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199865, Requested 1843. Please try again in 12m17.856s. Need more tokens? Upgrade to Dev Tier today at https:/",
+      "a1": true
+    },
+    {
+      "id": "K00001316",
+      "sumber": "aturan",
+      "detik": 2.895920753479004,
+      "sebab": "model bahasa tidak menjawab: peladen model tidak menjawab: HTTP Error 429: Too Many Requests, {\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m1y3mhsfegfr0q380dmfh7mj` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199731, Requested 1843. Please try again in 11m19.968s. Need more tokens? Upgrade to Dev Tier today at https:/",
+      "a1": true
+    },
+    {
+      "id": "K00001326",
+      "sumber": "aturan",
+      "detik": 3.9996988773345947,
+      "sebab": "model bahasa tidak menjawab: peladen model tidak menjawab: HTTP Error 429: Too Many Requests, {\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m1y3mhsfegfr0q380dmfh7mj` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199595, Requested 2179. Please try again in 12m46.367999999s. Need more tokens? Upgrade to Dev Tier today at h",
+      "a1": true
+    },
+    {
+      "id": "K00001343",
+      "sumber": "aturan",
+      "detik": 2.883334159851074,
+      "sebab": "model bahasa tidak menjawab: peladen model tidak menjawab: HTTP Error 429: Too Many Requests, {\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m1y3mhsfegfr0q380dmfh7mj` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199461, Requested 1250. Please try again in 5m7.152s. Need more tokens? Upgrade to Dev Tier today at https://c",
+      "a1": true
+    }
+  ]
+}

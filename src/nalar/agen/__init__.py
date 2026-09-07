@@ -22,7 +22,14 @@ from .dalam import kumpulkan_fakta, periksa_cepat, periksa_dalam
 from .gerbang import Gerbang, skor_keyakinan, tera
 from .isian import isi_lubang, susun_isian
 from .jejak import Jejak
-from .penutur import Balasan, GalatPenutur, Penutur, PenuturSetempat, PenuturTiruan
+from .penutur import (
+    Balasan,
+    GalatPenutur,
+    Penutur,
+    PenuturBerantai,
+    PenuturSetempat,
+    PenuturTiruan,
+)
 from .penyelia import Anggaran, Penyelia, RantaiDiputus
 from .periksa import angka_tak_bersumber, periksa_a1
 from .perkara import susun
@@ -40,6 +47,7 @@ __all__ = [
     "Gerbang",
     "Jejak",
     "Penutur",
+    "PenuturBerantai",
     "PenuturSetempat",
     "PenuturTiruan",
     "Penyelia",
