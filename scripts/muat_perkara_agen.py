@@ -24,6 +24,7 @@ Jalankan:
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import sys
 import time
@@ -40,9 +41,15 @@ from nalar.api.keadaan import Keadaan  # noqa: E402
 
 def utama() -> int:
     p = argparse.ArgumentParser(description=__doc__)
+    # Angka angka ini harus sama persis dengan scripts/muat_db.py. Dunia yang
+    # berbeda menghasilkan nomor berkas yang berbeda, dan barisnya akan
+    # tersimpan sebagai berkas perkara untuk klaim yang tidak ada di peragaan.
+    # Itu benar benar terjadi sekali, dan penjaga di bawah yang menangkapnya.
     p.add_argument("--n", type=int, default=60)
-    p.add_argument("--peserta", type=int, default=1500)
-    p.add_argument("--tahun", type=int, default=2)
+    p.add_argument("--peserta", type=int, default=8000)
+    p.add_argument("--tahun", type=int, default=3)
+    p.add_argument("--fktp", type=int, default=400)
+    p.add_argument("--fkrtl", type=int, default=80)
     p.add_argument("--benih", type=int, default=7)
     p.add_argument("--model", default=os.environ.get("NALAR_MODEL", "nalar-qwen3-4b"))
     p.add_argument("--kirim", action="store_true", help="Tulis ke basis data.")
@@ -54,7 +61,13 @@ def utama() -> int:
         return 2
 
     print("Menyiapkan keadaan, sekitar satu menit.")
-    K = Keadaan(n_peserta=a.peserta, tahun=a.tahun, seed=a.benih, n_fktp=90, n_fkrtl=24)
+    K = Keadaan(
+        n_peserta=a.peserta,
+        tahun=a.tahun,
+        seed=a.benih,
+        n_fktp=a.fktp,
+        n_fkrtl=a.fkrtl,
+    )
     K.bangun(alpha=0.02)
     urut = [K.id_klaim(int(i)) for i in K.urutan[: a.n]]
     print(f"{len(urut)} berkas, urut dari selisih terbesar.\n")
@@ -90,6 +103,24 @@ def utama() -> int:
 
     url, kunci = baca_env()
     db = Db(url, kunci)
+
+    # Penjaga dunia. Tiap klaim peragaan sudah punya barisnya sendiri di
+    # tabel ini, dimuat scripts/muat_db.py. Kalau nomor yang kita susun tidak
+    # ada di sana, dunianya beda, dan menulis tetap akan menaruh berkas
+    # perkara untuk klaim yang tidak pernah bisa dibuka pengunjung.
+    daftar = ",".join(b["klaim_id"] for b in baris)
+    ada = json.loads(
+        db._panggil("GET", f"perkara?klaim_id=in.({daftar})&select=klaim_id").decode()
+    )
+    punya = {r["klaim_id"] for r in ada}
+    hilang = [b["klaim_id"] for b in baris if b["klaim_id"] not in punya]
+    if hilang:
+        print(
+            f"Berhenti. {len(hilang)} nomor tidak ada di basis data peragaan, "
+            f"contohnya {hilang[:3]}."
+        )
+        print("Samakan --peserta, --tahun, --fktp, dan --fkrtl dengan muat_db.py.")
+        return 2
     # Kunci utamanya klaim_id, jadi baris lama ditimpa. Yang ditimpa versi
     # aturan berkas yang sama, dan versi aturan bisa dibuat ulang kapan saja
     # tanpa model bahasa.
