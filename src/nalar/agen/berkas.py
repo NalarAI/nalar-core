@@ -366,6 +366,11 @@ def jalankan(
             "sebab_mundur": sebab_mundur,
             "cacat": cepat["cacat"],
             "n_diperbaiki": n_diperbaiki,
+            # A1 atas naskah yang benar benar keluar, bukan atas naskah yang
+            # ditolak. Yang keluar di sini versi aturan, dan A1 versi aturan
+            # itu yang berlaku. Tanpa medan ini yang memanggil harus menebak,
+            # dan tebakannya akan menyebut berkas bersih sebagai bercacat.
+            "a1": dasar["a1"],
             "keadaan": "layak_kirim",
             "skor": 1.0,
             "jejak": dasar["jejak"],
@@ -388,6 +393,7 @@ def jalankan(
         "sebab_mundur": "",
         "cacat": [],
         "n_diperbaiki": n_diperbaiki,
+        "a1": cepat["a1"],
         "keadaan": gerbang.putuskan(skor) if gerbang else "belum_ada_gerbang",
         "skor": round(skor, 4),
         "jejak": jejak,

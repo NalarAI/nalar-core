@@ -16,7 +16,7 @@ import numpy as np
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from ..agen import awasi_pola, baca_sanggahan, susun
+from ..agen import awasi_pola, baca_sanggahan, susun, susun_agen
 from ..agen.penutur import Penutur, penutur_baku
 from ..pembulatan import bulat_berkas
 from ..profil import peringkat_faskes, perubahan_faskes, profil_faskes
@@ -320,14 +320,22 @@ def penjelasan(kid: str) -> Penjelasan:
     response_model=Perkara,
     summary="Berkas perkara untuk verifikator",
 )
-def perkara(kid: str) -> Perkara:
+def perkara(
+    kid: str,
+    agen: bool = Query(
+        False,
+        description="Susun dengan Agen Berkas kalau ada model bahasa menyala.",
+    ),
+) -> Perkara:
     """Berkas perkara satu klaim, disusun lapisan agen.
 
     Yang dilayani versi aturan: deterministik, tidak menuntut model bahasa
     menyala, dan bisa dijalankan ulang oleh siapa pun yang punya kodenya.
-    Ketika ada model berbobot terbuka di dalam pusat data, Agen Berkas
-    menggantikannya, dan yang jatuh di saringan tetap keluar sebagai versi
-    ini.
+
+    Dengan agen bernilai benar, Agen Berkas yang menyusunnya. Itu menuntut
+    ada model berbobot terbuka menyala, dan keluarannya tidak dijamin sama
+    dua kali. Naskah yang jatuh di saringan tetap keluar sebagai versi
+    aturan, dan medan sumber menyebut mana yang sedang dibaca.
 
     Sengaja terpisah dari penjelasan. Portal fasilitas kesehatan memanggil
     penjelasan, jadi apa pun yang ditaruh di sana sampai ke peramban pihak
@@ -340,12 +348,12 @@ def perkara(kid: str) -> Perkara:
     except KeyError:
         raise HTTPException(404, f"klaim {kid} tidak ada") from None
 
-    p = susun(KEADAAN, kid)
+    p = susun_agen(KEADAAN, kid, penutur=_penutur()) if agen else susun(KEADAAN, kid)
     r = p["ringkas_jejak"]
     return Perkara(
         id=kid,
         teks=p["teks"],
-        sumber="aturan",
+        sumber=p.get("sumber", "aturan"),
         jejak=Jejak(
             n_panggilan=r["n_panggilan"],
             alat=r["alat"],

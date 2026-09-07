@@ -198,6 +198,20 @@ with TestClient(app) as c:
         )
         cek("sumbernya disebut apa adanya", pk["sumber"] in ("aturan", "agen"))
 
+        # Jalur agen. Tanpa model bahasa menyala ia jatuh ke versi aturan,
+        # dan itu keluaran yang sah, jadi yang diuji bukan sumbernya
+        # melainkan bahwa apa pun yang keluar tetap lolos penjaga angka.
+        pa = c.get(f"/klaim/{kid}/perkara", params={"agen": "true"}).json()
+        cek(
+            "berkas perkara jalur agen tetap lolos penjaga angka",
+            pa["jejak"]["a1_lulus"] and pa["sumber"] in ("aturan", "agen"),
+            pa["sumber"],
+        )
+        cek(
+            "berkas perkara jalur agen menyebut selisih dan modus",
+            all(k in pa["teks"].lower() for k in ("selisih", "modus")),
+        )
+
         # Sanggahan. Ini satu satunya jalur yang menerima kiriman faskes,
         # jadi ia yang paling gampang dipakai memancing keluar apa yang
         # tidak boleh dilihat faskes.
