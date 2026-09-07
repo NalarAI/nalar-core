@@ -24,6 +24,7 @@ Yang tidak dihitung tidak bisa dijaga.
 
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 import time
@@ -102,6 +103,24 @@ class PenuturTiruan(Penutur):
         return True
 
 
+def _sebab(e: urllib.error.HTTPError) -> str:
+    """Keterangan penolakan beserta isinya, bukan cuma nomornya.
+
+    Penyedia model menolak dengan nomor yang sama untuk sebab yang jauh
+    berbeda. Empat ratus bisa berarti alatnya salah bentuk, pesannya salah
+    urutan, atau modelnya tidak ada. Nomornya saja tidak bisa dibedakan
+    siapa pun, dan yang membacanya nanti orang yang tidak sedang menatap
+    kode ini.
+
+    Isinya dipotong, karena yang berguna kalimat pertamanya dan yang
+    berikutnya cuma memanjangkan catatan.
+    """
+    isi = ""
+    with contextlib.suppress(OSError):
+        isi = e.read().decode("utf-8", "replace")[:300].strip()
+    return f"peladen model tidak menjawab: {e}{', ' + isi if isi else ''}"
+
+
 class PenuturSetempat(Penutur):
     """Peladen model berbobot terbuka di dalam jaringan, tata cara OpenAI.
 
@@ -119,6 +138,7 @@ class PenuturSetempat(Penutur):
         kunci: str | None = None,
         suhu: float = 0.0,
         tenggat_detik: float = 600.0,
+        n_coba: int = 3,
     ):
         self.alamat = (
             alamat or os.environ.get("NALAR_MODEL_URL") or "http://127.0.0.1:11434/v1"
@@ -128,10 +148,20 @@ class PenuturSetempat(Penutur):
         # kosong berarti kepala Authorization tidak dikirim sama sekali.
         self.kunci = kunci or os.environ.get("NALAR_MODEL_KEY") or ""
         # Suhu nol. Yang dinilai dari model ini ketaatannya memanggil alat
-        # yang benar, bukan keragaman kalimatnya. Keluaran yang bisa diulang
-        # juga syarat agar jejak auditnya berarti.
+        # yang benar, bukan keragaman kalimatnya.
+        #
+        # Suhu nol tidak membuat jawabannya sama persis tiap kali. Itu sudah
+        # diukur di sini: satu berkas yang disusun dua kali keluar dengan
+        # kalimat yang berbeda dan angka yang sama. Yang menjamin angkanya
+        # bukan suhu, melainkan jejak audit dan pemeriksaan A1.
         self.suhu = suhu
         self.tenggat = tenggat_detik
+        # Berapa kali permintaan yang ditolak karena laju diulang. Tiga untuk
+        # pengukuran berkelompok, tempat menunggu lebih murah daripada
+        # kehilangan berkas. Satu untuk melayani permintaan orang, tempat
+        # menunggu tiga puluh detik lebih buruk daripada jawaban versi
+        # aturan yang keluar sekarang.
+        self.n_coba = max(1, int(n_coba))
 
     def hidup(self) -> bool:
         try:
@@ -175,14 +205,14 @@ class PenuturSetempat(Penutur):
         # Yang ditunggu diambil dari kepala Retry-After kalau ada, karena
         # menebak sendiri berarti menunggu terlalu lama atau terlalu
         # sebentar, dan yang terlalu sebentar kena lagi.
-        for percobaan in range(3):
+        for percobaan in range(self.n_coba):
             try:
                 with urllib.request.urlopen(permintaan, timeout=self.tenggat) as r:
                     jawab = json.loads(r.read().decode("utf-8"))
                 break
             except urllib.error.HTTPError as e:
-                if e.code != 429 or percobaan == 2:
-                    raise GalatPenutur(f"peladen model tidak menjawab: {e}") from None
+                if e.code != 429 or percobaan == self.n_coba - 1:
+                    raise GalatPenutur(_sebab(e)) from None
                 tunggu = e.headers.get("Retry-After")
                 try:
                     jeda = min(float(tunggu), 20.0) if tunggu else 0.0

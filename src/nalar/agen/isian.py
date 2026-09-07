@@ -154,6 +154,21 @@ def _medan_alat(isi: dict[str, str], hasil: dict[str, dict]) -> None:
             isi[k] = rupiah(v) if k.endswith("_rp") else str(v)
 
 
+# Tanda pisah panjang yang dipakai model sebagai pengganti koma. Ia sah di
+# tulisan Inggris dan janggal di dokumen resmi berbahasa Indonesia, dan
+# berkas perkara ini dibaca verifikator, bukan pembaca blog.
+#
+# Diganti di sini, bukan diminta lewat arahan. Arahan yang bertambah
+# menggeser perilaku model, dan perilakunya sudah diukur pada lima ratus
+# berkas. Penggantian yang pasti tidak menggeser apa pun.
+PISAH = re.compile(r"\s+[\u2010-\u2015]\s+")
+
+
+def rapikan_pisah(teks: str) -> str:
+    """Tanda pisah panjang jadi koma, sesuai kalimat di sekitarnya."""
+    return PISAH.sub(", ", teks)
+
+
 def isi_lubang(teks: str, isi: dict[str, str]) -> tuple[str, list[str]]:
     """Ganti tiap nama isian dengan isinya. Yang tidak dikenal ikut dilaporkan.
 
@@ -171,4 +186,4 @@ def isi_lubang(teks: str, isi: dict[str, str]) -> tuple[str, list[str]]:
         hilang.append(nama)
         return m.group(0)
 
-    return LUBANG.sub(ganti, teks), hilang
+    return rapikan_pisah(LUBANG.sub(ganti, teks)), hilang

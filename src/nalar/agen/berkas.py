@@ -228,7 +228,7 @@ def jalankan(
     #
     # Yang tidak diberikan tetap dihitung seperti biasa, jadi jalur lama
     # tidak berubah satu langkah pun.
-    dasar = dasar if dasar is not None else susun(keadaan, id_berkas)
+    dasar = dasar if dasar is not None else susun(keadaan, id_berkas, perkakas)
     n_kata_dasar = len(dasar["teks"].split())
 
     if menahan is None:

@@ -44,6 +44,12 @@ jobs:
       - name: fungsi tanpa peladen
         run: python tests/test_fungsi.py
 
+      # Lapisan agen ikut disalin ke sana sebagai satu paket. Yang diperiksa
+      # kesamaannya, ketertutupan rantai impornya, dan tidak adanya pustaka
+      # berat yang menyelinap ikut.
+      - name: paket agen tanpa peladen
+        run: python tests/test_fungsi_perkara.py
+
       - name: uji inti
         run: python tests/test_inti.py
 

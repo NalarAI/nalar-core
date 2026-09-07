@@ -21,10 +21,18 @@ def _rp(n) -> str:
     return "Rp " + f"{int(round(n)):,}".replace(",", ".")
 
 
-def susun(keadaan, id_berkas: str) -> dict:
-    """Berkas perkara untuk satu nomor berkas, beserta jejak dan putusan A1."""
+def susun(keadaan, id_berkas: str, perkakas=None) -> dict:
+    """Berkas perkara untuk satu nomor berkas, beserta jejak dan putusan A1.
+
+    Argumen perkakas menerima pembuat perkakas, bukan perkakas yang sudah
+    jadi. Perkakas jadi membawa jejaknya sendiri, dan jejak itu bukan jejak
+    yang dilaporkan hasil ini, sehingga rantai auditnya keluar kosong.
+
+    Yang memakainya jalur tanpa peladen, tempat isi berkas dibaca dari basis
+    data dan keadaan data di memori tidak ada sama sekali.
+    """
     jejak = Jejak(perkara=id_berkas)
-    p = Perkakas(keadaan, jejak)
+    p = perkakas(jejak) if perkakas is not None else Perkakas(keadaan, jejak)
 
     berkas = p.panggil("ambil_berkas", id=id_berkas)
     hitung = p.panggil("hitung_pengandaian", id=id_berkas)
