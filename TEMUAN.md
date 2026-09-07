@@ -2506,3 +2506,38 @@ ini. Menuliskannya sebagai tercapai hanya karena dua ratus berkas pertama
 bersih akan jadi kebohongan yang paling mudah tidak ketahuan, jadi ia
 ditulis sebagai belum penuh. Yang dibutuhkan untuk menyelesaikannya cuma
 mesin dengan memori bebas empat gigabita, bukan perubahan kode.
+
+### Alasannya benar, penaksirnya yang tidak
+
+Memilih keuntungan maksimum sebagai ukuran bukan kelalaian. Alasannya
+ditulis sejak awal di adversarial.py, dan alasannya masih berdiri: yang
+menentukan bukan berapa persen pelaku tertangkap melainkan berapa besar
+yang masih bisa diambil pelaku terbaik. Sistem pengawasan yang baik tidak
+menangkap semua orang, ia membuat kecurangan tidak sepadan.
+
+Yang tidak pernah ditanyakan: seberapa teliti maksimum itu bisa ditaksir
+dari satu dunia. Jawabannya tidak teliti sama sekali. Maksimum atas beberapa
+ratus klaim bergantung pada satu klaim, dan satu klaim berpindah setiap kali
+dunianya berganti.
+
+Gagasan yang sama bisa ditulis dengan penaksir yang menjumlahkan. Ukurlah
+seluruh uang yang masih bisa diambil pelaku yang memeriksa sebelum
+bertindak, lalu bandingkan dengan yang diambil pelaku yang tidak peduli
+tertangkap. Satu berkas terbaik tidak lagi menentukan angkanya.
+
+Pada enam dunia yang sama:
+
+| | tengah | rentang | ragam relatif |
+|---|---|---|---|
+| keuntungan maksimum satu berkas | 0,327 | 0,180 sampai 0,550 | 0,350 |
+| penyusutan seluruh uang | 0,752 | 0,721 sampai 0,858 | 0,063 |
+
+Lima setengah kali lebih tenang, dan artinya bisa dibaca satu kalimat.
+Pelaku yang sabar mengambil sekitar seperempat dari yang diambil pelaku
+yang nekat.
+
+**A5 tetap gagal, dan angka 0,75 di atas bukan penggantinya.** Mengganti
+target yang gagal dengan ukuran baru yang kebetulan lulus adalah memeriksa
+pekerjaan sendiri. Yang boleh dilakukan cuma mencatatnya sebagai garis dasar
+hari ini, supaya target ketahanan berikutnya ditulis di atas penaksir yang
+bisa dipercaya, dengan ambang yang ditetapkan sebelum diukur.

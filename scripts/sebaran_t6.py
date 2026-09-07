@@ -119,6 +119,22 @@ def utama() -> int:
     print(
         f"  benih yang melewati batas 0,40 : {int((t6 >= 0.40).sum())} dari {len(t6)}"
     )
+    # Ukuran pengganti yang diusulkan. Ia menjumlahkan ratusan berkas,
+    # bukan mengambil satu yang terbesar, dan ia menjawab pertanyaan yang
+    # sejak awal ditulis di adversarial.py: apakah kecurangan jadi tidak
+    # sepadan, bukan apakah pelakunya tertangkap.
+    serakah = np.array([b["diambil_serakah_rp"] for b in baris], dtype=np.float64)
+    susut = 1.0 - ambil / serakah
+    print("\npenyusutan uang yang diambil, terhadap pelaku serakah")
+    print(
+        f"  terkecil {susut.min():.3f}  tengah {np.median(susut):.3f}  "
+        f"terbesar {susut.max():.3f}  simpangan {susut.std(ddof=1):.3f}"
+    )
+    print(
+        f"  ragam relatifnya {susut.std(ddof=1) / susut.mean():.3f}, "
+        f"melawan {t6.std(ddof=1) / max(t6.mean(), 1e-9):.3f} pada T6"
+    )
+
     print("\nsebagai pembanding, uang yang diambil pelaku hati hati")
     print(
         f"  terkecil Rp {ambil.min() / 1e6:.1f} jt  "
