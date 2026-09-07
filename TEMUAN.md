@@ -2794,3 +2794,25 @@ angkanya nol, karena tidak ada satu pun cacat pada separuh kalibrasinya.
 Gerbang dengan ambang nol meluluskan semuanya. Jadi jarak antara gerbang
 kosong dan gerbang tertera, pada keadaan sekarang, tidak mengubah satu
 berkas pun.
+
+### A1 diukur ulang, karena arahannya sudah bukan yang dulu
+
+Angka lima ratus berkas bersih itu diukur pada arahan penyusun yang lama.
+Sesudah itu arahannya bertambah dua aturan: berkas wajib menyebut
+besarannya, dan alat yang argumennya sudah ada dipanggil serentak. Angka
+lama jadi menggambarkan naskah yang bukan naskah yang dikirim.
+
+Itu bukan cacat kecil. Seluruh proyek ini berdiri di atas satu kebiasaan,
+bahwa yang diukur harus yang dikirim. Angka yang menggambarkan versi lain
+dari sistemnya adalah angka yang benar tentang sesuatu yang tidak ada.
+
+Hasil ukur ulangnya sama: lima ratus dari lima ratus berkas disusun agen,
+nol angka yang tidak berasal dari alat, nol yang mundur ke versi aturan, dan
+nol cacat pada pemeriksaan dalam. Ambang gerbangnya tetap nol pada dua ratus
+lima puluh berkas kalibrasi.
+
+Yang berubah harganya. Rp 49,77 jadi Rp 53,95 per berkas, naik delapan
+persen. Sebabnya jelas dan memang begitu seharusnya: arahan yang lebih
+panjang dikirim ulang tiap giliran. Harga itu dibayar untuk menutup satu
+kelas kegagalan yang sempat lolos ke situs, yaitu berkas perkara yang tidak
+menyebut satu besaran pun.
