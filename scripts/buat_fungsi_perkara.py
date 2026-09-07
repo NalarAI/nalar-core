@@ -131,7 +131,7 @@ def gerbang_tertera() -> dict:
     return keluar
 
 
-HANDLER = '''"""Agen Berkas sebagai fungsi tanpa peladen. BERKAS INI DIHASILKAN.
+HANDLER = r'''"""Agen Berkas sebagai fungsi tanpa peladen. BERKAS INI DIHASILKAN.
 
 Jangan disunting tangan. Sumbernya nalar-core/src/nalar/agen/berkas.py
 beserta lapisan yang dipakainya, dan berkas ini dihasilkan
@@ -170,6 +170,7 @@ from _nalar.gerbang import Gerbang  # noqa: E402
 from _nalar.jejak import Jejak  # noqa: E402
 from _nalar.penutur import PenuturBerantai, PenuturSetempat  # noqa: E402
 from _nalar.penyelia import Anggaran  # noqa: E402
+from _nalar.perkara import susun  # noqa: E402
 
 ALAMAT = os.environ.get("NALAR_MODEL_URL") or "https://api.groq.com/openai/v1"
 KUNCI = os.environ.get("NALAR_MODEL_KEY", "")
@@ -250,7 +251,7 @@ def _baris_jejak(jejak: Jejak) -> list:
     ]
 
 
-def susun_berkas(kid: str) -> tuple:
+def susun_berkas(kid: str, lapor=None) -> tuple:
     """Berkas perkara untuk satu nomor, beserta kode jawaban yang pantas.
 
     Tiga kegagalan yang berbeda dibedakan di sini, karena yang membacanya
@@ -301,14 +302,38 @@ def susun_berkas(kid: str) -> tuple:
         else None
     )
 
+    pabrik = _pabrik(sumber)
+
+    # Versi aturan disusun lebih dulu, dan itu disebut apa adanya kepada yang
+    # menonton. Ia bukan cadangan yang muncul kalau agen gagal, melainkan
+    # garis dasar yang harus dikalahkan agen. Menyembunyikannya membuat
+    # pekerjaan agen kelihatan lebih besar daripada yang sebenarnya.
+    #
+    # Ia dibangun di sini, bukan di dalam jalankan, supaya bisa dilaporkan.
+    # jalankan sudah menerimanya sebagai argumen sejak alat basis data ada.
+    if lapor:
+        lapor({{"jenis": "dasar"}})
+    dasar = susun(None, kid, perkakas=pabrik)
+    if lapor:
+        lapor(
+            {{
+                "jenis": "dasar_siap",
+                "n_panggilan": dasar["ringkas_jejak"]["n_panggilan"],
+                "n_kata": len(dasar["teks"].split()),
+                "teks": dasar["teks"],
+            }}
+        )
+
     h = jalankan(
         None,
         kid,
         penutur=penutur,
         anggaran=ANGGARAN,
         gerbang=gerbang,
-        perkakas=_pabrik(sumber),
+        perkakas=pabrik,
         menahan=_menahan(sumber, kid),
+        dasar=dasar,
+        lapor=lapor,
     )
 
     keluar = {{
@@ -357,7 +382,40 @@ class handler(BaseHTTPRequestHandler):
     def do_OPTIONS(self):  # noqa: N802
         self._jawab(200, {{}})
 
-    def _kerjakan(self, kid: str) -> None:
+    def _alirkan(self, kid: str) -> None:
+        """Kirim tiap langkah begitu ia selesai, lewat peristiwa terkirim.
+
+        Lingkaran agennya sepuluh sampai tiga puluh detik. Tanpa aliran ini
+        yang menunggu cuma melihat tombol berputar selama itu, dan proses
+        yang tidak kelihatan sama saja dengan proses yang tidak ada.
+
+        Yang dikirim langkah yang sudah lewat beserta lamanya yang
+        sebenarnya. Tidak ada satu pun angka di sini yang ditebak dari
+        pengatur waktu di peramban.
+        """
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream; charset=utf-8")
+        # no-transform dan X-Accel-Buffering menahan perantara menahan
+        # potongannya sampai penuh. Tanpa keduanya, yang sampai ke peramban
+        # satu bongkah di akhir, dan seluruh gunanya hilang.
+        self.send_header("Cache-Control", "no-cache, no-transform")
+        self.send_header("X-Accel-Buffering", "no")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Headers", "content-type")
+        self.end_headers()
+
+        def kirim(e):
+            baris = "data: " + json.dumps(e, ensure_ascii=False) + "\n\n"
+            self.wfile.write(baris.encode("utf-8"))
+            self.wfile.flush()
+
+        try:
+            kode, badan = susun_berkas(kid, kirim)
+            kirim({{"jenis": "selesai", "kode": kode, **badan}})
+        except Exception as e:  # noqa: BLE001
+            kirim({{"jenis": "galat", "galat": f"{{type(e).__name__}}: {{e}}"}})
+
+    def _kerjakan(self, kid: str, alir: bool = False) -> None:
         kid = kid.strip()
         # Nomor berkas masuk ke penyaring PostgREST, jadi bentuknya dibatasi
         # di sini, bukan dipercaya. Yang sah huruf K dan delapan angka.
@@ -365,14 +423,16 @@ class handler(BaseHTTPRequestHandler):
             salah = {{"galat": "nomor berkas tidak berbentuk K00000000"}}
             return self._jawab(422, salah)
         try:
+            if alir:
+                return self._alirkan(kid)
             kode, badan = susun_berkas(kid)
             self._jawab(kode, badan)
         except Exception as e:  # noqa: BLE001
             self._jawab(500, {{"galat": f"{{type(e).__name__}}: {{e}}"}})
 
     def do_GET(self):  # noqa: N802
-        q = urllib.parse.urlparse(self.path).query
-        self._kerjakan(urllib.parse.parse_qs(q).get("id", [""])[0])
+        q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+        self._kerjakan(q.get("id", [""])[0], alir=q.get("alir", ["0"])[0] == "1")
 
     def do_POST(self):  # noqa: N802
         try:
@@ -380,7 +440,7 @@ class handler(BaseHTTPRequestHandler):
             data = json.loads(self.rfile.read(n).decode("utf-8")) if n else {{}}
         except (ValueError, json.JSONDecodeError):
             return self._jawab(400, {{"galat": "badan bukan JSON"}})
-        self._kerjakan(str(data.get("id") or ""))
+        self._kerjakan(str(data.get("id") or ""), alir=bool(data.get("alir")))
 '''
 
 

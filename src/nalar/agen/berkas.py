@@ -229,6 +229,7 @@ def jalankan(
     perkakas=None,  # (Jejak) -> Perkakas
     dasar: dict | None = None,
     menahan: bool | None = None,
+    lapor=None,  # (dict) -> None, dipanggil tiap langkah selesai
 ) -> dict:
     """Berkas perkara untuk satu nomor, beserta jejak, biaya, dan keadaannya.
 
@@ -236,6 +237,7 @@ def jalankan(
     gerbang, bukan ketika melayani berkas sungguhan, karena harganya justru
     yang jadi alasan gerbangnya ada.
     """
+
     # Tiga hal bisa diberikan dari luar, dan ketiganya untuk satu keperluan:
     # menjalankan agen ini tanpa keadaan data di dalam memori. Alat yang
     # membaca basis data ada di alat_db.py, versi aturannya diambil dari
@@ -244,6 +246,17 @@ def jalankan(
     #
     # Yang tidak diberikan tetap dihitung seperti biasa, jadi jalur lama
     # tidak berubah satu langkah pun.
+    # Pelapor dipakai antarmuka yang menampilkan agen bekerja saat terjadi,
+    # bukan sesudah selesai. Yang dilaporkan langkah yang sudah lewat beserta
+    # lamanya yang sebenarnya, jadi tidak ada satu pun angka di layar yang
+    # ditebak dari pengatur waktu.
+    #
+    # Yang tidak memberikannya tidak membayar apa apa. Itu sebabnya
+    # pemanggilannya dibungkus, bukan diperiksa di tiap tempat.
+    def _lapor(**medan):
+        if lapor is not None:
+            lapor(medan)
+
     dasar = dasar if dasar is not None else susun(keadaan, id_berkas, perkakas)
     n_kata_dasar = len(dasar["teks"].split())
 
@@ -258,6 +271,19 @@ def jalankan(
     # hasil ini, sehingga rantai auditnya akan keluar kosong.
     alat = perkakas(jejak) if perkakas is not None else Perkakas(keadaan, jejak)
     p = Penyelia(alat, anggaran or Anggaran())
+
+    _lapor(
+        jenis="mulai",
+        berkas=id_berkas,
+        model=getattr(penutur, "model", "") or penutur.nama,
+        anggaran={
+            "giliran": p.anggaran.giliran,
+            "panggilan": p.anggaran.panggilan,
+            "detik": p.anggaran.detik,
+            "rp": p.anggaran.rp,
+        },
+        alat_tersedia=[a["name"] for a in p.perkakas.skema()],
+    )
 
     hasil_alat: list[dict] = []
     hasil_per_alat: dict[str, dict] = {}
@@ -278,6 +304,7 @@ def jalankan(
         ]
         try:
             while True:
+                _lapor(jenis="pikir", giliran=p.n_giliran + 1)
                 b = penutur.balas(pesan, p.perkakas.skema())
                 p.catat_balasan(b)
                 if not b.memanggil:
@@ -308,6 +335,17 @@ def jalankan(
                 )
                 for k, c in enumerate(b.panggilan):
                     jawab = p.panggil_lunak(c["nama"], **c["argumen"])
+                    catat = jejak.catatan[-1] if jejak.catatan else None
+                    _lapor(
+                        jenis="alat",
+                        urut=catat.urut if catat else 0,
+                        nama=c["nama"],
+                        argumen=c["argumen"],
+                        ms=catat.ms if catat else 0.0,
+                        berhasil=jawab["berhasil"],
+                        tolakan=jawab.get("tolakan", ""),
+                        sidik=catat.sidik if catat else "",
+                    )
                     if jawab["berhasil"]:
                         hasil_alat.append(jawab["hasil"])
                         hasil_per_alat[c["nama"]] = jawab["hasil"]
@@ -371,6 +409,7 @@ def jalankan(
                 break
 
     if teks and not sebab_mundur:
+        _lapor(jenis="tulis", n_kata=len(teks.split()))
         # Angkanya dipasang di sini, bukan diketik model. Alasannya panjang
         # dan ada di isian.py: percobaan pertama dengan model sungguhan
         # jatuh di penjaga A1 karena model menghitung sendiri selisihnya.
@@ -383,6 +422,12 @@ def jalankan(
             # belas berkas lolos membawa angka yang sah pada nama yang salah.
             cepat = periksa_cepat(teks, jejak, fakta)
             saring = periksa_dalam(teks, jejak, fakta, hasil_alat)
+            _lapor(
+                jenis="periksa",
+                a1=cepat["a1"],
+                lulus_dalam=saring["lulus"],
+                cacat=saring["cacat"],
+            )
             if not saring["lulus"]:
                 jenis = sorted({c["jenis"] for c in saring["cacat"]})
                 sebab_mundur = f"berkas susunan agen jatuh di saringan: {jenis}"
