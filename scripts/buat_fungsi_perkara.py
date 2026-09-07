@@ -166,6 +166,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _nalar.alat import GalatAlat  # noqa: E402
 from _nalar.alat_db import PerkakasBasisData, SumberBasisData  # noqa: E402
 from _nalar.berkas import jalankan  # noqa: E402
+from _nalar.dalam import periksa_cepat, periksa_dalam  # noqa: E402
 from _nalar.gerbang import Gerbang  # noqa: E402
 from _nalar.jejak import Jejak  # noqa: E402
 from _nalar.penutur import PenuturBerantai, PenuturSetempat  # noqa: E402
@@ -406,6 +407,48 @@ def susun_berkas(kid: str, lapor=None, model: str = "", uji: str = "") -> tuple:
     return 200, keluar
 
 
+def periksa_berkas(kid: str, teks: str) -> tuple:
+    """Jalankan penjaga angka pada naskah yang dikirim, bukan yang disusun.
+
+    Gunanya menunjukkan. Sifat A1 selama ini hanya bisa dibaca sebagai
+    kalimat di halaman, dan kalimat tentang penjaga tidak membuktikan
+    penjaganya ada. Yang dikirim ke sini naskah yang satu angkanya sengaja
+    diubah, dan yang dijawab putusan penjaga yang sama persis dengan yang
+    dipakai melayani berkas sungguhan.
+
+    Jejak pembandingnya jejak versi aturan, disusun ulang di sini. Alat yang
+    dipanggilnya sama dengan yang dipanggil agen, jadi himpunan angka yang
+    pernah dikembalikan alat juga sama. Modelnya tidak dipanggil sama
+    sekali, jadi jalur ini murah dan jawabannya selalu sama.
+    """
+    if not (DB_URL and DB_KUNCI):
+        return 503, {{"galat": "alamat basis data belum disetel pada fungsi ini"}}
+    if not teks.strip():
+        return 422, {{"galat": "naskah kosong"}}
+    if len(teks) > 20000:
+        return 422, {{"galat": "naskah terlalu panjang"}}
+
+    sumber = SumberBasisData(DB_URL, DB_KUNCI)
+    try:
+        if not sumber.satu(f"berkas?id=eq.{{urllib.parse.quote(kid)}}&select=id"):
+            return 404, {{"galat": f"berkas {{kid}} tidak ada pada peragaan ini"}}
+    except GalatAlat as e:
+        return 502, {{"galat": str(e)}}
+
+    dasar = susun(None, kid, perkakas=_pabrik(sumber))
+    cepat = periksa_cepat(teks, dasar["jejak"], dasar["fakta"])
+    dalam = periksa_dalam(teks, dasar["jejak"], dasar["fakta"], dasar["hasil"])
+    return 200, {{
+        "id": kid,
+        "a1": cepat["a1"],
+        "lulus_dalam": dalam["lulus"],
+        "cacat": dalam["cacat"],
+        "lulus": bool(cepat["a1"]["lulus"] and dalam["lulus"]),
+        "n_panggilan": dasar["ringkas_jejak"]["n_panggilan"],
+        "sidik_akhir": dasar["ringkas_jejak"]["sidik_akhir"],
+    }}
+
+
 class handler(BaseHTTPRequestHandler):
     def _jawab(self, kode: int, badan: dict) -> None:
         isi = json.dumps(badan, ensure_ascii=False).encode("utf-8")
@@ -486,6 +529,20 @@ class handler(BaseHTTPRequestHandler):
             data = json.loads(self.rfile.read(n).decode("utf-8")) if n else {{}}
         except (ValueError, json.JSONDecodeError):
             return self._jawab(400, {{"galat": "badan bukan JSON"}})
+        # Naskah yang ikut pada badan berarti yang diminta pemeriksaan, bukan
+        # penyusunan. Keduanya dipisah di sini supaya jalur penyusunan tidak
+        # pernah menerima naskah dari luar.
+        teks = data.get("teks")
+        if isinstance(teks, str):
+            kid = str(data.get("id") or "").strip()
+            if not (len(kid) == 9 and kid[0] == "K" and kid[1:].isdigit()):
+                salah = {{"galat": "nomor berkas tidak berbentuk K00000000"}}
+                return self._jawab(422, salah)
+            try:
+                kode, badan = periksa_berkas(kid, teks)
+                return self._jawab(kode, badan)
+            except Exception as e:  # noqa: BLE001
+                return self._jawab(500, {{"galat": f"{{type(e).__name__}}: {{e}}"}})
         self._kerjakan(
             str(data.get("id") or ""),
             alir=bool(data.get("alir")),
