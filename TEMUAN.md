@@ -2588,3 +2588,25 @@ Sesudah perbaikan, tolok ukur dua puluh empat surat tetap sempurna pada
 ingatan dan ketepatan, dan kode yang dibuang penjaga kutipan turun jadi nol.
 Alasan yang tercetak menyebut kutipan model tidak terbaca, supaya
 verifikator tahu mana yang dibuktikan kutipan dan mana yang dibuktikan nama.
+
+### Agennya sampai ke tangan pengunjung
+
+Peragaan membaca Supabase, bukan peladen Python, karena tidak ada mesin yang
+menyalakan model bahasa dua puluh empat jam. Akibatnya selama ini seluruh
+berkas perkara di sana versi aturan, dan pengunjung tidak pernah melihat satu
+pun keluaran agen.
+
+Enam puluh berkas dengan selisih terbesar sekarang disusun Agen Berkas di
+mesin ini, lengkap dengan jejak alat dan sidik rantainya, lalu disimpan apa
+adanya. Layar klaim menyebut siapa yang menyusunnya, dan sidik rantainya
+tercetak di bawah naskah supaya bisa dicocokkan.
+
+Jalan pertamanya salah dunia. Pemuatnya memakai 1500 peserta 2 tahun,
+sedangkan peragaannya dibangun dari 8000 peserta 3 tahun, jadi berkasnya
+tersimpan untuk nomor klaim yang tidak ada di sana. Layar klaimnya menjawab
+"K00000401 tidak ada" ketika dibuka sebagai pengunjung, dan itu yang
+menemukannya. Bukan uji, lagi lagi.
+
+Barisnya dihapus, parameternya disamakan, dan penjaganya sekarang menanyakan
+lebih dulu apakah nomor yang disusun ada di tabel peragaan. Kalau tidak,
+skripnya berhenti tanpa menulis apa pun.
