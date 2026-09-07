@@ -68,8 +68,12 @@ import urllib.error
 import urllib.request
 from http.server import BaseHTTPRequestHandler
 
-ALAMAT = os.environ.get("NALAR_MODEL_URL", "https://api.cerebras.ai/v1")
-MODEL = os.environ.get("NALAR_MODEL", "qwen-3.8-27b")
+# Bawaannya Groq, karena ia gratis tanpa kartu dan seluruh modelnya
+# mendukung pemanggilan alat. Modelnya sekeluarga dengan model setempat yang
+# dipakai mengukur, jadi perilakunya paling dekat dengan angka yang sudah ada.
+# Penyedia lain cukup diganti lewat peubah lingkungan, tanpa menyentuh kode.
+ALAMAT = os.environ.get("NALAR_MODEL_URL", "https://api.groq.com/openai/v1")
+MODEL = os.environ.get("NALAR_MODEL", "qwen/qwen3.6-27b")
 KUNCI = os.environ.get("NALAR_MODEL_KEY", "")
 TENGGAT = float(os.environ.get("NALAR_MODEL_TENGGAT", "25"))
 '''
