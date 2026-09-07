@@ -2652,3 +2652,48 @@ dasarnya sudah kami lihat sebelum ambangnya ditetapkan.
 Jadi yang berdiri di sini satu ukuran yang lebih layak dipercaya, beserta
 angkanya di luar sampel. Sebutan target baru saya tahan sampai ada pihak
 yang tidak ikut mengukur yang menuliskannya.
+
+### Agen yang benar benar dipakai pengunjung, dan dua cacat yang cuma model lain bisa temukan
+
+Sampai hari ini yang dilihat pengunjung keluaran agen yang disimpan lebih
+dulu. Sekarang satu agen benar benar bekerja saat itu juga, di situs publik,
+tanpa mesin yang menyala dua puluh empat jam.
+
+Agen Sanggah yang bisa begitu, dan alasannya struktural. Ia satu satunya
+agen yang tidak butuh keadaan data maupun penebak terlatih. Yang
+diperlukannya surat dari pengunjung, katalog pemeriksaan, dan satu model.
+Ketiganya muat di fungsi tanpa peladen.
+
+Penyedianya Groq, gratis tanpa kartu, dan modelnya gpt-oss-120b. Pilihan itu
+diukur bukan ditebak. Qwen di sana berpikir dulu sebelum menjawab, tiga kali
+lebih lambat dan lebih sering kehilangan pemeriksaan kedua pada satu surat.
+
+Cerebras dicoba lebih dulu dan menolak dengan kuota habis. Halaman harganya
+menyebut lima dolar kredit percobaan, sedangkan blog yang saya pakai riset
+menyebut sejuta token per hari. Blognya salah, dan saya sempat meneruskan
+angka itu sebelum memeriksanya ke sumber resmi.
+
+### Model yang berbeda memunculkan cacat yang model lama sembunyikan
+
+Angka pertama lewat Groq 21 dari 24 surat, di bawah model setempat yang 24
+dari 24. Sebabnya bukan modelnya.
+
+Yang pertama batas laju. Dua puluh empat surat terkirim dalam sebelas detik,
+jauh di atas jatah per menit, dan yang tertolak dihitung sebagai gagal
+membaca. Sekarang penutur mengulang dengan jeda bertahap, dan jedanya
+diambil dari kepala Retry-After kalau penyedianya mengirimkannya. Tanpa itu,
+pengunjung kedua yang menekan tombol pada menit yang sama akan mendapat
+kegagalan diam diam.
+
+Yang kedua penjaga kutipan kami sendiri. Ia menuntut kutipan sekurangnya dua
+kata, dan model awan mengutip "HbA1c" sebagai satu kata. Kutipan itu bukti
+terkuat yang bisa ada, dan penjaganya membuangnya.
+
+Syarat dua kata itu memang sewenang wenang sejak awal. Yang menjaganya
+syarat berikutnya, bahwa sekurangnya satu kata harus di luar daftar kata
+umum, dan syarat itu sudah cukup sendiri. Model setempat tidak pernah
+mengutip satu kata, jadi cacat itu tidur selama dua puluh empat surat, dua
+puluh sembilan uji, dan satu pemeriksaan enam agen.
+
+Sesudah keduanya diperbaiki, model awan dan model setempat sama sama 24 dari
+24 dengan ingatan dan ketepatan penuh.
