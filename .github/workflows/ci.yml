@@ -65,6 +65,12 @@ jobs:
       # Lapisan agen. Yang paling penting di antaranya penjaga A1: tidak ada
       # satu pun angka pada berkas perkara yang tidak berasal dari alat.
       # Diukur pada enam puluh berkas tiap kali alur ini jalan.
+      # Alat basis data, yang menjaga dua janji sekaligus: tidak ada alat yang
+      # bisa mengubah penilaian, dan alat yang tidak ditawarkan tidak pernah
+      # muncul pada skema yang dilihat model.
+      - name: uji alat basis data
+        run: python tests/test_alat_db.py
+
       - name: uji lapisan agen
         run: python tests/test_agen.py
 

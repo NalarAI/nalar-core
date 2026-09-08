@@ -53,6 +53,13 @@ if not (URL and KUNCI):
     print("\n0 lulus, 0 gagal")
     sys.exit(0)
 
+try:
+    import sklearn  # noqa: F401
+except ImportError:
+    print("\nDILEWATI  scikit-learn tidak terpasang")
+    print("          pasang dengan: pip install '.[dev]'")
+    sys.exit(0)
+
 from nalar.agen.alat import Perkakas  # noqa: E402
 from nalar.agen.alat_db import PerkakasBasisData, SumberBasisData  # noqa: E402
 from nalar.agen.jejak import Jejak  # noqa: E402

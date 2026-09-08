@@ -43,6 +43,13 @@ except ImportError:
     print("          pasang dengan: pip install '.[api,dev]'")
     sys.exit(0)
 
+try:
+    import sklearn  # noqa: F401
+except ImportError:
+    print("\nDILEWATI  scikit-learn tidak terpasang")
+    print("          pasang dengan: pip install '.[dev]'")
+    sys.exit(0)
+
 from nalar.api import keadaan as _k  # noqa: E402
 
 # Peladen aslinya memakai delapan ribu peserta. Untuk uji, jaringannya

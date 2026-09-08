@@ -42,6 +42,13 @@ except ImportError:
     print("          pasang dengan: pip install '.[api,dev]'")
     sys.exit(0)
 
+try:
+    import sklearn  # noqa: F401
+except ImportError:
+    print("\nDILEWATI  scikit-learn tidak terpasang")
+    print("          pasang dengan: pip install '.[dev]'")
+    sys.exit(0)
+
 from nalar.api import keadaan as _k  # noqa: E402
 
 _k.KEADAAN.__init__(n_peserta=1200, tahun=2, seed=7, n_fktp=60, n_fkrtl=20)
